@@ -1,0 +1,11 @@
+*.out*
+*.o*
+.vscode*
+*test*
+**.sh*
+*vgcore*
+.cache*
+compile_commands.json
+zappy_server
+zappy_gui
+zappy_ai
