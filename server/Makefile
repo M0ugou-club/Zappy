@@ -24,7 +24,6 @@ CFLAGS = -I./include
 
 $(NAME): $(OBJ)
 	@gcc $(CFLAGS) -o $(NAME) $(OBJ)
-	@cp $(NAME) ../$(NAME)
 
 %.o: %.c
 	@gcc $(CFLAGS) -o $@ -c $<
