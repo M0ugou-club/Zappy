@@ -21,9 +21,11 @@ CFLAGS = -I./include
 
 $(NAME): $(OBJ)
 	@gcc $(CFLAGS) -o $(NAME) $(OBJ)
+	@mv $(NAME) ../$(NAME)
 
 %.o: %.c
 	@gcc $(CFLAGS) -o $@ -c $<
+	@echo -e "\033[0;32m[OK] \033[0m\033[0;36m$<\033[0m"
 
 all: $(NAME)
 
