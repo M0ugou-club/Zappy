@@ -14,6 +14,9 @@ SRC =	src/main.c \
 		src/game/free_game.c \
 		src/socket/init_socket.c \
 		src/socket/free_socket.c \
+		src/connection/add_connection.c \
+		src/connection/free_connection.c \
+		src/connection/new_connection.c \
 
 OBJ = $(SRC:.c=.o)
 
