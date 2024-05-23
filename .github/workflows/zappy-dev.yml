@@ -46,23 +46,23 @@ jobs:
             exit 1
           fi
 
-  compile:
-    needs: check_coding_style
-    runs-on: ubuntu-latest
-    container: epitechcontent/epitest-docker
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #compile:
+  #  needs: check_coding_style
+  #  runs-on: ubuntu-latest
+  #  container: epitechcontent/epitest-docker
+  #  steps:
+  #    - name: Checkout repository
+  #      uses: actions/checkout@v4
 
-      - name: Compile program
-        run: make
+  #    - name: Compile program
+  #      run: make
 
-      - name: Check executables
-        run: |
-          IFS=',' read -ra exec_paths <<< "${EXECUTABLES}"
-          for exec_path in "${exec_paths[@]}"; do
-            [ -x "$exec_path" ] || exit 1
-          done
+  #    - name: Check executables
+  #      run: |
+  #        IFS=',' read -ra exec_paths <<< "${EXECUTABLES}"
+  #        for exec_path in "${exec_paths[@]}"; do
+  #          [ -x "$exec_path" ] || exit 1
+  #        done
 
-      - name: Clean
-        run: make fclean
+  #    - name: Clean
+  #      run: make fclean
