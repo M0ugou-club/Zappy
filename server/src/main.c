@@ -10,5 +10,6 @@
 int main(int argc, char **argv)
 {
     server_t *server = NULL;
+
     return EXIT_SUCCESS;
 }

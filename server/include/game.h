@@ -8,7 +8,7 @@
 #ifndef GAME_H_
     #define GAME_H_
 
-#include <stdlib.h>
+    #include <stdlib.h>
 
 typedef enum direction_e {
     NORTH,
