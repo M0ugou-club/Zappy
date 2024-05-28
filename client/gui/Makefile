@@ -11,6 +11,8 @@ SRC = gui.cpp
 
 SRC := $(addprefix src/, $(SRC))
 
+OBJ = $(SRC:.cpp=.o)
+
 CXX = g++
 
 COLOR_GREEN = \033[0;32m
@@ -22,19 +24,19 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -lraylib
 
 all: $(NAME)
 
-$(NAME):
-	$(CXX) $(CXXFLAGS) -o $(NAME) $(SRC)
-	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_GREEN)$(NAME) compiled$(COLOR_RESET)"
+$(NAME): $(OBJ)
+	@$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
+	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME) $(COLOR_BLUE)compiled$(COLOR_RESET)"
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$@$(COLOR_RESET)"
+	@$(CXX) $(CXXFLAGS) -o $@ -c $<
+	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_BLUE)$< $(COLOR_RESET)"
 
 clean:
-	rm -f *.o
+	@rm -f $(OBJ)
 
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 re: fclean all
 

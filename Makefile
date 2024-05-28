@@ -18,37 +18,37 @@ COLOR_BLUE = \033[0;34m
 COLOR_YELLOW = \033[0;33m
 COLOR_RESET = \033[0m
 
-all: $(NAME_SERVER) $(NAME_AI) $(NAME_GUI)
+all: server gui ai
 
 server:
-	$(MAKE) -C $(SERVER_PATH)
-	mv $(SERVER_PATH)/$(NAME_SERVER) .
-	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW) $(COLOR_BLUE)moved to root directory$(COLOR_RESET)"
+	@$(MAKE) -C $(SERVER_PATH)
+	@mv $(SERVER_PATH)/$(NAME_SERVER) .
+	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME_SERVER) $(COLOR_BLUE)moved to root directory$(COLOR_RESET)"
 
 ai:
-	$(MAKE) -C $(AI_PATH)
-	mv $(AI_PATH)/$(NAME_AI) .
+	@$(MAKE) -C $(AI_PATH)
+	@mv $(AI_PATH)/$(NAME_AI) .
 	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME_AI) $(COLOR_BLUE)moved to root directory$(COLOR_RESET)"
 
 gui:
-	$(MAKE) -C $(GUI_PATH)
-	mv $(GUI_PATH)/$(NAME_GUI) .
+	@$(MAKE) -C $(GUI_PATH)
+	@mv $(GUI_PATH)/$(NAME_GUI) .
 	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME_GUI) $(COLOR_BLUE)moved to root directory$(COLOR_RESET)"
 
 
 clean:
-	$(MAKE) -C server clean
-	$(MAKE) -C ai clean
-	$(MAKE) -C gui clean
+	@$(MAKE) -C $(SERVER_PATH) clean
+	@$(MAKE) -C $(GUI_PATH) clean
+	@$(MAKE) -C $(AI_PATH) clean
 
-fclean:
-	rm -f $(NAME_SERVER) $(NAME_AI) $(NAME_GUI)
+fclean: clean
+	@rm -f $(NAME_SERVER) $(NAME_AI) $(NAME_GUI)
 
 re: fclean all
 
 debug:
-	$(MAKE) -C server debug
-	$(MAKE) -C ai debug
-	$(MAKE) -C gui debug
+	@$(MAKE) -C $(SERVER_PATH) debug
+	@$(MAKE) -C $(GUI_PATH) debug
+	@$(MAKE) -C $(AI_PATH) debug
 
 .PHONY: all server ai gui clean fclean re debug
