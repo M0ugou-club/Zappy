@@ -30,10 +30,6 @@ typedef enum item_e {
 
 typedef struct square_s {
     item_t items[NONE];
-    struct square_s *north;
-    struct square_s *south;
-    struct square_s *east;
-    struct square_s *west;
 } square_t;
 
 typedef struct player_s {
@@ -46,7 +42,9 @@ typedef struct player_s {
 } player_t;
 
 typedef struct game_s {
-    struct square_s *map;
+    int map_x;
+    int map_y;
+    struct square_s **map;
     struct player_s *players;
     char **teams;
 } game_t;
