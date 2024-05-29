@@ -60,7 +60,7 @@ typedef struct player_s {
 typedef struct game_s {
     int map_x;
     int map_y;
-    struct density_s *max_items;
+    struct max_items_s *max_items;
     struct square_s **map;
     struct player_s *players;
     char **teams;
@@ -69,5 +69,6 @@ typedef struct game_s {
 game_t *init_game(int x, int y, char **teams);
 void free_game(game_t *game);
 max_items_t *fill_density(int x, int y);
+void place_items_randomly(game_t *game);
 
 #endif /* !GAME_H_ */
