@@ -1,12 +1,13 @@
-name: Zappy Dev CI
+name: Zappy main CI/CD
 on:
   workflow_dispatch:
   push:
     branches:
-      - dev
-  pull_request:
-    branches:
-      - dev
+      - main
+
+env:
+  SOURCE_REPO: "git@github.com:M0ugou-club/Zappy.git" #Insert source url of the git source repo
+  DEST_REPO: "github.com/EpitechPromo2027/B-YEP-400-TLS-4-1-zappy-alberic.flour-de-saegher.git" #Insert Destination url of the git dest rep
 
 jobs:
   check_repo:
@@ -47,23 +48,36 @@ jobs:
             exit 1
           fi
 
-  #compile:
-  #  needs: check_coding_style
-  #  runs-on: ubuntu-latest
-  #  container: epitechcontent/epitest-docker
-  #  steps:
-  #    - name: Checkout repository
-  #      uses: actions/checkout@v4
+  compile:
+    needs: check_coding_style
+    runs-on: ubuntu-latest
+    container: epitechcontent/epitest-docker
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  #    - name: Compile program
-  #      run: make
+      - name: Compile program
+        run: make
 
-  #    - name: Check executables
-  #      run: |
-  #        IFS=',' read -ra exec_paths <<< "${EXECUTABLES}"
-  #        for exec_path in "${exec_paths[@]}"; do
-  #          [ -x "$exec_path" ] || exit 1
-  #        done
+      - name: Check executables
+        run: |
+          IFS=',' read -ra exec_paths <<< "${EXECUTABLES}"
+          for exec_path in "${exec_paths[@]}"; do
+            [ -x "$exec_path" ] || exit 1
+          done
 
-  #    - name: Clean
-  #      run: make fclean
+      - name: Clean
+        run: make fclean
+
+  git-sync:
+    needs: check_repo
+    runs-on: ubuntu-latest
+    steps:
+      - name: git-sync
+        uses: wei/git-sync@v3
+        with:
+          source_repo: ${{ env.SOURCE_REPO }}
+          source_branch: "main"
+          destination_repo: ${{ env.DEST_REPO }}
+          destination_branch: "main"
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
