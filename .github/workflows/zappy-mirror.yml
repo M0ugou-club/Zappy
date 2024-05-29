@@ -1,9 +1,13 @@
-name: Zappy mirror CI/CD
+name: Zappy main CI/CD
 on:
   workflow_dispatch:
-  pull-request:
+  push:
     branches:
       - main
+
+env:
+  SOURCE_REPO: "git@github.com:M0ugou-club/Zappy.git" #Insert source url of the git source repo
+  DEST_REPO: "github.com/EpitechPromo2027/B-YEP-400-TLS-4-1-zappy-alberic.flour-de-saegher.git" #Insert Destination url of the git dest rep
 
 jobs:
   check_repo:
@@ -64,3 +68,16 @@ jobs:
 
       - name: Clean
         run: make fclean
+
+  git-sync:
+    needs: check_repo
+    runs-on: ubuntu-latest
+    steps:
+      - name: git-sync
+        uses: wei/git-sync@v3
+        with:
+          source_repo: ${{ env.SOURCE_REPO }}
+          source_branch: "main"
+          destination_repo: ${{ env.DEST_REPO }}
+          destination_branch: "main"
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
