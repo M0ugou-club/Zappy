@@ -48,6 +48,7 @@ typedef struct player_s {
 typedef struct game_s {
     struct square_s *map;
     struct player_s *players;
+    int max_players;
     char **teams;
 } game_t;
 
