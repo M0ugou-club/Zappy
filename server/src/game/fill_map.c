@@ -26,7 +26,8 @@ max_items_t *fill_density(int x, int y)
 
 static void place_food(game_t *game)
 {
-    int x, y;
+    int x;
+    int y;
     int count;
 
     srand(time(NULL));
@@ -39,7 +40,8 @@ static void place_food(game_t *game)
 
 static void place_linemate(game_t *game)
 {
-    int x, y;
+    int x;
+    int y;
     int count;
 
     srand(time(NULL));
@@ -52,7 +54,8 @@ static void place_linemate(game_t *game)
 
 static void place_deraumere(game_t *game)
 {
-    int x, y;
+    int x;
+    int y;
     int count;
 
     srand(time(NULL));
@@ -65,7 +68,8 @@ static void place_deraumere(game_t *game)
 
 static void place_sibur(game_t *game)
 {
-    int x, y;
+    int x;
+    int y;
     int count;
 
     srand(time(NULL));
@@ -78,7 +82,8 @@ static void place_sibur(game_t *game)
 
 static void place_mendiane(game_t *game)
 {
-    int x, y;
+    int x;
+    int y;
     int count;
 
     srand(time(NULL));
@@ -91,7 +96,8 @@ static void place_mendiane(game_t *game)
 
 static void place_phiras(game_t *game)
 {
-    int x, y;
+    int x;
+    int y;
     int count;
 
     srand(time(NULL));
@@ -104,7 +110,8 @@ static void place_phiras(game_t *game)
 
 static void place_thystame(game_t *game)
 {
-    int x, y;
+    int x;
+    int y;
     int count;
 
     srand(time(NULL));
