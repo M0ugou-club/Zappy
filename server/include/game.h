@@ -28,8 +28,24 @@ typedef enum item_e {
     NONE
 } item_t;
 
+typedef struct max_items_s {
+    int food;
+    int linemate;
+    int deraumere;
+    int sibur;
+    int mendiane;
+    int phiras;
+    int thystame;
+} max_items_t;
+
 typedef struct square_s {
-    item_t items[NONE];
+    int food;
+    int linemate;
+    int deraumere;
+    int sibur;
+    int mendiane;
+    int phiras;
+    int thystame;
 } square_t;
 
 typedef struct player_s {
@@ -44,6 +60,7 @@ typedef struct player_s {
 typedef struct game_s {
     int map_x;
     int map_y;
+    struct density_s *max_items;
     struct square_s **map;
     struct player_s *players;
     char **teams;
@@ -51,5 +68,6 @@ typedef struct game_s {
 
 game_t *init_game(int x, int y, char **teams);
 void free_game(game_t *game);
+max_items_t *fill_density(int x, int y);
 
 #endif /* !GAME_H_ */
