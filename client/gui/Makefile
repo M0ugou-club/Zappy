@@ -7,7 +7,8 @@
 
 NAME = zappy_gui
 
-SRC = gui.cpp
+SRC = gui.cpp \
+		Args.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 
@@ -26,8 +27,8 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
-	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME) $(COLOR_BLUE)\
-		compiled$(COLOR_RESET)"
+	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME) $(COLOR_BLUE)"\
+		" compiled$(COLOR_RESET)"
 
 %.o: %.cpp
 	@$(CXX) $(CXXFLAGS) -o $@ -c $<
