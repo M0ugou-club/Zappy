@@ -17,6 +17,7 @@ SRC =	src/main.c \
 		src/connection/add_connection.c \
 		src/connection/free_connection.c \
 		src/connection/new_connection.c \
+		src/game/fill_map.c \
 
 OBJ = $(SRC:.c=.o)
 
