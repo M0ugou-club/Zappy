@@ -7,7 +7,8 @@
 
 NAME = zappy_gui
 
-SRC = gui.cpp
+SRC = main.cpp \
+	  Gui.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 
