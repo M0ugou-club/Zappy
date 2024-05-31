@@ -5,6 +5,8 @@
 ** gui
 */
 
-int main() {
-    return 0;
+#include "Args.hpp"
+
+int main(int ac, char **av) {
+    Args::main_example(ac, av);
 }

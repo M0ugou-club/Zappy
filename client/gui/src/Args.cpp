@@ -6,6 +6,7 @@
 */
 
 #include "Args.hpp"
+#include "ServerConnection.hpp"
 
 #include <memory>
 
@@ -23,8 +24,11 @@ int Args::main_example(int ac, char **av)
     std::string ip = args.getIp();
     int port = args.getPort();
 
-    std::cout << "ip: " << ip << std::endl;
-    std::cout << "port: " << port << std::endl;
+    ServerConnection server(ip, port);
+    server.connectToServer();
+    std::string response = server.tryReceive();
+    std::cout << response << std::endl;
+    server.disconnectFromServer();
 
     return 0;
 }

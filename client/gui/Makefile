@@ -9,6 +9,7 @@ NAME = zappy_gui
 
 SRC = gui.cpp \
 		Args.cpp \
+		ServerConnection.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 

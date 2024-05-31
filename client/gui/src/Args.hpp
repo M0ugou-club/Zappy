@@ -13,8 +13,6 @@
 #include <vector>
 
 class Args {
-    static int main_example(int ac, char **av);
-    static bool isNumber(const std::string &str);
 
     class BadArgumentException : public std::exception {
         public:
@@ -27,6 +25,9 @@ class Args {
     };
 
     public:
+        static int main_example(int ac, char **av);
+        static bool isNumber(const std::string &str);
+
         Args(int ac, char **av);
         ~Args();
 
