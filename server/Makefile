@@ -10,14 +10,20 @@ NAME = zappy_server
 SRC =	src/main.c \
 		src/server/init_server.c \
 		src/server/free_server.c \
+		src/server/run_server.c \
+		src/args/get_args.c \
+		src/args/free_args.c \
+		src/args/set/set_port.c \
+		src/args/set/set_size.c \
+		src/args/set/set_game_properties.c \
 		src/game/init_game.c \
 		src/game/free_game.c \
+		src/game/fill_map.c \
 		src/socket/init_socket.c \
 		src/socket/free_socket.c \
 		src/connection/add_connection.c \
 		src/connection/free_connection.c \
 		src/connection/new_connection.c \
-		src/game/fill_map.c \
 
 OBJ = $(SRC:.c=.o)
 
