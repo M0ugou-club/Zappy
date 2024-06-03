@@ -10,6 +10,8 @@
 
 #include <iostream>
 #include <raylib/raylib-cpp.hpp>
+#include "Map.hpp"
+#include "Camera.hpp"
 
 class Gui {
     public:
@@ -21,6 +23,8 @@ class Gui {
     private:
         int _width;
         int _height;
+        Camera _camera;
+        Map _map;
 };
 
 #endif /* !GUI_HPP_ */
