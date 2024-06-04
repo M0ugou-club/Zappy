@@ -7,6 +7,28 @@
 
 #include "server.h"
 
+void cmd_exit(server_t *srv, connection_t *cl, regex_parse_t *parse)
+{
+    SEND(cl, "exit\n");
+    close(cl->fd);
+}
+
+static const command_regex_t CMDS[] = {
+    {"Forward$", NULL},
+    {"Right$", NULL},
+    {"Left$", NULL},
+    {"Look$", NULL},
+    {"Inventory$", NULL},
+    {"Broadcast (.+)$", NULL},
+    {"Connect_nbr$", NULL},
+    {"Fork$", NULL},
+    {"Eject$", NULL},
+    {"Take ([a-z]+)$", NULL},
+    {"Set ([a-z]+)$", NULL},
+    {"Incantation$", NULL},
+    {NULL, NULL}
+};
+
 static char *get_arg(const char *src, size_t start, size_t end)
 {
     char *dest = malloc(end - start + 1);
@@ -19,10 +41,35 @@ static char *get_arg(const char *src, size_t start, size_t end)
     return dest;
 }
 
-// TODO: Implement the regex parsing
+static void replace_cr(char *str)
+{
+    for (size_t i = 0; str[i] != '\0'; i++)
+        if (str[i] == '\r')
+            str[i] = '\0';
+}
+
 static void execute(char *cmd, int client_fd, server_t *srv)
 {
-    return;
+    int regex_ret = 0;
+    regex_t *regex = malloc(sizeof(regex_t));
+    regex_parse_t parse = {0};
+
+    replace_cr(cmd);
+    parse.str = cmd;
+    memset(parse.pmatch, 0, sizeof(parse.pmatch));
+    for (int i = 0; CMDS[i].command != NULL; i++) {
+        regex_ret = regcomp(regex, CMDS[i].command, REG_EXTENDED);
+        if (regex_ret != 0)
+            continue;
+        regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
+        if (regex_ret == 0) {
+            CMDS[i].func(srv, get_client_by_fd(srv->cons, client_fd), &parse);
+            regfree(regex);
+            return;
+        }
+        regfree(regex);
+    }
+    SEND_FD(client_fd, CMD_ERROR);
 }
 
 static char *new_buffer(connection_t *client, char *tmp)

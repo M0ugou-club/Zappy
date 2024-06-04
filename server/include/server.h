@@ -12,14 +12,18 @@
     #define EXIT_SUCCESS 0
 
     #define BUFFER_SIZE 1024
+    #define MAX_REGEX_MATCHES 16
 
     #define SEND(conn, msg) write(conn->fd, msg, strlen(msg))
     #define SEND_FD(fd, msg) write(fd, msg, strlen(msg))
+
+    #define CMD_ERROR "ko\n"
 
     #include <unistd.h>
     #include <stdlib.h>
     #include <string.h>
     #include <stdio.h>
+    #include <regex.h>
     #include "socket.h"
     #include "connection.h"
     #include "game.h"
@@ -64,6 +68,16 @@ typedef struct server_s {
     fd_set *readfds;
     fd_set *writefds;
 } server_t;
+
+typedef struct regex_parse_s {
+    const char *str;
+    regmatch_t pmatch[MAX_REGEX_MATCHES];
+} regex_parse_t;
+
+typedef struct command_regex_s {
+    char *command;
+    void (*func)(server_t *srv, connection_t *cl, regex_parse_t *parse);
+} command_regex_t;
 
 void build_sets(server_t *srv, connection_t *conn);
 connection_t *get_client_by_fd(connection_t *cl, int sockfd);
