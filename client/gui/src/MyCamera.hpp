@@ -28,7 +28,7 @@ class MyCamera {
     protected:
     private:
         raylib::Camera3D _camera = {};
-        raylib::Vector3 _position = {0.0f, 6.5f, 6.5f};
+        raylib::Vector3 _position = {0.0f, 0.0f, 0.0f};
         raylib::Vector3 _target = {0.0f, 0.0f, 0.0f};
         raylib::Vector3 _up = {0.0f, 1.0f, 0.0f};
         float _fovy = 90.0f;
