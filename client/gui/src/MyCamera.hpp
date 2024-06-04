@@ -17,8 +17,8 @@ class MyCamera {
         typedef enum move {
             LEFT,
             RIGHT,
-            ZOOM_IN,
-            ZOOM_OUT
+            FORWARD,
+            BACKWARD
         } move;
         MyCamera();
         ~MyCamera();
@@ -28,12 +28,12 @@ class MyCamera {
     protected:
     private:
         raylib::Camera3D _camera = {};
-        raylib::Vector3 _position = {0.0f, 10.0f, 10.0f};
+        raylib::Vector3 _position = {0.0f, 6.5f, 6.5f};
         raylib::Vector3 _target = {0.0f, 0.0f, 0.0f};
         raylib::Vector3 _up = {0.0f, 1.0f, 0.0f};
-        float _fovy = 45.0f;
+        float _fovy = 90.0f;
         int _type = CAMERA_PERSPECTIVE;
-        float _distance_to_target = 10.0f;
+        float _distance_to_target = 6.5f;
         float _angle = 0.0f;
         float _speed = 0.01f;
 };
