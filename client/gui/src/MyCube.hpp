@@ -20,12 +20,14 @@ class MyCube {
         Vector3 get_position() { return _position; }
         void set_position(Vector3 position) { _position = position; }
         void set_color(raylib::Color color) { _color = color; }
+        void set_border_color(Color color) { _border_color = color; }
 
     protected:
     private:
         Vector3 _position = {0.0f, 0.0f, 0.0f};
         Vector3 _size = {1.0f, 1.0f, 1.0f};
         raylib::Color _color = raylib::Color::Black();
+        Color _border_color = BLACK;
 };
 
 #endif /* !MYCUBE_HPP_ */

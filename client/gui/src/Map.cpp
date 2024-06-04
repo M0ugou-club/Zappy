@@ -31,8 +31,9 @@ void Map::init_map()
         std::vector<MyCube> tmp;
         for (int j = 0; j < _y; j++) {
             MyCube cube;
-            cube.set_position(Vector3{(float)i + 1, 0, (float)j});
+            cube.set_position(Vector3{(float)i - (_x / 2.0f - 0.5f), 0, (float)j - (_y / 2.0f - 0.5f)});
             cube.set_color(color ? raylib::Color::White() : raylib::Color::Black());
+            cube.set_border_color(color ? BLACK : WHITE);
             tmp.push_back(cube);
             color = !color;
         }
