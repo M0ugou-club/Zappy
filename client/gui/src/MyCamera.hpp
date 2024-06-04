@@ -22,15 +22,15 @@ class MyCamera {
         } move;
         MyCamera();
         ~MyCamera();
-        raylib::Camera3D get_camera() { return _camera; }
-        void move_camera(move direction);
+        raylib::Camera3D getCamera() { return _camera; }
+        void moveCamera(move direction);
 
     protected:
     private:
         raylib::Camera3D _camera = {};
-        Vector3 _position = {0.0f, 10.0f, 10.0f};
-        Vector3 _target = {0.0f, 0.0f, 0.0f};
-        Vector3 _up = {0.0f, 1.0f, 0.0f};
+        raylib::Vector3 _position = {0.0f, 10.0f, 10.0f};
+        raylib::Vector3 _target = {0.0f, 0.0f, 0.0f};
+        raylib::Vector3 _up = {0.0f, 1.0f, 0.0f};
         float _fovy = 45.0f;
         int _type = CAMERA_PERSPECTIVE;
         float _distance_to_target = 10.0f;

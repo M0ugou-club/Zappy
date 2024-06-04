@@ -20,7 +20,7 @@ MyCamera::~MyCamera()
 {
 }
 
-void MyCamera::move_camera(move direction)
+void MyCamera::moveCamera(move direction)
 {
     if (direction == LEFT) {
         _angle += _speed;
@@ -33,12 +33,12 @@ void MyCamera::move_camera(move direction)
         _position.z = _distance_to_target * sin(_angle);
     }
     if (direction == ZOOM_IN) {
-        _distance_to_target -= _speed;
+        _distance_to_target -= _speed * 4;
         _position.x = _distance_to_target * cos(_angle);
         _position.z = _distance_to_target * sin(_angle);
     }
     if (direction == ZOOM_OUT) {
-        _distance_to_target += _speed;
+        _distance_to_target += _speed * 4;
         _position.x = _distance_to_target * cos(_angle);
         _position.z = _distance_to_target * sin(_angle);
     }
