@@ -13,6 +13,7 @@ SRC = main.cpp \
 	  ServerConnection.cpp \
 	  Map.cpp \
 	  MyCamera.cpp \
+	  items/Item.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 
