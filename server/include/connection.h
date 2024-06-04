@@ -12,11 +12,13 @@
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <stdbool.h>
+    #include <string.h>
 
 typedef struct connection_s {
     int fd;
     struct sockaddr_in addr;
     char *buffer;
+    char **send_queue;
     char *team;
     struct connection_s *next;
 } connection_t;

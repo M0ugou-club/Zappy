@@ -13,7 +13,6 @@ void free_server(server_t *server)
     free(server->args);
     free(server->readfds);
     free(server->writefds);
-    free(server->exceptfds);
     free(server->cons);
     free(server->sock);
     free(server->game);

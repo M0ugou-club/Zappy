@@ -36,6 +36,7 @@ int set_teams(args_t *args, char **argv, int *i, int argc)
     }
     args->teams = malloc(sizeof(char *) * (count + 1));
     for (int j = 0; j < count; j++) {
+        args->teams[j] = malloc(strlen(argv[*i + 1 + j]) + 1);
         strcpy(args->teams[j], argv[*i + 1 + j]);
     }
     args->teams[count] = NULL;
