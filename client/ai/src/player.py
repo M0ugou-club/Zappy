@@ -1,3 +1,5 @@
+import random
+
 class Player:
     def __init__(self, team):
         self.team = team
@@ -15,16 +17,15 @@ class Player:
         self.is_incanting = False
 
 
-    def go_to(self, tile, searching_item : list) -> None:
+    def go_to(self, tile : list, pos : tuple, searching_item : list) -> None:
         '''go to the tile given in parameter'''
-        x, y = tile.get_coord
-        for _ in range(y):
+        for _ in range(pos.y):
             self.forward()
-        if x > 0:
+        if pos.x > 0:
             self.right()
-        elif x < 0:
+        elif pos.x < 0:
             self.left()
-        for _ in range(abs(x)):
+        for _ in range(abs(pos.x)):
             self.forward()
         self.get_object(tile, searching_item)
 
@@ -49,9 +50,9 @@ class Player:
         pass
 
 
-    def get_object(self, tile : list , items : list) -> None:
+    def get_object(self, tile : list , searching_item : list) -> None:
         '''take the item in the tile'''
-        for item in items:
+        for item in searching_item:
             if item in tile:
                 self.take(item)
 
@@ -107,6 +108,11 @@ class Player:
         pass
 
 
+    def recieve_broadcast(self) -> str:
+        '''recieve a broadcast'''
+        pass
+
+
     def connect_nbr(self) -> None:
         '''connect the player'''
         pass
@@ -132,10 +138,49 @@ class Player:
         pass
 
 
+    def get_correct_tile(looked: list,  searching_item : list) -> tuple[int, list]:
+        '''get the correct tile'''
+        for i in range(len(looked)):
+            for j in range(len(searching_item)):
+                if j in looked[i]:
+                    return i, looked[i]
+        return None
+
+
+    def get_pos(self, tile: int) -> tuple[int, int]:
+        '''set the coord of the tile'''
+        index = 0
+        for y in range(self.level + 1) :
+            for x in range(-y, y + 1) :
+                if index == tile:
+                    return x, y
+        return 0, 0
+
+
+    def search_object(self, looked: list, searching_item : list) -> None:
+        '''search the object in the tile'''
+        correct_tile = self.get_correct_tile(self.looked, searching_item)
+        if correct_tile:
+            self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
+        else :
+            self.go_to_direction(random.randint(1, 3))
+
+
     def survive(self) -> None:
         '''survive'''
-        pass
+        self.search_object(self.look(), ['food'])
+
 
     def expedition(self) -> None:
         '''expeditions'''
-        pass
+        self.search_object(self.look(), ['linemate', 'deraumere', 'sibur', 'mendiane', 'phiras', 'thystame'])
+
+
+    def run(self) -> None:
+        '''run the player'''
+        while (True):
+            if self.inventory['food'] < 10:
+                self.survive()
+            else:
+                self.expedition()
+            self.recieve_broadcast()
