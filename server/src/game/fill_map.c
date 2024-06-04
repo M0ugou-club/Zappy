@@ -8,7 +8,7 @@
 #include <time.h>
 #include "game.h"
 
-static const int density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
+static const float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
 
 max_items_t *fill_density(int x, int y)
 {

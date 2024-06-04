@@ -64,6 +64,7 @@ typedef struct game_s {
     struct square_s **map;
     struct player_s *players;
     char **teams;
+    int *team_slots;
 } game_t;
 
 game_t *init_game(int x, int y, char **teams);
