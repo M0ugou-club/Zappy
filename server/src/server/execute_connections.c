@@ -22,25 +22,7 @@ static char *get_arg(const char *src, size_t start, size_t end)
 // TODO: Implement the regex parsing
 static void execute(char *cmd, int client_fd, server_t *srv)
 {
-    // int regex_ret = 0;
-    // regex_t *regex = malloc(sizeof(regex_t));
-    // regex_parse_t parse = {0};
-
-    // parse.str = cmd;
-    // memset(parse.pmatch, 0, sizeof(parse.pmatch));
-    // for (int i = 0; cmds[i].cmd_regex != NULL; i++) {
-    //     regex_ret = regcomp(regex, cmds[i].cmd_regex, REG_EXTENDED);
-    //     if (regex_ret != 0)
-    //         continue;
-    //     regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
-    //     if (regex_ret == 0) {
-    //         cmds[i].func(parse, client_fd, srv, srv->client);
-    //         regfree(regex);
-    //         return;
-    //     }
-    //     regfree(regex);
-    // }
-    // SND(COMMAND_NOT_IMPL, client_fd);
+    return;
 }
 
 static char *new_buffer(connection_t *client, char *tmp)

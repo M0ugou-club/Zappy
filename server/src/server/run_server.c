@@ -29,6 +29,7 @@ static void accept_connection(server_t *srv)
     struct sockaddr_in cli_addr;
     socklen_t len = sizeof(cli_addr);
     char *buffer = malloc(sizeof(char) * 1024);
+    connection_t *new = NULL;
 
     memset(buffer, 0, 1024);
     newsockfd = accept(srv->sock->fd, (struct sockaddr *)&cli_addr, &len);
@@ -36,7 +37,7 @@ static void accept_connection(server_t *srv)
         return;
     SEND_FD(newsockfd, "WELCOME\n");
     read(newsockfd, buffer, 1024);
-    connection_t *new = new_connection(newsockfd,
+    new = new_connection(newsockfd,
         (struct sockaddr_in *)&cli_addr, buffer);
     srv->cons = add_connection(srv->cons, new);
     SEND_INT(new, 1);
@@ -44,6 +45,7 @@ static void accept_connection(server_t *srv)
     free(buffer);
 }
 
+// TODO: add game tick at end of while loop
 void run_server(server_t *srv)
 {
     int select_ret = 0;
@@ -62,6 +64,5 @@ void run_server(server_t *srv)
         read_connections(srv);
         execute_connections(srv);
         send_messages(srv);
-        // game_loop(srv->game);
     }
 }
