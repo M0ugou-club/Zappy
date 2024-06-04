@@ -16,11 +16,11 @@ class MyCamera {
     public:
         MyCamera();
         ~MyCamera();
-        Camera3D get_camera() { return _camera; }
+        raylib::Camera3D get_camera() { return _camera; }
 
     protected:
     private:
-        Camera3D _camera = {};
+        raylib::Camera3D _camera = {};
         Vector3 _position = {0.0f, 10.0f, 10.0f};
         Vector3 _target = {0.0f, 0.0f, 0.0f};
         Vector3 _up = {0.0f, 1.0f, 0.0f};
@@ -28,4 +28,4 @@ class MyCamera {
         int _type = CAMERA_PERSPECTIVE;
 };
 
-#endif /* !MYCAMERA_HPP_ */     
+#endif /* !MYCAMERA_HPP_ */
