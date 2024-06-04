@@ -26,6 +26,14 @@ void Gui::start()
     SetTargetFPS(60);
     _map.init_map();
     while (!window.ShouldClose()) {
+        if(IsKeyDown(KEY_Q))
+            _camera.move_camera(_camera.LEFT);
+        if(IsKeyDown(KEY_D))
+            _camera.move_camera(_camera.RIGHT);
+        if(IsKeyDown(KEY_Z))
+            _camera.move_camera(_camera.ZOOM_IN);
+        if(IsKeyDown(KEY_S))
+            _camera.move_camera(_camera.ZOOM_OUT);
         BeginDrawing();
         window.ClearBackground(PURPLE);
         BeginMode3D(_camera.get_camera());
