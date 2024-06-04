@@ -13,6 +13,7 @@
 
 class Map {
     public:
+        Map();
         Map(int x, int y);
         ~Map();
         void create_map();
