@@ -1,9 +1,13 @@
 import random
 
 class Player:
-    def __init__(self, team):
+    def __init__(self, team, machine, port):
         self.team = team
         self.level = 1
+        self.fd = 0
+        self.machine = machine
+        self.port = port
+        self.socket = socket.socket()
         self.inventory = {
             'food': 1,
             'linemate': 0,
@@ -46,7 +50,7 @@ class Player:
 
 
     def take(self) -> None:
-        '''take the object in the tile'''
+        """take the object in the tile"""
         pass
 
 
@@ -178,6 +182,13 @@ class Player:
 
     def run(self) -> None:
         '''run the player'''
+        self.socket.connect((self.machine, self.port))
+        self.socket.sendall("\n".encode())
+        while True:
+            self.socket.sendall(self.team + "\n")
+            if self.socket.recv(1024).decode() == "ko\n":
+                break
+
         while (True):
             if self.inventory['food'] < 10:
                 self.survive()
