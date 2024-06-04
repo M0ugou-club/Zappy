@@ -14,9 +14,7 @@
     #define BUFFER_SIZE 1024
 
     #define SEND(conn, msg) write(conn->fd, msg, strlen(msg))
-    #define SEND_INT(conn, msg) dprintf(conn->fd, "%d", msg)
     #define SEND_FD(fd, msg) write(fd, msg, strlen(msg))
-    #define SEND_INT_FD(fd, msg) dprintf(fd, "%d", msg)
 
     #include <unistd.h>
     #include <stdlib.h>

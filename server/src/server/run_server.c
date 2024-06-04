@@ -40,7 +40,7 @@ static void accept_connection(server_t *srv)
     new = new_connection(newsockfd,
         (struct sockaddr_in *)&cli_addr, buffer);
     srv->cons = add_connection(srv->cons, new);
-    SEND_INT(new, 1);
+    dprintf(new->fd, "%d\n", 1);
     dprintf(new->fd, " %zu %zu\n", srv->args->x, srv->args->y);
     free(buffer);
 }
