@@ -7,12 +7,6 @@
 
 #include "server.h"
 
-void cmd_exit(server_t *srv, connection_t *cl, regex_parse_t *parse)
-{
-    SEND(cl, "exit\n");
-    close(cl->fd);
-}
-
 static const command_regex_t CMDS[] = {
     {"Forward$", NULL},
     {"Right$", NULL},

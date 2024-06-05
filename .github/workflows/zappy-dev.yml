@@ -42,7 +42,7 @@ jobs:
             echo "::error file=$file,line=$line_number::$severity $message"
           done < coding-style-reports.log
           line_count=$(wc -l coding-style-reports.log | awk '{print $1}')
-          if [ "$line_count" -gt 6 ]; then
+          if [ "$line_count" -gt 0 ]; then
             echo "::error::Too many style errors"
             exit 1
           fi

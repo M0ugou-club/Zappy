@@ -23,7 +23,8 @@ static int get_max_fd(server_t *srv)
 }
 
 // TODO: rewrite this function with game data:
-// check if team exists, if it doesn't, send ko and close connection, also close if team is full
+// check if team exists, if it doesn't, send ko and close connection
+// also close if team is full
 static void accept_connection(server_t *srv)
 {
     int newsockfd;
