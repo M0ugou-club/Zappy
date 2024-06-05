@@ -24,6 +24,7 @@ class MyCamera {
         ~MyCamera();
         raylib::Camera3D getCamera() { return _camera; }
         void moveCamera(move direction);
+        void updateCamera();
 
     protected:
     private:

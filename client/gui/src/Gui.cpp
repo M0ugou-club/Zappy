@@ -27,14 +27,7 @@ void Gui::start()
     window.SetTargetFPS(60);
     _map.init_map();
     while (!window.ShouldClose()) {
-        if(IsKeyDown(KEY_W))
-            _camera.moveCamera(_camera.FORWARD);
-        if(IsKeyDown(KEY_S))
-            _camera.moveCamera(_camera.BACKWARD);
-        if(IsKeyDown(KEY_A))
-            _camera.moveCamera(_camera.LEFT);
-        if(IsKeyDown(KEY_D))
-            _camera.moveCamera(_camera.RIGHT);
+        _camera.updateCamera();
         window.BeginDrawing();
         window.ClearBackground(PURPLE);
         _camera.getCamera().BeginMode();

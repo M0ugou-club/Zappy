@@ -44,3 +44,15 @@ void MyCamera::moveCamera(move direction)
 
     _camera.position = _position;
 }
+
+void MyCamera::updateCamera()
+{
+    if(IsKeyDown(KEY_W))
+        moveCamera(FORWARD);
+    if(IsKeyDown(KEY_S))
+        moveCamera(BACKWARD);
+    if(IsKeyDown(KEY_A))
+        moveCamera(LEFT);
+    if(IsKeyDown(KEY_D))
+        moveCamera(RIGHT);
+}
