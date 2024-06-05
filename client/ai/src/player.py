@@ -51,7 +51,7 @@ class Player:
 
 
     def take(self) -> None:
-        """take the object in the tile"""
+        '''take the object in the tile'''
         pass
 
 
