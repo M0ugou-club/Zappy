@@ -17,10 +17,6 @@ Item::Item(float x, float y, float z, int quantity)
     _quantity = quantity;
 }
 
-Item::~Item()
-{
-}
-
 void Item::draw(float delta)
 {
     float yFloatingAnim = sinf(GetTime() * 2.0f) * Y_FLOATING_ANIM_HEIGHT;

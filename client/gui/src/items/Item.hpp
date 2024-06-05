@@ -18,7 +18,7 @@ class Item {
         static constexpr float ITEM_HEIGHT_OFFSET = 1.5f;
 
         Item(float x, float y, float z, int quantity = 1);
-        ~Item();
+        ~Item() = default;
 
         void draw(float delta = 0);
         void setPosition(float x, float y, float z);
