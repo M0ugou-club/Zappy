@@ -14,8 +14,8 @@ class Map {
     public:
         Map();
         Map(int x, int y);
-        ~Map();
-        void init_map();
+        ~Map() = default;
+        void initMap();
         void draw();
 
     protected:

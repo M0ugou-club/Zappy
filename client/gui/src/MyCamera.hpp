@@ -21,7 +21,7 @@ class MyCamera {
             BACKWARD
         } move;
         MyCamera();
-        ~MyCamera();
+        ~MyCamera() = default;
         raylib::Camera3D getCamera() { return _camera; }
         void moveCamera(move direction);
         void updateCamera();

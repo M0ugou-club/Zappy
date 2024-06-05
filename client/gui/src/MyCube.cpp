@@ -11,10 +11,6 @@ MyCube::MyCube()
 {
 }
 
-MyCube::~MyCube()
-{
-}
-
 void MyCube::draw()
 {
     DrawCube(_position, _size.x, _size.y, _size.z, _color);

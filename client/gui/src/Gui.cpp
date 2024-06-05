@@ -16,16 +16,12 @@ Gui::Gui()
     _map = Map(10, 10);
 }
 
-Gui::~Gui()
-{
-}
-
 void Gui::start()
 {
     raylib::Window window(_width, _height, "Zappy");
 
     window.SetTargetFPS(60);
-    _map.init_map();
+    _map.initMap();
     while (!window.ShouldClose()) {
         _camera.updateCamera();
         window.BeginDrawing();

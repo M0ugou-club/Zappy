@@ -19,10 +19,6 @@ MyCamera::MyCamera()
     _camera.projection = _type;
 }
 
-MyCamera::~MyCamera()
-{
-}
-
 void MyCamera::moveCamera(move direction)
 {
     if (direction == LEFT) {

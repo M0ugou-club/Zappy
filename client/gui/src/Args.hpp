@@ -29,7 +29,7 @@ class Args {
         static bool isNumber(const std::string &str);
 
         Args(int ac, char **av);
-        ~Args();
+        ~Args() = default;
 
         int setArgs();
         std::string getIp() const;

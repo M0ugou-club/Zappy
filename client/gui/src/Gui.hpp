@@ -14,7 +14,7 @@
 class Gui {
     public:
         Gui();
-        ~Gui();
+        ~Gui() = default;
         void start();
 
     protected:
