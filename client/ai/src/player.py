@@ -37,21 +37,37 @@ class Player:
 
     def forward(self) -> None:
         '''move forward'''
+        self.socket.sendall("Forward\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
         pass
 
 
     def right(self) -> None:
         '''turn right'''
+        self.socket.sendall("Right\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
         pass
 
 
     def left(self) -> None:
         '''turn left'''
+        self.socket.sendall("Left\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
         pass
 
 
-    def take(self) -> None:
+    def take(self, object : str) -> None:
         '''take the object in the tile'''
+        self.socket.sendall(f"Take {object}\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
         pass
 
 
@@ -100,46 +116,75 @@ class Player:
 
     def look(self) -> list:
         '''look around the player'''
+        self.socket.sendall("Look\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
+        print(f"Around -> {response}", end="")
         pass
 
 
     def incantation(self) -> None:
         '''incantation'''
+        self.socket.sendall("Incantation\n".encode())
+        response = self.socket.recv(1024).decode()
         pass
 
 
     def broadcast(self, message : str) -> None:
         '''broadcast a message'''
+        self.socket.sendall(f"Broadcast {message}\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
         pass
 
 
-    def recieve_broadcast(self) -> str:
+    def receive_broadcast(self) -> str:
         '''recieve a broadcast'''
         pass
 
 
     def connect_nbr(self) -> None:
         '''connect the player'''
+        self.socket.sendall("Connect_nbr\n".encode())
         pass
 
 
     def fork(self) -> None:
         '''fork the player'''
+        self.socket.sendall("Fork\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
         pass
 
 
     def eject(self) -> None:
         '''eject the player'''
+        self.socket.sendall("Eject\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
         pass
 
 
     def set_object(self, object : str) -> None:
-        '''set the object in the tile'''
+        '''set object down'''
+        self.socket.sendall(f"Set {object}\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
         pass
 
 
-    def inventory(self) -> None:
+    def get_inventory(self) -> None:
         '''get the inventory of the player'''
+        self.socket.sendall("Inventory\n".encode())
+        response = self.socket.recv(1024).decode()
+        if response == "ko\n":
+            self.survival = False
+        print(f"Inventory -> {response}", end="")
         pass
 
 
@@ -190,12 +235,15 @@ class Player:
             if self.socket.recv(1024).decode() == "ko\n":
                 break
 
-        # while (True):
-        #     if self.inventory['food'] < 10:
-        #         self.survive()
-        #     else:
-        #         self.expedition()
-        #     self.recieve_broadcast()
+        while (True):
+            self.forward()
+            self.get_inventory()
+            self.look()
+            # if self.inventory['food'] < 10:
+            #     self.survive()
+            # else:
+            #     self.expedition()
+            # self.recieve_broadcast()
 
     def disconnect(self) -> None:
         '''disconnect the player'''
