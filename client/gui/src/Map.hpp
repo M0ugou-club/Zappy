@@ -8,20 +8,22 @@
 #ifndef MAP_HPP_
 #define MAP_HPP_
 
-#include <iostream>
-#include <raylib/raylib-cpp.hpp>
+#include "MyCube.hpp"
 
 class Map {
     public:
         Map();
         Map(int x, int y);
         ~Map();
-        void create_map();
+        void init_map();
+        void draw();
 
     protected:
     private:
         int _x;
         int _y;
+
+        std::vector<std::vector<MyCube>> _map;
 };
 
 #endif /* !MAP_HPP_ */

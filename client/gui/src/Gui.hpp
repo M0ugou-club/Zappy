@@ -8,8 +8,6 @@
 #ifndef GUI_HPP_
 #define GUI_HPP_
 
-#include <iostream>
-#include <raylib/raylib-cpp.hpp>
 #include "Map.hpp"
 #include "MyCamera.hpp"
 

@@ -10,8 +10,8 @@
 
 Gui::Gui()
 {
-    _width = 960;
-    _height = 540;
+    _width = 1920;
+    _height = 1080;
     _camera = MyCamera();
     _map = Map(10, 10);
 }
@@ -23,23 +23,24 @@ Gui::~Gui()
 void Gui::start()
 {
     raylib::Window window(_width, _height, "Zappy");
-    // Vector3 cubePosition = { 0.0f, 0.0f, 0.0f };
-    Item item1(0, 0, 0);
-    Item item2(2, 0, 1);
 
-    SetTargetFPS(60);
+    window.SetTargetFPS(60);
+    _map.init_map();
     while (!window.ShouldClose()) {
-        BeginDrawing();
-        window.ClearBackground(RAYWHITE);
-        BeginMode3D(_camera.get_camera());
-        // DrawCube(cubePosition, 2.0f, 2.0f, 2.0f, RED);
-        // DrawCubeWires(cubePosition, 2.0f, 2.0f, 2.0f, MAROON);
-        item1.draw(GetFrameTime());
-        item2.draw(GetFrameTime());
-        DrawGrid(10, 1.0f);
-        EndMode3D();
-        DrawText("Welcome to the third dimension!", 10, 40, 20, DARKGRAY);
-        DrawFPS(10, 10);
-        EndDrawing();
+        if(IsKeyDown(KEY_W))
+            _camera.moveCamera(_camera.FORWARD);
+        if(IsKeyDown(KEY_S))
+            _camera.moveCamera(_camera.BACKWARD);
+        if(IsKeyDown(KEY_A))
+            _camera.moveCamera(_camera.LEFT);
+        if(IsKeyDown(KEY_D))
+            _camera.moveCamera(_camera.RIGHT);
+        window.BeginDrawing();
+        window.ClearBackground(PURPLE);
+        _camera.getCamera().BeginMode();
+        _map.draw();
+        _camera.getCamera().EndMode();
+        window.DrawFPS(10, 10);
+        window.EndDrawing();
     }
 }
