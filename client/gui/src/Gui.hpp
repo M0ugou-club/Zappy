@@ -8,19 +8,21 @@
 #ifndef GUI_HPP_
 #define GUI_HPP_
 
-#include <iostream>
-#include <raylib/raylib-cpp.hpp>
+#include "Map.hpp"
+#include "MyCamera.hpp"
 
 class Gui {
     public:
         Gui();
-        ~Gui();
+        ~Gui() = default;
         void start();
 
     protected:
     private:
         int _width;
         int _height;
+        MyCamera _camera;
+        Map _map;
 };
 
 #endif /* !GUI_HPP_ */

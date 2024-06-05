@@ -47,10 +47,6 @@ Args::Args(int ac, char **av)
 {
 }
 
-Args::~Args()
-{
-}
-
 int Args::setArgs()
 {
     if (_av.size() < 5) {

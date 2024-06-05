@@ -11,6 +11,10 @@ SRC = main.cpp \
 	  Gui.cpp \
 	  Args.cpp \
 	  ServerConnection.cpp \
+	  Map.cpp \
+	  MyCamera.cpp \
+	  MyCube.cpp \
+	  items/Item.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 

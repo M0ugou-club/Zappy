@@ -6,26 +6,30 @@
 */
 
 #include "Gui.hpp"
+#include "items/Item.hpp"
 
 Gui::Gui()
 {
-    _width = 960;
-    _height = 540;
-}
-
-Gui::~Gui()
-{
+    _width = 1920;
+    _height = 1080;
+    _camera = MyCamera();
+    _map = Map(10, 10);
 }
 
 void Gui::start()
 {
     raylib::Window window(_width, _height, "Zappy");
 
-    SetTargetFPS(60);
+    window.SetTargetFPS(60);
+    _map.initMap();
     while (!window.ShouldClose()) {
-        BeginDrawing();
-        window.ClearBackground(RAYWHITE);
-        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-        EndDrawing();
+        _camera.updateCamera();
+        window.BeginDrawing();
+        window.ClearBackground(PURPLE);
+        _camera.getCamera().BeginMode();
+        _map.draw();
+        _camera.getCamera().EndMode();
+        window.DrawFPS(10, 10);
+        window.EndDrawing();
     }
 }
