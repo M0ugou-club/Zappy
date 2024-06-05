@@ -19,15 +19,13 @@ Item::Item(float x, float y, float z, int quantity)
 
 Item::~Item()
 {
-    UnloadModel(_cubeModel);
 }
 
 void Item::draw(float delta)
 {
-    _rotationAngle += ROTATION_SPEED * delta;
     float yFloatingAnim = sinf(GetTime() * 2.0f) * Y_FLOATING_ANIM_HEIGHT;
-    DrawModelEx(
-        _cubeModel,
+    _rotationAngle += ROTATION_SPEED * delta;
+    _cubeModel.Draw(
         {_position.GetX(), _position.GetY() + yFloatingAnim + ITEM_HEIGHT_OFFSET, _position.GetZ()},
         {0.0f, 1.0f, 0.0f},
         _rotationAngle,

@@ -27,8 +27,8 @@ class Item {
         raylib::Vector3 _position = {};
         int _quantity;
 
-        Mesh _cubeMesh = GenMeshCube(SIZE, SIZE, SIZE / 10);
-        Model _cubeModel = LoadModelFromMesh(_cubeMesh);
+        raylib::Mesh _cubeMesh = raylib::Mesh::Cube(SIZE, SIZE, SIZE / 10);
+        raylib::Model _cubeModel = raylib::Model(_cubeMesh);
         float _rotationAngle = 0.0f;
 };
 
