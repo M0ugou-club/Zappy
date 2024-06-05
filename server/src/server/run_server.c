@@ -22,7 +22,9 @@ static int get_max_fd(server_t *srv)
     return max;
 }
 
-// TODO: rewrite this function with game data
+// TODO: rewrite this function with game data:
+// check if team exists, if it doesn't, send ko and close connection
+// also close if team is full
 static void accept_connection(server_t *srv)
 {
     int newsockfd;
@@ -45,7 +47,18 @@ static void accept_connection(server_t *srv)
     free(buffer);
 }
 
-// TODO: add game tick at end of while loop
+static int get_connections_count(connection_t *cl)
+{
+    int count = 0;
+
+    while (cl != NULL) {
+        count++;
+        cl = cl->next;
+    }
+    return count;
+}
+
+// TODO: add game tick at end of while loop and handle client disconnection
 void run_server(server_t *srv)
 {
     int select_ret = 0;
