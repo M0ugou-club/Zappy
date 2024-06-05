@@ -1,6 +1,7 @@
 '''Connexion for the server'''
 import socket
 import sys
+import player
 
 
 P_HELP = "is the port number"
@@ -49,24 +50,28 @@ def get_machine():
 def main():
     '''Main function to handle client connection and communication.'''
     info = [get_port(), get_name(), get_machine()]
-    client_socket = socket.socket()
-    try:
-        client_socket.connect((info[2], int(info[0])))
-        print(f"Connected to {info[2]} on port {info[0]}")
-        client_socket.sendall("".encode())
-        while True:
-            message = input("Commande: ") + "\n"
-            client_socket.sendall(message.encode())
-            data = client_socket.recv(1024).decode()
-            print(data)
-            if data.strip() == "dead":
-                print("Client dead, On ferme en plus tu pu...")
-                break
-    except Exception as e:
-        print(f"An error occurred: {e}")
-    finally:
-        client_socket.close()
-        print("Connection closed.")
+    IA1 = player.Player(info[1], info[2], info[0])
+
+    IA1.run()
+    IA1.disconnect()
+
+    # try:
+    #     client_socket.connect((info[2], int(info[0])))
+    #     print(f"Connected to {info[2]} on port {info[0]}")
+    #     client_socket.sendall("".encode())
+    #     while True:
+    #         message = input("Commande: ") + "\n"
+    #         client_socket.sendall(message.encode())
+    #         data = client_socket.recv(1024).decode()
+    #         print(data)
+    #         if data.strip() == "dead":
+    #             print("Client dead, On ferme en plus tu pu...")
+    #             break
+    # except Exception as e:
+    #     print(f"An error occurred: {e}")
+    # finally:
+    #     client_socket.close()
+    #     print("Connection closed.")
 
 
 
