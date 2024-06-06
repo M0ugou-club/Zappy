@@ -17,9 +17,7 @@ server_t *init_server(args_t *args)
     server->game = init_game(args->x, args->y, args->teams);
     server->readfds = malloc(sizeof(fd_set));
     server->writefds = malloc(sizeof(fd_set));
-    server->exceptfds = malloc(sizeof(fd_set));
     FD_ZERO(server->readfds);
     FD_ZERO(server->writefds);
-    FD_ZERO(server->exceptfds);
     return (server);
 }

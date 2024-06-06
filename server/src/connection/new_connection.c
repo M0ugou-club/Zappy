@@ -15,8 +15,8 @@ connection_t *new_connection(int fd, struct sockaddr_in *addr, char *team)
         return NULL;
     new->fd = fd;
     new->addr = *addr;
-    new->buffer = NULL;
-    new->team = team;
+    new->buffer = malloc(sizeof(char) * 1024);
+    new->team = strdup(team);
     new->next = NULL;
     return new;
 }
