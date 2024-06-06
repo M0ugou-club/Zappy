@@ -46,6 +46,10 @@ typedef struct square_s {
     int mendiane;
     int phiras;
     int thystame;
+    struct square_s *north;
+    struct square_s *south;
+    struct square_s *east;
+    struct square_s *west;
 } square_t;
 
 typedef struct player_s {
