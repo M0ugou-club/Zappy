@@ -8,19 +8,28 @@
 #include "server.h"
 
 static const command_regex_t CMDS[] = {
-    {"Forward$", NULL},
-    {"Right$", NULL},
-    {"Left$", NULL},
-    {"Look$", NULL},
-    {"Inventory$", NULL},
-    {"Broadcast (.+)$", NULL},
-    {"Connect_nbr$", NULL},
-    {"Fork$", NULL},
-    {"Eject$", NULL},
-    {"Take ([a-z]+)$", NULL},
-    {"Set ([a-z]+)$", NULL},
-    {"Incantation$", NULL},
-    {NULL, NULL}
+    {"Forward$", false, cmd_forward},
+    {"Right$", false, cmd_right},
+    {"Left$", false, cmd_left},
+    {"Look$", false, cmd_look},
+    {"Inventory$", false, cmd_inventory},
+    {"Broadcast (.+)$", false, cmd_broadcast},
+    {"Connect_nbr$", false, cmd_connect_nbr},
+    {"Fork$", false, cmd_fork},
+    {"Eject$", false, cmd_eject},
+    {"Take ([a-z]+)$", false, cmd_take},
+    {"Set ([a-z]+)$", false, cmd_set},
+    {"Incantation$", false, cmd_incantation},
+    {"msz$", true, cmd_msz},
+    {"bct ([0-9]+) ([0-9]+)$", true, cmd_bct},
+    {"mct$", true, cmd_mct},
+    {"tna$", true, cmd_tna},
+    {"ppo #([0-9]+)$", true, cmd_ppo},
+    {"plv #([0-9]+)$", true, cmd_plv},
+    {"pin #([0-9]+)$", true, cmd_pin},
+    {"sgt$", true, cmd_sgt},
+    {"sst ([0-9]+)$", true, cmd_sst},
+    {NULL, false, NULL}
 };
 
 static char *get_arg(const char *src, size_t start, size_t end)
@@ -42,6 +51,18 @@ static void replace_cr(char *str)
             str[i] = '\0';
 }
 
+static void run_cmd(const command_regex_t *cmd, server_t *srv,
+    int client_fd, regex_parse_t parse)
+{
+    connection_t *client = get_client_by_fd(srv->cons, client_fd);
+
+    if (client == NULL)
+        return;
+    if (cmd->spec_only == true && strcmp(client->team, "GRAPHIC") != 0)
+        return;
+    cmd->func(srv, client, &parse);
+}
+
 static void execute(char *cmd, int client_fd, server_t *srv)
 {
     int regex_ret = 0;
@@ -57,7 +78,7 @@ static void execute(char *cmd, int client_fd, server_t *srv)
             continue;
         regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
         if (regex_ret == 0) {
-            CMDS[i].func(srv, get_client_by_fd(srv->cons, client_fd), &parse);
+            run_cmd(&CMDS[i], srv, client_fd, parse);
             regfree(regex);
             return;
         }

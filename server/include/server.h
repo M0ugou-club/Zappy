@@ -17,6 +17,7 @@
     #define SEND(conn, msg) write(conn->fd, msg, strlen(msg))
     #define SEND_FD(fd, msg) write(fd, msg, strlen(msg))
 
+    #define CMD_SUCCESS "ok\n"
     #define CMD_ERROR "ko\n"
 
     #include <unistd.h>
@@ -76,6 +77,7 @@ typedef struct regex_parse_s {
 
 typedef struct command_regex_s {
     char *command;
+    bool spec_only;
     void (*func)(server_t *srv, connection_t *cl, regex_parse_t *parse);
 } command_regex_t;
 
@@ -93,5 +95,31 @@ void send_messages(server_t *srv);
 server_t *init_server(args_t *args);
 void free_server(server_t *server);
 void run_server(server_t *server);
+
+/* Commands */
+void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_left(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_inventory(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_broadcast(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_connect_nbr(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_fork(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_eject(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_take(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse);
+
+// GUI commands
+void cmd_bct(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_mct(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_msz(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_pin(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_plv(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_ppo(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_sgt(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_sst(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_tna(server_t *srv, connection_t *cl, regex_parse_t *parse);
+/* Commands */
 
 #endif /* !SERVER_H_ */
