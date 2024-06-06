@@ -15,6 +15,7 @@ SRC = main.cpp \
 	  MyCamera.cpp \
 	  MyCube.cpp \
 	  items/Item.cpp \
+	  Player.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 

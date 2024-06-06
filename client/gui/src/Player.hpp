@@ -14,28 +14,29 @@
 
 class Player {
     public:
-        Player(float x, float y, float z);
-        ~Player() = default;
+        static constexpr float SIZE = 1.5f;
 
-        inline raylib::Vector3 getPosition() { return _position; }
-        inline int getLevel() { return _level; }
+        Player();
+        ~Player();
+
+        inline raylib::Vector3 getPosition() const { return _position; }
+        inline int getLevel() const { return _level; }
         inline void setPosition(raylib::Vector3 position) { _position = position; }
         inline void setColor(raylib::Color color) { _color = color; }
-        inline void setBorderColor(Color color) { _border_color = color; }
         inline void setLevel(int level) { _level = level; }
 
-        void draw();
+        void draw() const;
         void move();
 
-    protected:
     private:
-        raylib::Vector3 _position = {};
-        int _level = 1;
-
-        raylib::Mesh _rectMesh = raylib::Mesh::Cube(1.0f, 1.0f, 1.0f);
-        raylib::Model _rectModel = raylib::Model(_rectMesh);
+        float width = 1.0f;
+        float height = 2.0f;
+        float depth = 0.2f;
+        raylib::Vector3 _position = {0.0f, 0.0f, 0.0f};
+        Mesh rectangleMesh = GenMeshCube(width, height, depth);
+        Model rectangleModel = LoadModelFromMesh(rectangleMesh);
         raylib::Color _color = raylib::Color::Black();
-        Color _border_color = BLACK;
+        int _level = 1;
 };
 
 #endif /* !PLAYER_HPP_ */

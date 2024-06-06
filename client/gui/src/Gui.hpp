@@ -10,6 +10,7 @@
 
 #include "Map.hpp"
 #include "MyCamera.hpp"
+#include "Player.hpp"
 
 class Gui {
     public:
@@ -23,6 +24,8 @@ class Gui {
         int _height;
         MyCamera _camera;
         Map _map;
+        Player _player;
+
 };
 
 #endif /* !GUI_HPP_ */
