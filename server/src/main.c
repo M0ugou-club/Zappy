@@ -19,6 +19,7 @@ int main(int argc, char **argv)
     server_t *server = NULL;
     args_t *args = get_args(argc, argv);
 
+    srand(time(NULL));
     if (args == NULL)
         return usage(EXIT_ERROR);
     if (argc == 2 && strcmp(argv[1], "-h") == 0)

@@ -30,7 +30,6 @@ static void place_food(game_t *game)
     int y;
     int count;
 
-    srand(time(NULL));
     for (count = 0; count < game->max_items->food; count++) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;
@@ -44,7 +43,6 @@ static void place_linemate(game_t *game)
     int y;
     int count;
 
-    srand(time(NULL));
     for (count = 0; count < game->max_items->linemate; count++) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;
@@ -58,7 +56,6 @@ static void place_deraumere(game_t *game)
     int y;
     int count;
 
-    srand(time(NULL));
     for (count = 0; count < game->max_items->deraumere; count++) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;
@@ -72,7 +69,6 @@ static void place_sibur(game_t *game)
     int y;
     int count;
 
-    srand(time(NULL));
     for (count = 0; count < game->max_items->sibur; count++) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;
@@ -86,7 +82,6 @@ static void place_mendiane(game_t *game)
     int y;
     int count;
 
-    srand(time(NULL));
     for (count = 0; count < game->max_items->mendiane; count++) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;
@@ -100,7 +95,6 @@ static void place_phiras(game_t *game)
     int y;
     int count;
 
-    srand(time(NULL));
     for (count = 0; count < game->max_items->phiras; count++) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;
@@ -114,7 +108,6 @@ static void place_thystame(game_t *game)
     int y;
     int count;
 
-    srand(time(NULL));
     for (count = 0; count < game->max_items->thystame; count++) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;

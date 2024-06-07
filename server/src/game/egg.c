@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "server.h"
 #include "game.h"
 
 void add_egg(square_t *square, char *team_name)
@@ -62,4 +63,22 @@ bool check_egg(square_t *square, char *team_name)
             return true;
     }
     return false;
+}
+
+void place_eggs(game_t *game, args_t *args)
+{
+    int x;
+    int y;
+    int nb_teams = 0;
+    int count = 0;
+
+    nb_teams = get_array_size(args->teams);
+    while (count < nb_teams * args->maxClients) {
+        for (int i = 0; i < nb_teams; i++) {
+            x = rand() % game->map_x;
+            y = rand() % game->map_y;
+            add_egg(&game->map[x][y], args->teams[i]);
+            count++;
+        }
+    }
 }
