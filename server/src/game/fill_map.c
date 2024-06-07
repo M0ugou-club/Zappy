@@ -7,6 +7,7 @@
 
 #include <time.h>
 #include "game.h"
+#include "egg.h"
 
 static const float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
 
@@ -115,7 +116,7 @@ static void place_thystame(game_t *game)
     }
 }
 
-void place_items_randomly(game_t *game)
+void place_items_randomly(game_t *game, args_t *args)
 {
     place_food(game);
     place_linemate(game);
@@ -124,4 +125,5 @@ void place_items_randomly(game_t *game)
     place_mendiane(game);
     place_phiras(game);
     place_thystame(game);
+    place_eggs(game, args);
 }
