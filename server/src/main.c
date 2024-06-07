@@ -5,6 +5,7 @@
 ** main
 */
 
+#include <time.h>
 #include "server.h"
 
 static int usage(int exit_code)

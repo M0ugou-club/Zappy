@@ -11,6 +11,15 @@
 #include "server.h"
 #include "game.h"
 
+static int count_str_array(char **arr)
+{
+    int i = 0;
+
+    while (arr[i] != NULL)
+        i++;
+    return i;
+}
+
 void add_egg(square_t *square, char *team_name)
 {
     int str_array_len = 0;
