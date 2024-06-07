@@ -7,7 +7,7 @@
 
 #include "Item.hpp"
 
-#include <raylib/raylib-cpp.hpp>
+#include <raylib-cpp.hpp>
 
 Item::Item(float x, float y, float z, int quantity)
 {
