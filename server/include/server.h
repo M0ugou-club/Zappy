@@ -89,6 +89,8 @@ void read_connections(server_t *srv);
 void execute_connections(server_t *srv);
 
 void queue_message(connection_t *conn, char *msg);
+void queue_formatted_message(connection_t *conn, char *fmt, ...);
+void send_formatted_message(connection_t *conn, char *fmt, ...);
 void send_message(server_t *srv, connection_t *cl);
 void send_messages(server_t *srv);
 
