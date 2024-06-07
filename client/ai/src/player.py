@@ -98,13 +98,27 @@ class Player:
             self.survival = False
         pass
 
+
+    def interpretlook(self, response : str) -> list:
+        '''interpret the look response'''
+        print(response, end="")
+        response = response[1:-2]
+        response = response.split(',')
+        for i in range(len(response)):
+            response[i] = response[i].split(' ')
+        return response
+        pass
+
+
     def look(self) -> list:
         '''look around the player'''
         self.socket.sendall("Look\n".encode())
         response = self.socket.recv(1024).decode()
-        if response == "ko\n":
+        if response != "ko\n":
+            print(f"Around -> {self.interpretlook(response)}")
+            return response
+        else:
             self.survival = False
-        print(f"Around -> {response}", end="")
         pass
 
 
@@ -251,7 +265,7 @@ class Player:
 
     def search_object(self, looked: list, searching_item : list) -> None:
         '''search the object in the tile'''
-        correct_tile = self.get_correct_tile(self.looked, searching_item)
+        correct_tile = self.get_correct_tile(looked, searching_item)
         if correct_tile:
             self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
         else :
@@ -260,7 +274,7 @@ class Player:
 
     def survive(self) -> None:
         '''survive'''
-        inventory = self.inventory()
+        inventory = self.get_inventory()
         while inventory['food'] < 10:
             self.search_object(self.look(), ['food'])
 
@@ -272,7 +286,7 @@ class Player:
 
     def check_requirements(self, requirements: dict) -> bool:
         '''check the requirements'''
-        inventory = self.inventory()
+        inventory = self.get_inventory()
         for key in requirements:
             if inventory[key] < requirements[key]:
                 return 1
@@ -291,7 +305,8 @@ class Player:
 
     def try_incantation(self) -> None:
         '''try the incantation'''
-        if self.inventory['food'] < 10:
+        inventory = self.get_inventory()
+        if inventory['food'] < 10:
             return
         requirements = level_requirements[self.level - 1]
         requirements_checked = self.check_requirements(requirements)
@@ -319,7 +334,8 @@ class Player:
                 break
 
         while (True):
-            if self.inventory['food'] < 10:
+            inventory = self.get_inventory()
+            if inventory['food'] < 10:
                 self.survive()
             else:
                 self.expedition()
