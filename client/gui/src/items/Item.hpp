@@ -8,7 +8,7 @@
 #ifndef ITEM_HPP_
     #define ITEM_HPP_
 
-#include <raylib/raylib-cpp.hpp>
+#include <raylib-cpp.hpp>
 
 class Item {
     public:
