@@ -1,6 +1,55 @@
 import random
 import socket
 
+level_requirements = {
+    1: {
+        'player': 1,
+        'linemate': 1
+    },
+    2: {
+        'player': 2,
+        'linemate': 1,
+        'deraumere': 1,
+        'sibur': 1
+    },
+    3: {
+        'player': 2,
+        'linemate': 2,
+        'sibur': 1,
+        'phiras': 2
+    },
+    4: {
+        'player': 4,
+        'linemate': 1,
+        'deraumere': 1,
+        'sibur': 2,
+        'phiras': 1
+    },
+    5: {
+        'player': 4,
+        'linemate': 1,
+        'deraumere': 2,
+        'sibur': 1,
+        'mendiane': 3
+    },
+    6: {
+        'player': 6,
+        'linemate': 1,
+        'deraumere': 2,
+        'sibur': 3,
+        'phiras': 1
+    },
+    7: {
+        'player': 6,
+        'linemate': 2,
+        'deraumere': 2,
+        'sibur': 2,
+        'phiras': 2,
+        'mendiane': 2,
+        'thystame': 1
+    }
+}
+
 class Player:
     def __init__(self, team, machine, port):
         self.team = team
@@ -9,15 +58,6 @@ class Player:
         self.machine = machine
         self.port = port
         self.socket = socket.socket()
-        self.inventory = {
-            'food': 1,
-            'linemate': 0,
-            'deraumere': 0,
-            'sibur': 0,
-            'mendiane': 0,
-            'phiras': 0,
-            'thystame': 0
-        }
         self.survival = True
         self.is_incanting = False
 
@@ -220,12 +260,53 @@ class Player:
 
     def survive(self) -> None:
         '''survive'''
-        self.search_object(self.look(), ['food'])
+        inventory = self.inventory()
+        while inventory['food'] < 10:
+            self.search_object(self.look(), ['food'])
 
 
     def expedition(self) -> None:
         '''expeditions'''
         self.search_object(self.look(), ['linemate', 'deraumere', 'sibur', 'mendiane', 'phiras', 'thystame'])
+
+
+    def check_requirements(self, requirements: dict) -> bool:
+        '''check the requirements'''
+        inventory = self.inventory()
+        for key in requirements:
+            if inventory[key] < requirements[key]:
+                return 1
+        return 0
+
+
+    def what_i_need(self, requirements: dict) -> list:
+        '''return list of which item i need to search for'''
+        pass
+
+
+    def call_teammates(self) -> None:
+        '''call the teammates'''
+        pass
+
+
+    def try_incantation(self) -> None:
+        '''try the incantation'''
+        if self.inventory['food'] < 10:
+            return
+        requirements = level_requirements[self.level - 1]
+        requirements_checked = self.check_requirements(requirements)
+        if requirements_checked == 0:
+            self.incantation()
+        else:
+            #while requirements_checked != 0:
+            #    if requirements_checked == 1:
+            #        self.search_object(self.look(), self.what_i_need(requirements))
+            #    else:
+            #        self.call_teammates()
+            #    requirements_checked = self.check_requirements(requirements)
+            #self.incantation()
+            #self.is_incanting = True
+            pass
 
 
     def run(self) -> None:
@@ -238,14 +319,13 @@ class Player:
                 break
 
         while (True):
-            self.forward()
-            self.get_inventory()
-            self.look()
             if self.inventory['food'] < 10:
                 self.survive()
             else:
                 self.expedition()
-            self.recieve_broadcast()
+            ##self.recieve_broadcast()
+            if not self.incantation :
+                self.try_incantation()
 
     def disconnect(self) -> None:
         '''disconnect the player'''
