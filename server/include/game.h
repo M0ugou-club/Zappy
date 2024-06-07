@@ -39,6 +39,7 @@ typedef struct max_items_s {
 } max_items_t;
 
 typedef struct square_s {
+    char **eggs;
     int food;
     int linemate;
     int deraumere;
