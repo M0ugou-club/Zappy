@@ -99,13 +99,17 @@ class Player:
         pass
 
 
-    def interpretlook(self, response : str) -> list:
+    def interpret_look(self, response : str) -> list:
         '''interpret the look response'''
-        print(response, end="")
         response = response[1:-2]
         response = response.split(',')
         for i in range(len(response)):
+            if (response[i][0] == ' '):
+                response[i] = response[i][1:]
             response[i] = response[i].split(' ')
+        for i in range(len(response)):
+            if response[i] == ['']:
+                response[i] = []
         return response
         pass
 
@@ -115,7 +119,8 @@ class Player:
         self.socket.sendall("Look\n".encode())
         response = self.socket.recv(1024).decode()
         if response != "ko\n":
-            print(f"Around -> {self.interpretlook(response)}")
+            response = self.interpret_look(response)
+            print(f"Around -> {response}")
             return response
         else:
             self.survival = False
@@ -171,14 +176,29 @@ class Player:
         pass
 
 
-    def get_inventory(self) -> None:
+    def interpret_inventory(self, response : str) -> dict:
+        '''interpret the inventory response'''
+        response = response[1:-2]
+        response = response.split(',')
+        for i in range(len(response)):
+            if (response[i][0] == ' '):
+                response[i] = response[i][1:]
+        inventory = {}
+        for i in range(len(response)):
+            response[i] = response[i].split(' ')
+            inventory[response[i][0]] = int(response[i][1])
+        return inventory
+
+
+    def get_inventory(self) -> dict:
         '''get the inventory of the player'''
         self.socket.sendall("Inventory\n".encode())
         response = self.socket.recv(1024).decode()
         if response == "ko\n":
             self.survival = False
-        print(f"Inventory -> {response}", end="")
-        pass
+        response = self.interpret_inventory(response)
+        print(f"Inventory -> {response}")
+        return response
 
 
     ##AI functions
