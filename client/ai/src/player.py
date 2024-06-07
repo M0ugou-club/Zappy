@@ -287,20 +287,30 @@ class Player:
     def check_requirements(self, requirements: dict) -> bool:
         '''check the requirements'''
         inventory = self.get_inventory()
+        look = self.look()
         for key in requirements:
             if inventory[key] < requirements[key]:
                 return 1
+            if key == 'player':
+                if look[0] < requirements[key]:
+                    return 2
         return 0
 
 
     def what_i_need(self, requirements: dict) -> list:
         '''return list of which item i need to search for'''
-        pass
+        inventory = self.get_inventory()
+        needed = []
+        for key in requirements:
+            if inventory[key] < requirements[key]:
+                needed.append(key)
+        return needed
 
 
     def call_teammates(self) -> None:
         '''call the teammates'''
-        pass
+        self.broadcast(self.team + ": ON EVOLUE OUUU ??" + str(self.level))
+        return
 
 
     def try_incantation(self) -> None:
@@ -313,14 +323,14 @@ class Player:
         if requirements_checked == 0:
             self.incantation()
         else:
-            #while requirements_checked != 0:
-            #    if requirements_checked == 1:
-            #        self.search_object(self.look(), self.what_i_need(requirements))
-            #    else:
-            #        self.call_teammates()
-            #    requirements_checked = self.check_requirements(requirements)
-            #self.incantation()
-            #self.is_incanting = True
+            while requirements_checked != 0:
+                if requirements_checked == 1:
+                    self.search_object(self.look(), self.what_i_need(requirements))
+                else:
+                    self.call_teammates()
+                requirements_checked = self.check_requirements(requirements)
+            self.incantation()
+            self.is_incanting = True
             pass
 
 
