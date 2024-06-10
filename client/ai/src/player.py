@@ -63,7 +63,7 @@ class Player:
     }
 
 
-    MOUVEMENTS_DIRECTION = [
+    MOVEMENTS_DIRECTION = [
         lambda self: (self.forward()),
         lambda self: (self.left(), self.forward(), self.right(), self.forward()),
         lambda self: (self.left(), self.forward()),
