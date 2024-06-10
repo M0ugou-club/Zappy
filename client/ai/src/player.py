@@ -245,11 +245,6 @@ class Player:
                 self.take(item)
 
 
-    def receive_broadcast(self) -> str:
-        '''recieve a broadcast'''
-        pass
-
-
     def get_correct_tile(self, looked: list,  searching_item : list) -> tuple[int, list]:
         '''get the correct tile'''
         for i in range(len(looked)):
@@ -383,7 +378,7 @@ class Player:
             inventory = self.get_inventory()
             if inventory['food'] < 5:
                 self.survive()
-            self.recieve_broadcast()
+            self.receive_broadcast()
             if not self.is_incanting :
                 self.try_incantation()
             self.expedition()
