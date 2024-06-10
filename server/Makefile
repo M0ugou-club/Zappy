@@ -17,6 +17,24 @@ SRC =	src/main.c \
 		src/server/send_message.c \
 		src/server/send_messages.c \
 		src/server/queue_message.c \
+		src/server/commands/broadcast.c \
+		src/server/commands/connect_nbr.c \
+		src/server/commands/eject.c \
+		src/server/commands/fork.c \
+		src/server/commands/incantation.c \
+		src/server/commands/inventory.c \
+		src/server/commands/item.c \
+		src/server/commands/look.c \
+		src/server/commands/move.c \
+		src/server/commands/gui/bct.c \
+		src/server/commands/gui/mct.c \
+		src/server/commands/gui/msz.c \
+		src/server/commands/gui/pin.c \
+		src/server/commands/gui/plv.c \
+		src/server/commands/gui/ppo.c \
+		src/server/commands/gui/sgt.c \
+		src/server/commands/gui/sst.c \
+		src/server/commands/gui/tna.c \
 		src/args/get_args.c \
 		src/args/free_args.c \
 		src/args/set/set_port.c \
