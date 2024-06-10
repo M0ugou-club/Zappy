@@ -13,7 +13,7 @@ class Player:
         self.is_incanting = False
 
 
-    level_requirements = {
+    LEVEL_REQUIREMENTS = {
         1: {
             'player': 1,
             'linemate': 1
@@ -61,6 +61,18 @@ class Player:
             'thystame': 1
         }
     }
+
+
+    MOUVEMENTS_DIRECTION = [
+        lambda self: (self.forward()),
+        lambda self: (self.left(), self.forward(), self.right(), self.forward()),
+        lambda self: (self.left(), self.forward()),
+        lambda self: (self.left(), self.forward(), self.left(), self.forward()),
+        lambda self: (self.left(), self.left(), self.forward()),
+        lambda self: (self.right(), self.forward(), self.right(), self.forward()),
+        lambda self: (self.right(), self.forward()),
+        lambda self: (self.right(), self.forward(), self.left(), self.forward())
+    ]
 
     ##IPC functions
 
@@ -205,6 +217,11 @@ class Player:
 
     ##AI functions
 
+    def go_to_direction(self, direction : int) -> None:
+        '''go to the direction given in parameter'''
+        self.MOUVEMENTS_DIRECTION[direction](self)
+
+
     def go_to(self, tile : list, pos : tuple, searching_item : list) -> None:
         '''go to the tile given in parameter'''
         print(f"{pos=}")
@@ -226,42 +243,6 @@ class Player:
                 print("Item found")
                 print(item)
                 self.take(item)
-
-
-    def go_to_direction(self, direction : int) -> None:
-        '''go to the direction given in parameter'''
-        if direction == 1:
-            self.forward()
-        elif direction == 2:
-            self.left()
-            self.forward()
-            self.right()
-            self.forward()
-        elif direction == 3:
-            self.left()
-            self.forward()
-        elif direction == 4:
-            self.left()
-            self.forward()
-            self.left()
-            self.forward()
-        elif direction == 5:
-            self.left()
-            self.left()
-            self.forward()
-        elif direction == 6:
-            self.right()
-            self.forward()
-            self.right()
-            self.forward()
-        elif direction == 7:
-            self.right()
-            self.forward()
-        elif direction == 8:
-            self.right()
-            self.forward()
-            self.left()
-            self.forward()
 
 
     def receive_broadcast(self) -> str:
@@ -345,6 +326,21 @@ class Player:
         return needed
 
 
+    def receive_broadcast(self) -> None:
+        '''receive the broadcast'''
+        response = self.fd.recv(1024).decode()
+        if response == "ko\n" or response.startswith("message") == False:
+            return
+        direction = response.split(", ")[0].split(" ")[1]
+        message = response.split(", ")[1]
+        if not message.startswith(self.team):
+            return
+        ordre = message.split(": ")[1]
+        lvl = int(message.split("?")[1])
+        if ordre == "ON EVOLUE OUUU ??" and lvl == self.level:
+            self.go_to_direction(int(direction))
+        return
+
     def call_teammates(self) -> None:
         '''call the teammates'''
         self.broadcast(self.team + ": ON EVOLUE OUUU ??" + str(self.level))
@@ -356,19 +352,19 @@ class Player:
         inventory = self.get_inventory()
         if inventory['food'] < 5:
             return
-        requirements = self.level_requirements[self.level]
+        requirements = self.LEVEL_REQUIREMENTS[self.level]
         requirements_checked = self.check_requirements(requirements)
         if requirements_checked == 0:
             self.incantation()
         else:
-            #while requirements_checked != 0:
-            #    if requirements_checked == 1:
-            #        self.search_object(self.look(), self.what_i_need(requirements))
-            #    else:
-            #        self.call_teammates()
-            #    requirements_checked = self.check_requirements(requirements)
-            #self.incantation()
-            #self.is_incanting = True
+            while requirements_checked != 0:
+                if requirements_checked == 1:
+                    self.search_object(self.look(), self.what_i_need(requirements))
+                else:
+                    self.call_teammates()
+                requirements_checked = self.check_requirements(requirements)
+            self.incantation()
+            self.is_incanting = True
             pass
 
 
@@ -387,7 +383,7 @@ class Player:
             inventory = self.get_inventory()
             if inventory['food'] < 5:
                 self.survive()
-            ##self.recieve_broadcast()
+            self.recieve_broadcast()
             if not self.is_incanting :
                 self.try_incantation()
             self.expedition()
