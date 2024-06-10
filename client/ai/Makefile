@@ -5,24 +5,30 @@
 ## Makefile
 ##
 
+PYTHON = python
+
+SRC = 	src/player.py \
+		src/connexion.py \
+
+DIST_DIR = dist
+
+BUILD_DIR = build
+
 NAME = zappy_ai
 
-SRC = src/connexion.py
-
-$(NAME):
-	touch $(NAME)
-	echo "#!/bin/bash" >> $(NAME)
-	/bin/echo -n "/usr/bin/env python3 $(SRC) $$" >> $(NAME)
-	echo "@" >> $(NAME)
-	chmod +x $(NAME)
-
-all: $(NAME)
+$(NAME): $(MAIN_SCRIPT)
+	pyinstaller --onefile --name $(NAME) $(SRC)
+	mv $(DIST_DIR)/$(NAME) $(NAME)
 
 clean:
+	rm -rf $(DIST_DIR) $(BUILD_DIR) $(NAME).spec
+
+fclean:
+	rm -rf $(DIST_DIR) $(BUILD_DIR) $(NAME).spec
 	rm -f $(NAME)
 
-fclean: clean
+all: clean build run
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: clean fclean all re
