@@ -54,5 +54,5 @@ void Button::draw()
         else
             Panel::draw();
     }
-    DrawText(_text.c_str(), _position.x + _size.x / 2 - MeasureText(_text.c_str(), 20) / 2, _position.y + _size.y / 2 - 10, 20, _colorMap["text"]);
+    raylib::DrawText(_text.c_str(), _position.x + _size.x / 2 - MeasureText(_text.c_str(), 20) / 2, _position.y + _size.y / 2 - 10, 20, _colorMap["text"]);
 }
