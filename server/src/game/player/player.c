@@ -53,7 +53,6 @@ player_t pop_player(player_t *players, int id)
         players[j - 1] = players[j];
     }
     players[j - 1].id = -1;
-
     return players[i];
 }
 
