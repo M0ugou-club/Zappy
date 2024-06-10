@@ -352,14 +352,14 @@ class Player:
         if requirements_checked == 0:
             self.incantation()
         else:
-            while requirements_checked != 0:
-                if requirements_checked == 1:
-                    self.search_object(self.look(), self.what_i_need(requirements))
-                else:
-                    self.call_teammates()
-                requirements_checked = self.check_requirements(requirements)
-            self.incantation()
-            self.is_incanting = True
+            #while requirements_checked != 0:
+            #    if requirements_checked == 1:
+            #        self.search_object(self.look(), self.what_i_need(requirements))
+            #    else:
+            #        self.call_teammates()
+            #    requirements_checked = self.check_requirements(requirements)
+            #self.incantation()
+            #self.is_incanting = True
             pass
 
 
@@ -378,7 +378,7 @@ class Player:
             inventory = self.get_inventory()
             if inventory['food'] < 5:
                 self.survive()
-            self.receive_broadcast()
+            ##self.receive_broadcast()
             if not self.is_incanting :
                 self.try_incantation()
             self.expedition()
