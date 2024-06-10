@@ -17,4 +17,3 @@ player_t *get_player_by_id(player_t *players, int id);
 int get_player_count(player_t *players);
 
 #endif /* !PLAYER_H_ */
-
