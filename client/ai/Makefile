@@ -7,8 +7,7 @@
 
 NAME = zappy_ai
 
-SRC = src/player.py \
-	  src/connexion.py
+SRC = src/connexion.py
 
 $(NAME):
 	touch $(NAME)

@@ -49,6 +49,7 @@ def get_machine():
 
 def main():
     '''Main function to handle client connection and communication.'''
+    print("Client started")
     info = [get_port(), get_name(), get_machine()]
     IA1 = player.Player(info[1], info[2], info[0])
 
