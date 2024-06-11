@@ -11,6 +11,7 @@
     #include <iostream>
     #include <string>
     #include <memory>
+    #include <thread>
     #include <unistd.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
@@ -25,7 +26,10 @@ class ServerConnection {
         void disconnectFromServer();
         std::string tryReceive();
 
+        void connectToServerThread();
+
     private:
+        std::thread _thread;
         std::string _ip;
         int _port;
         int _socket = -1;

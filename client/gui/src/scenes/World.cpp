@@ -25,6 +25,7 @@ void World::update()
     _window->ClearBackground(raylib::Color::Black());
     _camera.getCamera().BeginMode();
     _map.draw();
+    // _player.draw();
     _camera.getCamera().EndMode();
     _window->DrawFPS(10, 10);
     _window->EndDrawing();
