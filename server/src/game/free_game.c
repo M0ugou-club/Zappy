@@ -7,7 +7,7 @@
 
 #include "game.h"
 
-static free_eggs(square_t *square)
+static void free_eggs(square_t *square)
 {
     for (int i = 0; square->eggs[i]; i++)
         free(square->eggs[i]);
