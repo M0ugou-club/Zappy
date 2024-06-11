@@ -1,5 +1,6 @@
 import random
 import socket
+import subprocess
 import select
 
 class Player:
@@ -13,6 +14,7 @@ class Player:
         self.survival = True
         self.is_incanting = False
         self.team_mates = 0
+        self.MTopt = False
 
 
     LEVEL_REQUIREMENTS = {
@@ -173,8 +175,10 @@ class Player:
         '''fork the player'''
         self.socket.sendall("Fork\n".encode())
         response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
+        if response != "ko\n":
+            if self.MTopt == True :
+                subprocess.Popen(["./zappy_ai", "-p", str(self.port), "-n", self.team])
+        print(response)
         pass
 
 
@@ -370,6 +374,14 @@ class Player:
         return
 
 
+    def put_requirements(self, requirements: dict) -> None:
+        '''put the requirements'''
+        for key in requirements:
+            if key != 'player':
+                for _ in range(requirements[key]):
+                    self.set_object(key)
+
+
     def try_incantation(self) -> None:
         '''try the incantation'''
         inventory = self.get_inventory()
@@ -387,6 +399,7 @@ class Player:
                 if self.get_inventory()['food'] < 5:
                     return
             requirements_checked = self.check_requirements(requirements)
+        self.put_requirements(requirements)
         self.incantation()
 
 
