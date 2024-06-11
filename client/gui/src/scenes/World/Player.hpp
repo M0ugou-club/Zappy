@@ -28,13 +28,15 @@ class Player {
         void draw() const;
         void move();
 
+        static const raylib::Vector3 OFFSET;
+
     private:
-        float width = 1.0f;
-        float height = 2.0f;
-        float depth = 0.2f;
+        float _width = 0.5f;
+        float _height = 0.5f;
+        float _depth = 0.5f;
         raylib::Vector3 _position = {0.0f, 0.0f, 0.0f};
-        Mesh rectangleMesh = GenMeshCube(width, height, depth);
-        Model rectangleModel = LoadModelFromMesh(rectangleMesh);
+        Mesh _rectangleMesh = GenMeshCube(_width, _height, _depth);
+        Model _rectangleModel = LoadModelFromMesh(_rectangleMesh);
         raylib::Color _color = raylib::Color::Black();
         int _level = 1;
 };

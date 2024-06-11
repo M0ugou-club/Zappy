@@ -7,13 +7,15 @@
 
 #include "Player.hpp"
 
+const raylib::Vector3 Player::OFFSET = {0.5f, 1.0f, 0.5f};
+
 Player::Player()
 {
     _position.SetX(0.0f);
-    _position.SetY(10.0f);
+    _position.SetY(0.0f);
     _position.SetZ(0.0f);
-    rectangleMesh = GenMeshCube(width, height, depth);
-    rectangleModel = LoadModelFromMesh(rectangleMesh);
+    _rectangleMesh = GenMeshCube(_width, _height, _depth);
+    _rectangleModel = LoadModelFromMesh(_rectangleMesh);
     _color = raylib::Color::Black();
     _level = 1;
 }
@@ -24,7 +26,7 @@ Player::~Player()
 
 void Player::draw() const
 {
-    DrawModel(rectangleModel, _position, 1.0f, WHITE);
+    DrawModel(_rectangleModel, _position + OFFSET, 1.0f, raylib::Color::Pink());
 }
 
 void Player::move()
