@@ -60,7 +60,6 @@ typedef struct player_s {
     direction_t direction;
     size_t level;
     item_t inventory[NONE];
-    int fd;
 } player_t;
 
 typedef struct game_s {
