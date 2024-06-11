@@ -11,6 +11,7 @@ class Player:
         self.socket = socket.socket()
         self.survival = True
         self.is_incanting = False
+        self.team_mates = 0
 
 
     LEVEL_REQUIREMENTS = {
@@ -142,10 +143,13 @@ class Player:
 
     def incantation(self) -> None:
         '''incantation'''
+        print("Incantation")
         self.socket.sendall("Incantation\n".encode())
         response = self.socket.recv(1024).decode()
         if response != "ko\n":
             self.level += 1
+        else:
+            print(response)
 
 
     def broadcast(self, message : str) -> None:
@@ -219,7 +223,8 @@ class Player:
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
-        self.MOUVEMENTS_DIRECTION[direction](self)
+        print(direction)
+        self.MOVEMENTS_DIRECTION[direction](self)
 
 
     def go_to(self, tile : list, pos : tuple, searching_item : list) -> None:
@@ -303,11 +308,12 @@ class Player:
         inventory = self.get_inventory()
         look = self.look()
         for key in requirements:
-            if key == 'player':
-                if self.count_player(look[0]) < requirements[key]:
-                    return 2
-            elif inventory[key] < requirements[key]:
+            if key != 'player' and inventory[key] < requirements[key]:
                 return 1
+        for player in requirements:
+            if player == 'player':
+                if self.count_player(look[0]) < requirements[player]:
+                    return 2
         return 0
 
 
@@ -316,14 +322,18 @@ class Player:
         inventory = self.get_inventory()
         needed = []
         for key in requirements:
+            print(key)
+            if key == 'player':
+                continue
             if inventory[key] < requirements[key]:
                 needed.append(key)
+        print(needed)
         return needed
 
 
     def receive_broadcast(self) -> None:
         '''receive the broadcast'''
-        response = self.fd.recv(1024).decode()
+        response = self.socket.recv(1024).decode()
         if response == "ko\n" or response.startswith("message") == False:
             return
         direction = response.split(", ")[0].split(" ")[1]
@@ -338,6 +348,8 @@ class Player:
 
     def call_teammates(self) -> None:
         '''call the teammates'''
+        if self.team_mates < self.LEVEL_REQUIREMENTS[self.level]['player']:
+            self.fork()
         self.broadcast(self.team + ": ON EVOLUE OUUU ??" + str(self.level))
         return
 
@@ -349,18 +361,17 @@ class Player:
             return
         requirements = self.LEVEL_REQUIREMENTS[self.level]
         requirements_checked = self.check_requirements(requirements)
-        if requirements_checked == 0:
-            self.incantation()
-        else:
-            #while requirements_checked != 0:
-            #    if requirements_checked == 1:
-            #        self.search_object(self.look(), self.what_i_need(requirements))
-            #    else:
-            #        self.call_teammates()
-            #    requirements_checked = self.check_requirements(requirements)
-            #self.incantation()
-            #self.is_incanting = True
-            pass
+        while requirements_checked != 0:
+            if requirements_checked == 1:
+                print("searching for items")
+                self.search_object(self.look(), self.what_i_need(requirements))
+            else:
+                print("calling teammates")
+                self.call_teammates()
+                if self.get_inventory()['food'] < 5:
+                    return
+            requirements_checked = self.check_requirements(requirements)
+        self.incantation()
 
 
     def run(self) -> None:
@@ -374,14 +385,12 @@ class Player:
 
         while (True):
             print("MY LEVEL IS : ", self.level)
-            self.fork()
             inventory = self.get_inventory()
             if inventory['food'] < 5:
                 self.survive()
             ##self.receive_broadcast()
             if not self.is_incanting :
                 self.try_incantation()
-            self.expedition()
 
     def disconnect(self) -> None:
         '''disconnect the player'''
