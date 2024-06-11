@@ -410,8 +410,8 @@ class Player:
             response = self.socket.recv(1024).decode()
             if response:
                 print("Received:", response)
-                if response.startswith("Broadcast "):
-                    self.receive_broadcast()
+                if response.startswith("message "):
+                    print("Received broadcast")
                 else:
                     pass
 
@@ -429,14 +429,14 @@ class Player:
                 break
 
         while True:
+            # self.socket.sendall("Broadcast Salut !\n".encode())
+            # self.handle_server_response()
             print("MY LEVEL IS : ", self.level)
             inventory = self.get_inventory()
-            print(next(iter(inventory)))
             if inventory['food'] < 5:
                 self.survive()
             if not self.is_incanting:
                 self.try_incantation()
-            self.handle_server_response()
 
 
     def disconnect(self) -> None:
