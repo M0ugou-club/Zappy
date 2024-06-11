@@ -16,6 +16,7 @@
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
+    #include <sys/select.h>
 
 class ServerConnection {
     public:
@@ -29,6 +30,8 @@ class ServerConnection {
         void connectToServerThread();
 
     private:
+        int selectFd();
+
         std::thread _thread;
         std::string _ip;
         int _port;

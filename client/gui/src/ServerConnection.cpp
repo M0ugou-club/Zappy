@@ -39,8 +39,23 @@ std::string ServerConnection::tryReceive()
     return std::string(buffer);
 }
 
+int ServerConnection::selectFd() {
+    fd_set readfds;
+    int retval;
+
+    FD_ZERO(&readfds);
+    FD_SET(_socket, &readfds);
+    retval = select(_socket + 1, &readfds, NULL, NULL, NULL);
+    if (retval == -1) {
+        throw std::runtime_error("Error selecting socket");
+    }
+    return retval;
+}
+
 void ServerConnection::connectToServerThread()
 {
+    int sel;
+
     _socket = socket(AF_INET, SOCK_STREAM, 0);
     if (_socket == -1) {
         throw std::runtime_error("Error creating socket");
@@ -52,6 +67,10 @@ void ServerConnection::connectToServerThread()
         throw std::runtime_error("Error connecting to server");
     }
     while (1) {
+        sel = selectFd();
+        if (sel == 0) {
+            continue;
+        }
         std::string msg = tryReceive();
         std::cout << msg << std::endl;
     }
