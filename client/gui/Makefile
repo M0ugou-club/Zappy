@@ -14,6 +14,7 @@ SRC = main.cpp \
 	  Map.cpp \
 	  MyCamera.cpp \
 	  MyCube.cpp \
+	  SafeQueue.cpp \
 	  items/Item.cpp \
 	  ui/ColorsMap.cpp \
 	  ui/Panel.cpp \
