@@ -148,6 +148,7 @@ class Player:
         response = self.socket.recv(1024).decode()
         if response != "ko\n":
             self.level += 1
+            self.fork()
         else:
             print(response)
 
@@ -348,8 +349,6 @@ class Player:
 
     def call_teammates(self) -> None:
         '''call the teammates'''
-        if self.team_mates < self.LEVEL_REQUIREMENTS[self.level]['player']:
-            self.fork()
         self.broadcast(self.team + ": ON EVOLUE OUUU ??" + str(self.level))
         return
 
