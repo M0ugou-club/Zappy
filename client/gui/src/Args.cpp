@@ -26,9 +26,6 @@ int Args::main_example(int ac, char **av)
 
     ServerConnection server(ip, port);
     server.connectToServer();
-    std::string response = server.tryReceive();
-    std::cout << response << std::endl;
-    server.disconnectFromServer();
 
     return 0;
 }

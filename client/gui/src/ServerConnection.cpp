@@ -24,10 +24,9 @@ void ServerConnection::connectToServer()
 
 void ServerConnection::disconnectFromServer()
 {
-    if (_socket != -1) {
-        close(_socket);
-        _socket = -1;
-    }
+    _thread.join();
+    close(_socket);
+    _socket = -1;
 }
 
 std::string ServerConnection::tryReceive()
@@ -53,6 +52,7 @@ void ServerConnection::connectToServerThread()
         throw std::runtime_error("Error connecting to server");
     }
     while (1) {
-        sleep(1);
+        std::string msg = tryReceive();
+        std::cout << msg << std::endl;
     }
 }
