@@ -7,8 +7,8 @@
 
 #include "ServerConnection.hpp"
 
-ServerConnection::ServerConnection(std::string ip, int port)
-    : _ip(ip), _port(port)
+ServerConnection::ServerConnection(std::string ip, int port, SafeQueue<std::string> *queue)
+    : _ip(ip), _port(port), _queue(queue)
 {
 }
 
@@ -24,6 +24,9 @@ void ServerConnection::connectToServer()
 
 void ServerConnection::disconnectFromServer()
 {
+    if (_socket == -1) {
+        return;
+    }
     _thread.join();
     close(_socket);
     _socket = -1;
@@ -39,7 +42,15 @@ std::string ServerConnection::tryReceive()
     return std::string(buffer);
 }
 
-int ServerConnection::selectFd() {
+void ServerConnection::sendToServer(std::string msg)
+{
+    if (send(_socket, msg.c_str(), msg.length(), 0) == -1) {
+        throw std::runtime_error("Error sending to server");
+    }
+    std::cout << "-> : " << msg << std::endl;
+}
+
+int ServerConnection::_selectFd() {
     fd_set readfds;
     int retval;
 
@@ -52,10 +63,20 @@ int ServerConnection::selectFd() {
     return retval;
 }
 
-void ServerConnection::connectToServerThread()
+void ServerConnection::_comunicationLoop()
 {
     int sel;
+    sel = _selectFd();
+    if (sel == 0) {
+        return;
+    }
+    std::string msg = tryReceive();
+    _queue->enqueue(msg);
+    std::cout << "<- : " << msg << std::endl;
+}
 
+void ServerConnection::connectToServerThread()
+{
     _socket = socket(AF_INET, SOCK_STREAM, 0);
     if (_socket == -1) {
         throw std::runtime_error("Error creating socket");
@@ -66,12 +87,7 @@ void ServerConnection::connectToServerThread()
     if (connect(_socket, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
         throw std::runtime_error("Error connecting to server");
     }
-    while (1) {
-        sel = selectFd();
-        if (sel == 0) {
-            continue;
-        }
-        std::string msg = tryReceive();
-        std::cout << msg << std::endl;
+    while (true) {
+        _comunicationLoop();
     }
 }
