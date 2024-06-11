@@ -1,0 +1,3 @@
+[submodule "client/gui/raylib-cpp"]
+	path = client/gui/raylib-cpp
+	url = git@github.com:RobLoach/raylib-cpp.git

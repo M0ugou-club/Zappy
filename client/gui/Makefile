@@ -33,10 +33,11 @@ COLOR_BLUE = \033[0;34m
 COLOR_YELLOW = \033[0;33m
 COLOR_RESET = \033[0m
 
-CXXFLAGS = --start-no-unused-arguments -Wall -Wextra -std=c++17\
+CXXFLAGS = -Wall -Wextra -std=c++17\
 	$(shell uname -m | grep -q "arm" && echo "--start-no-unused-arguments"\
         && echo "-I/opt/homebrew/Cellar/raylib/5.0/include"\
-        && echo "-L/opt/homebrew/Cellar/raylib/5.0/lib" || echo "") -lraylib
+        && echo "-L/opt/homebrew/Cellar/raylib/5.0/lib" || echo "")\
+		-I./raylib-cpp/include/ -lraylib
 
 all: $(NAME)
 
