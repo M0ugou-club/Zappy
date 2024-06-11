@@ -14,13 +14,15 @@ SRC = main.cpp \
 	  Map.cpp \
 	  MyCamera.cpp \
 	  MyCube.cpp \
+	  SafeQueue.cpp \
 	  items/Item.cpp \
 	  ui/ColorsMap.cpp \
 	  ui/Panel.cpp \
 	  ui/Button.cpp \
 	  scenes/AScene.cpp \
-	  scenes/World.cpp \
 	  scenes/Menu.cpp \
+	  scenes/World.cpp \
+	  scenes/World/Player.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 

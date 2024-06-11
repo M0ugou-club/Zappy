@@ -7,12 +7,6 @@
 
 #include "Map.hpp"
 
-Map::Map()
-{
-    _x = 4;
-    _y = 4;
-}
-
 Map::Map(int x, int y)
 {
     _x = x;
