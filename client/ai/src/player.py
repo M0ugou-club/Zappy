@@ -1,5 +1,6 @@
 import random
 import socket
+import select
 
 class Player:
     def __init__(self, team, machine, port):
@@ -363,6 +364,19 @@ class Player:
             pass
 
 
+    def handle_server_response(self):
+        '''Handle incoming server messages'''
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            if response:
+                print("Received:", response)
+                if response.startswith("Broadcast "):
+                    self.receive_broadcast()
+                else:
+                    pass
+
+
     def run(self) -> None:
         '''run the player'''
         try:
@@ -376,16 +390,16 @@ class Player:
             if self.socket.recv(1024).decode() == "ko\n":
                 break
 
-        while (True):
+        while True:
             print("MY LEVEL IS : ", self.level)
             self.fork()
             inventory = self.get_inventory()
             if inventory['food'] < 5:
                 self.survive()
-            #self.receive_broadcast()
-            if not self.is_incanting :
+            if not self.is_incanting:
                 self.try_incantation()
             self.expedition()
+            self.handle_server_response()
 
 
     def disconnect(self) -> None:
