@@ -39,6 +39,7 @@ typedef struct max_items_s {
 } max_items_t;
 
 typedef struct square_s {
+    char **eggs;
     int food;
     int linemate;
     int deraumere;
@@ -46,6 +47,10 @@ typedef struct square_s {
     int mendiane;
     int phiras;
     int thystame;
+    struct square_s *north;
+    struct square_s *south;
+    struct square_s *east;
+    struct square_s *west;
 } square_t;
 
 typedef struct player_s {
@@ -63,6 +68,7 @@ typedef struct game_s {
     struct max_items_s *max_items;
     struct square_s **map;
     struct player_s *players;
+    int max_players;
     char **teams;
     int *team_slots;
 } game_t;
@@ -70,6 +76,5 @@ typedef struct game_s {
 game_t *init_game(int x, int y, char **teams);
 void free_game(game_t *game);
 max_items_t *fill_density(int x, int y);
-void place_items_randomly(game_t *game);
 
 #endif /* !GAME_H_ */

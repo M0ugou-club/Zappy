@@ -19,16 +19,7 @@ ServerConnection::~ServerConnection()
 
 void ServerConnection::connectToServer()
 {
-    _socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (_socket == -1) {
-        throw std::runtime_error("Error creating socket");
-    }
-    _addr.sin_family = AF_INET;
-    _addr.sin_port = htons(_port);
-    _addr.sin_addr.s_addr = inet_addr(_ip.c_str());
-    if (connect(_socket, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
-        throw std::runtime_error("Error connecting to server");
-    }
+    _thread = std::thread(&ServerConnection::connectToServerThread, this);
 }
 
 void ServerConnection::disconnectFromServer()
@@ -47,4 +38,21 @@ std::string ServerConnection::tryReceive()
         throw std::runtime_error("Error reading from server");
     }
     return std::string(buffer);
+}
+
+void ServerConnection::connectToServerThread()
+{
+    _socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (_socket == -1) {
+        throw std::runtime_error("Error creating socket");
+    }
+    _addr.sin_family = AF_INET;
+    _addr.sin_port = htons(_port);
+    _addr.sin_addr.s_addr = inet_addr(_ip.c_str());
+    if (connect(_socket, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
+        throw std::runtime_error("Error connecting to server");
+    }
+    while (1) {
+        sleep(1);
+    }
 }

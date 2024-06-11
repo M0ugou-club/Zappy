@@ -8,7 +8,7 @@
 NAME = zappy_gui
 
 SRC = main.cpp \
-	  Gui.cpp \
+	  Core.cpp \
 	  Args.cpp \
 	  ServerConnection.cpp \
 	  Map.cpp \
@@ -16,6 +16,12 @@ SRC = main.cpp \
 	  MyCube.cpp \
 	  items/Item.cpp \
 	  Player.cpp \
+	  ui/ColorsMap.cpp \
+	  ui/Panel.cpp \
+	  ui/Button.cpp \
+	  scenes/AScene.cpp \
+	  scenes/World.cpp \
+	  scenes/Menu.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 
@@ -28,7 +34,11 @@ COLOR_BLUE = \033[0;34m
 COLOR_YELLOW = \033[0;33m
 COLOR_RESET = \033[0m
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -lraylib
+CXXFLAGS = -Wall -Wextra -std=c++17\
+	$(shell uname -m | grep -q "arm" && echo "--start-no-unused-arguments"\
+        && echo "-I/opt/homebrew/Cellar/raylib/5.0/include"\
+        && echo "-L/opt/homebrew/Cellar/raylib/5.0/lib" || echo "")\
+		-I./raylib-cpp/include/ -lraylib
 
 all: $(NAME)
 

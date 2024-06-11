@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <vector>
-#include <raylib/raylib-cpp.hpp>
+#include <raylib-cpp.hpp>
 
 class MyCamera {
     public:
