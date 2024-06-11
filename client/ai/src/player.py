@@ -323,7 +323,7 @@ class Player:
 
     def receive_broadcast(self) -> None:
         '''receive the broadcast'''
-        response = self.fd.recv(1024).decode()
+        response = self.socket.recv(1024).decode()
         if response == "ko\n" or response.startswith("message") == False:
             return
         direction = response.split(", ")[0].split(" ")[1]
@@ -365,8 +365,11 @@ class Player:
 
     def run(self) -> None:
         '''run the player'''
-        fd = self.socket.connect((self.machine, int(self.port)))
-        print(fd)
+        try:
+            self.socket.connect((self.machine, int(self.port)))
+        except socket.error as e:
+            print(f"Socket error: {e}")
+            return
         self.socket.sendall("\n".encode())
         while True:
             self.socket.sendall((self.team + "\n").encode())
@@ -379,12 +382,13 @@ class Player:
             inventory = self.get_inventory()
             if inventory['food'] < 5:
                 self.survive()
-            ##self.receive_broadcast()
+            #self.receive_broadcast()
             if not self.is_incanting :
                 self.try_incantation()
             self.expedition()
 
+
     def disconnect(self) -> None:
         '''disconnect the player'''
-        if (self.fd != 0):
-            self.socket.close()
+        self.socket.close()
+        pass
