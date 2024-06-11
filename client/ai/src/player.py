@@ -365,7 +365,8 @@ class Player:
 
     def run(self) -> None:
         '''run the player'''
-        self.socket.connect((self.machine, int(self.port)))
+        fd = self.socket.connect((self.machine, int(self.port)))
+        print(fd)
         self.socket.sendall("\n".encode())
         while True:
             self.socket.sendall((self.team + "\n").encode())
