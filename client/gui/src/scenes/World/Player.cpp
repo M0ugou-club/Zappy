@@ -10,7 +10,7 @@
 Player::Player()
 {
     _position.SetX(0.0f);
-    _position.SetY(0.0f);
+    _position.SetY(10.0f);
     _position.SetZ(0.0f);
     rectangleMesh = GenMeshCube(width, height, depth);
     rectangleModel = LoadModelFromMesh(rectangleMesh);

@@ -12,6 +12,7 @@
     #include "AScene.hpp"
     #include "../Map.hpp"
     #include "../MyCamera.hpp"
+    #include "World/Player.hpp"
 
 class World : public AScene {
     public:
