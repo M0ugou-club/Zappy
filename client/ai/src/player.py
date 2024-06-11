@@ -196,6 +196,24 @@ class Player:
         pass
 
 
+    def check_dict_inventory(self, key : str) -> bool:
+        '''check the inventory'''
+        if key == 'food':
+            return True
+        if key == 'linemate':
+            return True
+        if key == 'deraumere':
+            return True
+        if key == 'sibur':
+            return True
+        if key == 'mendiane':
+            return True
+        if key == 'phiras':
+            return True
+        if key == 'thystame':
+            return True
+        return False
+
     def interpret_inventory(self, response : str) -> dict:
         '''interpret the inventory response'''
         response = response[1:-2]
@@ -206,7 +224,11 @@ class Player:
         inventory = {}
         for i in range(len(response) - 1):
             response[i] = response[i].split(' ')
-            inventory[response[i][0]] = int(response[i][1])
+            if self.check_dict_inventory(response[i][0]):
+                inventory[response[i][0]] = int(response[i][1])
+            else:
+                key = response[i][0]
+                inventory[key[3:]] = int(response[i][1])
         return inventory
 
 
@@ -386,7 +408,6 @@ class Player:
                 else:
                     pass
 
-
     def run(self) -> None:
         '''run the player'''
         try:
@@ -403,11 +424,11 @@ class Player:
         while True:
             print("MY LEVEL IS : ", self.level)
             inventory = self.get_inventory()
+            print(next(iter(inventory)))
             if inventory['food'] < 5:
                 self.survive()
             if not self.is_incanting:
                 self.try_incantation()
-            self.expedition()
             self.handle_server_response()
 
 
