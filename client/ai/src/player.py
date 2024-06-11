@@ -198,21 +198,15 @@ class Player:
 
     def check_dict_inventory(self, key : str) -> bool:
         '''check the inventory'''
-        if key == 'food':
-            return True
-        if key == 'linemate':
-            return True
-        if key == 'deraumere':
-            return True
-        if key == 'sibur':
-            return True
-        if key == 'mendiane':
-            return True
-        if key == 'phiras':
-            return True
-        if key == 'thystame':
-            return True
-        return False
+        return key in [
+            "food",
+            "linemate",
+            "deraumere",
+            "sibur",
+            "mendiane",
+            "phiras",
+            "thystame"
+        ]
 
     def interpret_inventory(self, response : str) -> dict:
         '''interpret the inventory response'''
