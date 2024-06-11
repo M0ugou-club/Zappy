@@ -11,6 +11,7 @@
     #include "IScene.hpp"
     #include "Window.hpp"
     #include <string>
+    #include <memory>
 
 class AScene : public IScene {
     public:
