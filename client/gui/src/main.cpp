@@ -26,9 +26,17 @@ int main(int ac, char **av)
     }
 
     ServerConnection server(args.getIp(), args.getPort(), queues);
-    server.connectToServer();
+    try {
+        server.connectToServer();
+    }
+    catch(const std::exception& e) {
+        std::cerr << e.what() << '\n';
+        return 84;
+    }
+    server.sendToServer("GRAPHIC");
 
     core.start();
+    server.disconnectFromServer();
     delete std::get<IN>(queues);
     delete std::get<OUT>(queues);
     return 0;

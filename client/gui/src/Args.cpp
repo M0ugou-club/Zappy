@@ -27,9 +27,9 @@ Args::Args(int ac, char **av)
 int Args::setArgs()
 {
     if (_av.size() < 5) {
-        throw BadArgumentException("Not enough arguments");
+        throw std::runtime_error("Not enough arguments");
     } else if (_av.size() > 5) {
-        throw BadArgumentException("Too many arguments");
+        throw std::runtime_error("Too many arguments");
     }
     for (int i = 1; i < _ac; i++) {
         if (_av[i][0] != '-')
@@ -39,7 +39,7 @@ int Args::setArgs()
         } else if (_av[i] == "-h") {
             _processIp(i + 1);
         } else {
-            throw BadArgumentException("Invalid arguments");
+            throw std::runtime_error("Invalid arguments");
         }
     }
     return 0;
@@ -63,11 +63,11 @@ void Args::_processIp(int i)
 void Args::_processPort(int i)
 {
     if (Args::isNumber(_av[i]) == false) {
-        throw BadArgumentException("Invalid port");
+        throw std::runtime_error("Invalid port");
     }
     try {
         _port = std::stoi(_av[i]);
     } catch (std::exception &e) {
-        throw BadArgumentException("Invalid port");
+        throw std::runtime_error("Invalid port");
     }
 }
