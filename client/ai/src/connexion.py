@@ -47,11 +47,16 @@ def get_machine():
             return sys.argv[index + 1]
     return 'localhost'
 
+def get_opt() -> bool:
+    '''get the options for mutltithreading'''
+    if "--multithread" in sys.argv:
+        return True
+
 def main():
     '''Main function to handle client connection and communication.'''
     print("Client started")
-    info = [get_port(), get_name(), get_machine()]
-    IA1 = player.Player(info[1], info[2], info[0])
+    info = [get_port(), get_name(), get_machine(), get_opt()]
+    IA1 = player.Player(info[1], info[2], info[0], info[3])
 
     IA1.run()
     IA1.disconnect()
