@@ -10,5 +10,10 @@
 // Look in a cone in front of the player
 void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
-    return;
+    player_t *player = get_player_by_fd(cl, srv);
+    char response[1024] = "";
+    int cone_width = 3;
+
+    for (int i = 1; i < player->level; i++) {
+    }
 }

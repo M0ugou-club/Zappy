@@ -5,14 +5,14 @@
 ** main
 */
 
-#include "Gui.hpp"
+#include "Core.hpp"
 #include "Args.hpp"
 
 int main(int ac, char **av)
 {
-    Gui gui;
+    Core core;
 
     Args::main_example(ac, av);
-    gui.start();
+    core.start();
     return 0;
 }

@@ -41,6 +41,7 @@ SRC =	src/main.c \
 		src/args/set/set_size.c \
 		src/args/set/set_game_properties.c \
 		src/args/error_args.c \
+		src/game/egg.c \
 		src/game/init_game.c \
 		src/game/free_game.c \
 		src/game/fill_map.c \
