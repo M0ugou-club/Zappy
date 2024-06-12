@@ -19,10 +19,11 @@
     #include <netinet/in.h>
     #include <arpa/inet.h>
     #include <sys/select.h>
+    #include <cstring>
 
 class ServerConnection {
     public:
-        ServerConnection(std::string ip, int port, SafeQueue<std::string> *queue);
+        ServerConnection(std::string ip, int port, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues);
         ~ServerConnection();
 
         void connectToServer();
@@ -34,11 +35,12 @@ class ServerConnection {
 
     private:
         int _selectFd();
-        void _communicationLoop();
+        void _receiveLoop();
+        void _sendLoop();
 
         std::string _ip;
         int _port;
-        SafeQueue<std::string> *_queue;
+        std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> _queues;
         std::thread _thread;
         int _socket = -1;
         struct sockaddr_in _addr;

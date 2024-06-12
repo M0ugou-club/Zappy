@@ -7,8 +7,8 @@
 
 #include "ServerConnection.hpp"
 
-ServerConnection::ServerConnection(std::string ip, int port, SafeQueue<std::string> *queue)
-    : _ip(ip), _port(port), _queue(queue)
+ServerConnection::ServerConnection(std::string ip, int port, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues)
+    : _ip(ip), _port(port), _queues(queues)
 {
 }
 
@@ -35,6 +35,7 @@ void ServerConnection::disconnectFromServer()
 std::string ServerConnection::tryReceive()
 {
     char buffer[1024] = {0};
+    memset(buffer, 0, 1024);
     int valread = read(_socket, buffer, 1024);
     if (valread == -1) {
         throw std::runtime_error("Error reading from server");
@@ -44,10 +45,7 @@ std::string ServerConnection::tryReceive()
 
 void ServerConnection::sendToServer(std::string msg)
 {
-    if (send(_socket, msg.c_str(), msg.length(), 0) == -1) {
-        throw std::runtime_error("Error sending to server");
-    }
-    std::cout << "-> : " << msg << std::endl;
+    std::get<1>(_queues)->enqueue(msg);
 }
 
 int ServerConnection::_selectFd() {
@@ -63,7 +61,7 @@ int ServerConnection::_selectFd() {
     return retval;
 }
 
-void ServerConnection::_communicationLoop()
+void ServerConnection::_receiveLoop()
 {
     int sel;
     sel = _selectFd();
@@ -71,8 +69,21 @@ void ServerConnection::_communicationLoop()
         return;
     }
     std::string msg = tryReceive();
-    _queue->enqueue(msg);
+    std::get<0>(_queues)->enqueue(msg);
     std::cout << "<- : " << msg << std::endl;
+}
+
+void ServerConnection::_sendLoop()
+{
+    std::string sending;
+
+    while (std::get<1>(_queues)->empty()) {
+        sending = std::get<1>(_queues)->dequeue();
+        if (send(_socket, sending.c_str(), sending.length(), 0) == -1) {
+            throw std::runtime_error("Error sending to server");
+        }
+        std::cout << "-> : " << sending << std::endl;
+    }
 }
 
 void ServerConnection::connectToServerThread()
@@ -88,6 +99,7 @@ void ServerConnection::connectToServerThread()
         throw std::runtime_error("Error connecting to server");
     }
     while (true) {
-        _communicationLoop();
+        _receiveLoop();
+        _sendLoop();
     }
 }
