@@ -13,6 +13,7 @@
 int Args::main_example(int ac, char **av)
 {
     Args args(ac, av);
+    SafeQueue<std::string> queue;
 
     try {
         args.setArgs();
@@ -24,11 +25,13 @@ int Args::main_example(int ac, char **av)
     std::string ip = args.getIp();
     int port = args.getPort();
 
-    ServerConnection server(ip, port);
+    ServerConnection server(ip, port, &queue);
     server.connectToServer();
-    std::string response = server.tryReceive();
-    std::cout << response << std::endl;
-    server.disconnectFromServer();
+
+    while (1) {
+        sleep(1);
+        std::cout << "Always Here" << std::endl;
+    }
 
     return 0;
 }
