@@ -82,39 +82,46 @@ class Player:
 
     def forward(self) -> None:
         '''move forward'''
-        self.socket.sendall("Forward\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
+        _ , ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall("Forward\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Forward:" + response)
 
 
     def right(self) -> None:
         '''turn right'''
-        self.socket.sendall("Right\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
+        _ , ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall("Right\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Right:" + response)
 
 
     def left(self) -> None:
         '''turn left'''
-        self.socket.sendall("Left\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
+        _ , ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall("Left\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Left:" + response)
 
 
     def take(self, object : str) -> None:
-        '''take the object in the tile'''
-        self.socket.sendall(f"Take {object}\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            print("ko")
-            self.survival = False
-        pass
+        '''take object'''
+        _ , ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall(f"Take {object}\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Take:" + response)
 
 
     def interpret_look(self, response : str) -> list:
@@ -134,70 +141,87 @@ class Player:
 
     def look(self) -> list:
         '''look around the player'''
-        self.socket.sendall("Look\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response != "ko\n":
-            response = self.interpret_look(response)
-            return response
-        else:
-            self.survival = False
-        pass
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall("Look\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Look:" + response)
+            return self.interpret_look(response)
 
 
     def incantation(self) -> None:
         '''incantation'''
         print("Incantation")
-        self.socket.sendall("Incantation\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response != "ko\n":
-            self.level += 1
-            self.fork()
-        else:
-            print(response)
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall("Incantation\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Incantation:" + response)
+            if response != "ko\n":
+                self.level += 1
+                self.is_incanting = True
 
 
     def broadcast(self, message : str) -> None:
         '''broadcast a message'''
-        self.socket.sendall(f"Broadcast {message}\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall(f"Broadcast {message}\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Broadcast:" + response)
+            return
+        print("No broadcast")
 
 
     def connect_nbr(self) -> None:
         '''connect the player'''
-        self.socket.sendall("Connect_nbr\n".encode())
-        pass
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall("Connect_nbr\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Connect_nbr:" + response)
+            return
 
 
     def fork(self) -> None:
         '''fork the player'''
-        self.socket.sendall("Fork\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response != "ko\n":
-            if self.MTopt == True :
-                subprocess.Popen(["./zappy_ai", "-p", str(self.port), "-n", self.team])
-        print(response)
-        pass
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall("Fork\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Fork:" + response)
 
 
     def eject(self) -> None:
         '''eject the player'''
-        self.socket.sendall("Eject\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall("Eject\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Eject:" + response)
 
 
     def set_object(self, object : str) -> None:
-        '''set object down'''
-        self.socket.sendall(f"Set {object}\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
+        '''set object'''
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall(f"Set {object}\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            response = self.socket.recv(1024).decode()
+            print("Set:" + response)
 
 
     def check_dict_inventory(self, key : str) -> bool:
@@ -231,14 +255,18 @@ class Player:
 
 
     def get_inventory(self) -> dict:
-        '''get the inventory of the player'''
-        self.socket.sendall("Inventory\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        response = self.interpret_inventory(response)
-        print(response)
-        return response
+        '''get the inventory'''
+        print("Inventory")
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            print("Sending inventory")
+            self.socket.sendall("Inventory\n".encode())
+        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+        if ready_to_read:
+            print("Receiving inventory")
+            response = self.socket.recv(1024).decode()
+            return self.interpret_inventory(response)
+        print("No inventory")
 
 
     ##AI functions
@@ -430,13 +458,25 @@ class Player:
 
         while True:
             # self.socket.sendall("Broadcast Salut !\n".encode())
-            # self.handle_server_response()
             print("MY LEVEL IS : ", self.level)
-            inventory = self.get_inventory()
-            if inventory['food'] < 5:
-                self.survive()
-            if not self.is_incanting:
-                self.try_incantation()
+            self.forward()
+            self.right()
+            self.left()
+            self.look()
+            #self.get_inventory()
+            #self.incantation()
+            self.broadcast("Salut !")
+            self.connect_nbr()
+            #self.fork()
+            self.eject()
+            self.set_object("food")
+            self.take("food")
+            #inventory = self.get_inventory()
+            #if inventory['food'] < 5:
+            #    self.survive()
+            #if not self.is_incanting:
+            #    self.try_incantation()
+            #self.handle_server_response()
 
 
     def disconnect(self) -> None:
