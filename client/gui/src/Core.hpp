@@ -20,7 +20,7 @@
 
 class Core {
     public:
-        Core(const Args &args, SafeQueue<std::string> *eventQueue);
+        Core(const Args &args, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues);
         ~Core() = default;
         void start();
 
@@ -35,7 +35,7 @@ class Core {
         std::string _currentScene;
         std::map<std::string, std::unique_ptr<IScene>> _scenes;
         std::string _newSceneName;
-        SafeQueue<std::string> *_eventQueue;
+        std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> _queues;
 };
 
 #endif /* !CORE_HPP_ */

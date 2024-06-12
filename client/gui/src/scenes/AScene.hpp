@@ -13,6 +13,7 @@
     #include "../SafeQueue.hpp"
     #include <string>
     #include <memory>
+    #include <tuple>
 
 class AScene : public IScene {
     public:
@@ -27,7 +28,7 @@ class AScene : public IScene {
 
     protected:
         std::shared_ptr<raylib::Window> _window;
-        SafeQueue<std::string> *_eventQueue;
+        std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> _queues;
         bool _shouldClose = false;
 };
 

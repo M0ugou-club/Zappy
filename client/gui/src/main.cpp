@@ -12,8 +12,10 @@
 int main(int ac, char **av)
 {
     Args args(ac, av);
-    SafeQueue<std::string> queue;
-    Core core(args, &queue);
+    std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues;
+    std::get<IN>(queues) = new SafeQueue<std::string>;
+    std::get<OUT>(queues) = new SafeQueue<std::string>;
+    Core core(args, queues);
 
     try {
         args.setArgs();
@@ -23,9 +25,11 @@ int main(int ac, char **av)
         return 84;
     }
 
-    ServerConnection server(args.getIp(), args.getPort(), &queue);
+    ServerConnection server(args.getIp(), args.getPort(), queues);
     server.connectToServer();
 
     core.start();
+    delete std::get<IN>(queues);
+    delete std::get<OUT>(queues);
     return 0;
 }

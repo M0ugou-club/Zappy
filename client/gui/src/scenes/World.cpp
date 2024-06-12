@@ -7,17 +7,17 @@
 
 #include "World.hpp"
 
-World::World(const raylib::Window &window, std::string &newSceneName, SafeQueue<std::string> *eventQueue)
+World::World(const raylib::Window &window, std::string &newSceneName, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues)
     : _map(10, 10), _newSceneName(newSceneName)
 {
     _window = std::make_shared<raylib::Window>(window);
-    _eventQueue = eventQueue;
+    _queues = queues;
 }
 
 void World::parseEventQueue()
 {
-    while (!_eventQueue->empty()) {
-        std::string packet = _eventQueue->dequeue();
+    while (!std::get<IN>(_queues)->empty()) {
+        std::string packet = std::get<IN>(_queues)->dequeue();
         parsePacket(packet);
     }
 

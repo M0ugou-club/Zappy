@@ -7,8 +7,8 @@
 
 #include "Core.hpp"
 
-Core::Core(const Args &args, SafeQueue<std::string> *eventQueue)
-    : _args(args), _defaultScene("menu"), _eventQueue(eventQueue)
+Core::Core(const Args &args, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues)
+    : _args(args), _defaultScene("menu"), _queues(queues)
 {
     _width = 1920 / 2;
     _height = 1080 / 2;
@@ -16,8 +16,8 @@ Core::Core(const Args &args, SafeQueue<std::string> *eventQueue)
 
 void Core::loadScenes(raylib::Window &window)
 {
-    _scenes["menu"] = std::make_unique<Menu>(window, _newSceneName, _eventQueue);
-    _scenes["world"] = std::make_unique<World>(window, _newSceneName, _eventQueue);
+    _scenes["menu"] = std::make_unique<Menu>(window, _newSceneName, _queues);
+    _scenes["world"] = std::make_unique<World>(window, _newSceneName, _queues);
 }
 
 void Core::loadScene(const std::string &scene)

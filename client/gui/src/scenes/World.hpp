@@ -15,10 +15,11 @@
     #include "../Map.hpp"
     #include "../MyCamera.hpp"
     #include "World/Player.hpp"
+    #include "../Defines.hpp"
 
 class World : public AScene {
     public:
-        World(const raylib::Window &window, std::string &newSceneName, SafeQueue<std::string> *eventQueue);
+        World(const raylib::Window &window, std::string &newSceneName, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues);
         ~World() = default;
 
         void load();
