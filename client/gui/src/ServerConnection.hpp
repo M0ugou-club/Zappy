@@ -43,6 +43,7 @@ class ServerConnection {
         std::string _ip;
         int _port;
         std::atomic<bool> _connected = false;
+        std::string _buffer;
         std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> _queues;
         std::thread _thread;
         int _fd = -1;

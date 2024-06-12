@@ -89,9 +89,12 @@ void ServerConnection::_receiveLoop()
     if (sel == 0) {
         return;
     }
-    std::string msg = tryReceive();
-    std::get<IN>(_queues)->enqueue(msg);
-    std::cout << "<- : " << msg << std::endl;
+    _buffer += tryReceive();
+    while (_buffer.find("\n") != std::string::npos) {
+        std::get<IN>(_queues)->enqueue(_buffer.substr(0, _buffer.find("\n")));
+        std::cout << "<- : " << _buffer.substr(0, _buffer.find("\n")) << std::endl;
+        _buffer = _buffer.substr(_buffer.find("\n") + 1);
+    }
 }
 
 void ServerConnection::_sendLoop()
