@@ -3,7 +3,7 @@ import socket
 import subprocess
 
 class Player:
-    def __init__(self, team, machine, port):
+    def __init__(self, team, machine, port, MTopt):
         self.team = team
         self.level = 1
         self.fd = 0
@@ -13,7 +13,8 @@ class Player:
         self.survival = True
         self.is_incanting = False
         self.team_mates = 0
-        self.MTopt = False
+        self.MTopt = MTopt
+        self.log = True
 
 
     LEVEL_REQUIREMENTS = {
@@ -110,9 +111,6 @@ class Player:
         '''take the object in the tile'''
         self.socket.sendall(f"Take {object}\n".encode())
         response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            print("ko")
-            self.survival = False
         pass
 
 
@@ -145,14 +143,13 @@ class Player:
 
     def incantation(self) -> None:
         '''incantation'''
-        print("Incantation")
+        if self.log:
+            print("Incantation")
         self.socket.sendall("Incantation\n".encode())
         response = self.socket.recv(1024).decode()
         if response != "ko\n":
             self.level += 1
             self.fork()
-        else:
-            print(response)
 
 
     def broadcast(self, message : str) -> None:
@@ -176,9 +173,8 @@ class Player:
         response = self.socket.recv(1024).decode()
         if response != "ko\n":
             if self.MTopt == True :
+                self.log = False
                 subprocess.Popen(["./zappy_ai", "-p", str(self.port), "-n", self.team])
-        print(response)
-        pass
 
 
     def eject(self) -> None:
@@ -220,7 +216,8 @@ class Player:
         if response == "ko\n":
             self.survival = False
         response = self.interpret_inventory(response)
-        print(response)
+        if self.log:
+            print(response)
         return response
 
 
@@ -228,13 +225,11 @@ class Player:
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
-        print(direction)
         self.MOVEMENTS_DIRECTION[direction](self)
 
 
     def go_to(self, tile : list, pos : tuple, searching_item : list) -> None:
         '''go to the tile given in parameter'''
-        print(f"{pos=}")
         for _ in range(pos[1]):
             self.forward()
         if pos[0] > 0:
@@ -250,8 +245,9 @@ class Player:
         '''take the item in the tile'''
         for item in searching_item:
             if item in tile:
-                print("Item found")
-                print(item)
+                if self.log:
+                    print("Item found")
+                    print(item)
                 self.take(item)
 
 
@@ -281,21 +277,17 @@ class Player:
         if correct_tile:
             self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
         else :
-            print("Item not found")
             self.go_to_direction(random.randint(1, 3))
 
 
     def survive(self) -> None:
         '''survive'''
         while self.get_inventory()['food'] < 15:
-            test = self.get_inventory()
-            print(test['food'])
             self.search_object(self.look(), ['food'])
 
 
     def expedition(self) -> None:
         '''expeditions'''
-        print("Expedition")
         self.search_object(self.look(), ['linemate', 'deraumere', 'sibur', 'mendiane', 'phiras', 'thystame'])
 
 
@@ -327,12 +319,10 @@ class Player:
         inventory = self.get_inventory()
         needed = []
         for key in requirements:
-            print(key)
             if key == 'player':
                 continue
             if inventory[key] < requirements[key]:
                 needed.append(key)
-        print(needed)
         return needed
 
 
@@ -367,6 +357,8 @@ class Player:
 
     def try_incantation(self) -> None:
         '''try the incantation'''
+        if self.log:
+            print("incantation try")
         inventory = self.get_inventory()
         if inventory['food'] < 5:
             return
@@ -374,10 +366,12 @@ class Player:
         requirements_checked = self.check_requirements(requirements)
         while requirements_checked != 0:
             if requirements_checked == 1:
-                print("searching for items")
+                if self.log:
+                    print("searching for items")
                 self.search_object(self.look(), self.what_i_need(requirements))
             else:
-                print("calling teammates")
+                if self.log:
+                    print("calling teammates")
                 self.call_teammates()
                 if self.get_inventory()['food'] < 5:
                     return
@@ -396,7 +390,8 @@ class Player:
                 break
 
         while (True):
-            print("MY LEVEL IS : ", self.level)
+            if self.log:
+                print("MY LEVEL IS : ", self.level)
             inventory = self.get_inventory()
             if inventory['food'] < 5:
                 self.survive()
