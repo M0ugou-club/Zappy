@@ -10,32 +10,6 @@
 
 #include <memory>
 
-int Args::main_example(int ac, char **av)
-{
-    Args args(ac, av);
-    SafeQueue<std::string> queue;
-
-    try {
-        args.setArgs();
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << std::endl;
-        std::cerr << "Usage: ./zappy_gui -p port -h machine" << std::endl;
-        return 84;
-    }
-    std::string ip = args.getIp();
-    int port = args.getPort();
-
-    ServerConnection server(ip, port, &queue);
-    server.connectToServer();
-
-    while (1) {
-        sleep(1);
-        std::cout << "Always Here" << std::endl;
-    }
-
-    return 0;
-}
-
 bool Args::isNumber(const std::string &str)
 {
     for (const auto &c : str) {
