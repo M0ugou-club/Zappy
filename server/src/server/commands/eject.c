@@ -29,4 +29,5 @@ void cmd_eject(server_t *srv, connection_t *cl, regex_parse_t *parse)
         tmp = tmp->next;
     }
     player->square->eggs = NULL;
+    queue_formatted_message(cl, "ok");
 }

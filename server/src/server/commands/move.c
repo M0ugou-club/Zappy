@@ -21,6 +21,7 @@ void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse)
     } else if (player->direction == WEST) {
         player->square = player->square->west;
     }
+    queue_formatted_message(cl, "ok");
 }
 
 // Turn the player to the right
@@ -37,6 +38,7 @@ void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse)
     } else if (player->direction == WEST) {
         player->direction = NORTH;
     }
+    queue_formatted_message(cl, "ok");
 }
 
 // Turn the player to the left
@@ -53,4 +55,5 @@ void cmd_left(server_t *srv, connection_t *cl, regex_parse_t *parse)
     } else if (player->direction == WEST) {
         player->direction = SOUTH;
     }
+    queue_formatted_message(cl, "ok");
 }
