@@ -64,16 +64,16 @@ static void run_cmd(const command_regex_t *cmd, server_t *srv,
     if (cmd->spec_only == false && strcmp(client->team, "GRAPHIC") == 0)
         return;
     if (!cmd->spec_only) {
-        player = get_player_by_fd(srv->game->players, client->fd);
-        if (difftime(time(NULL), player->last_action) < cmd->time / srv->args->frequency) {
+        player = get_player_by_id(srv->game->players, client->fd);
+        if (difftime(time(NULL), player->last_action)
+            < cmd->time / srv->args->frequency) {
             queue_message(client, "ko\n");
             return;
         }
     }
     cmd->func(srv, client, &parse);
-    if (!cmd->spec_only && player != NULL) {
+    if (!cmd->spec_only && player != NULL)
         player->last_action = time(NULL);
-    }
 }
 
 static void execute(char *cmd, int client_fd, server_t *srv)
