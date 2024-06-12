@@ -9,6 +9,7 @@
     #define GAME_H_
 
     #include <stdlib.h>
+    #include <time.h>
 
 typedef enum direction_e {
     NORTH,
@@ -53,6 +54,7 @@ typedef struct player_s {
     char *team;
     struct square_s *square;
     direction_t direction;
+    time_t last_action;
     size_t level;
     item_t inventory[NONE];
 } player_t;
