@@ -63,7 +63,7 @@ int ServerConnection::_selectFd() {
     return retval;
 }
 
-void ServerConnection::_comunicationLoop()
+void ServerConnection::_communicationLoop()
 {
     int sel;
     sel = _selectFd();
@@ -88,6 +88,6 @@ void ServerConnection::connectToServerThread()
         throw std::runtime_error("Error connecting to server");
     }
     while (true) {
-        _comunicationLoop();
+        _communicationLoop();
     }
 }

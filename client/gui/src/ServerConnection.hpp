@@ -34,7 +34,7 @@ class ServerConnection {
 
     private:
         int _selectFd();
-        void _comunicationLoop();
+        void _communicationLoop();
 
         std::string _ip;
         int _port;
