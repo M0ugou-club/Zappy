@@ -16,8 +16,8 @@ Core::Core()
 
 void Core::loadScenes(raylib::Window &window)
 {
-    _scenes["menu"] = std::make_unique<Menu>(window, _newSceneName);
-    _scenes["world"] = std::make_unique<World>(window, _newSceneName);
+    _scenes["menu"] = std::make_unique<Menu>(window, _newSceneName, &_eventQueue);
+    _scenes["world"] = std::make_unique<World>(window, _newSceneName, &_eventQueue);
 }
 
 void Core::loadScene(const std::string &scene)

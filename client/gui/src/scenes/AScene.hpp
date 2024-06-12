@@ -10,6 +10,7 @@
 
     #include "IScene.hpp"
     #include "Window.hpp"
+    #include "../SafeQueue.hpp"
     #include <string>
     #include <memory>
 
@@ -24,10 +25,9 @@ class AScene : public IScene {
         void closeWindow();
         bool shouldClose() { return _shouldClose; }
 
-        void (*loadScene)(std::string sceneName) = nullptr;
-
     protected:
         std::shared_ptr<raylib::Window> _window;
+        SafeQueue<std::string> *_eventQueue;
         bool _shouldClose = false;
 };
 

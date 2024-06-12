@@ -16,10 +16,12 @@ template <typename T>
 class SafeQueue {
     public:
         SafeQueue() = default;
+        SafeQueue(const SafeQueue &other) = default;
         ~SafeQueue() = default;
 
         void enqueue(T t);
         T dequeue();
+        bool empty() { return _queue.empty(); }
 
     private:
         std::queue<T> _queue;

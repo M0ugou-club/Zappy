@@ -8,7 +8,7 @@
 #include "Menu.hpp"
 #include "World.hpp"
 
-Menu::Menu(const raylib::Window &window, std::string &newSceneName)
+Menu::Menu(const raylib::Window &window, std::string &newSceneName, SafeQueue<std::string> *eventQueue)
     : _playButton(
         "button.png",
         {(float)window.GetWidth() / 2 - 120, 250},
@@ -25,6 +25,7 @@ Menu::Menu(const raylib::Window &window, std::string &newSceneName)
     _newSceneName(newSceneName)
 {
     _window = std::make_shared<raylib::Window>(window);
+    _eventQueue = eventQueue;
 }
 
 void Menu::load()

@@ -34,6 +34,7 @@ class Core {
         std::string _currentScene;
         std::map<std::string, std::unique_ptr<IScene>> _scenes;
         std::string _newSceneName;
+        SafeQueue<std::string> _eventQueue;
 };
 
 #endif /* !CORE_HPP_ */
