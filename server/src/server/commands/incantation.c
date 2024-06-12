@@ -18,37 +18,54 @@ static const int incantation[7][6] =
     {6, 2, 2, 2, 2, 2, 1}
 };
 
-// Begin an incantation
-void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse)
+static bool check_incantation(server_t *srv,
+    connection_t *cl, player_t *player)
 {
-    player_t *player = get_player_by_fd(cl, srv);
-    player_t *tmp = srv->game->players;
-    connection_t *tmp_cl = srv->cons;
     int i_inventory = 1;
 
     if (player->level == 8) {
         queue_formatted_message(cl, "ko");
-        return;
+        return false;
     }
     for (int i = 0; i < 7; i++) {
-        if (player->inventory[i_inventory] < incantation[player->level - 1][i]) {
+        if (player->inventory[i_inventory] <
+            incantation[player->level - 1][i]) {
             queue_formatted_message(cl, "ko");
-            return;
+            return false;
         }
         i_inventory++;
     }
-    i_inventory = 1;
+    return true;
+}
+
+static void incantation_message(server_t *srv,
+    connection_t *cl, player_t *player)
+{
+    player_t *tmp = srv->game->players;
+    connection_t *t_cl = srv->cons;
+
+    queue_formatted_message(cl, "Current level: %d", player->level);
+    for (int i = 0; tmp != NULL; i++) {
+        if (tmp->square == player->square && tmp->fd != cl->fd) {
+            t_cl = get_client_by_fd(srv->cons, tmp->fd);
+            queue_formatted_message(t_cl, "Current level: %d", player->level);
+        }
+        tmp = tmp->next;
+    }
+}
+
+// Begin an incantation
+void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse)
+{
+    player_t *player = get_player_by_fd(cl, srv);
+    int i_inventory = 1;
+
+    if (!check_incantation(srv, cl, player))
+        return;
     queue_formatted_message(cl, "Elevation underway");
     for (int i = 0; i < 7; i++) {
         player->inventory[i_inventory] -= incantation[player->level - 1][i];
     }
     player->level += 1;
-    queue_formatted_message(cl, "Current level: %d", player->level);
-    for (int i = 0; tmp != NULL; i++) {
-        if (tmp->square == player->square && tmp->fd != cl->fd) {
-            tmp_cl = get_client_by_fd(srv->cons, tmp->fd);
-            queue_formatted_message(tmp_cl, "Current level: %d", player->level);
-        }
-        tmp = tmp->next;
-    }
+    incantation_message(srv, cl, player);
 }
