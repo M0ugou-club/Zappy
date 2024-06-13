@@ -34,6 +34,13 @@ void World::parsePacket(std::string packet)
         }},
         {"pnw (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$", [this](std::vector<std::string> args) {
             addPlayer(args[5], std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2]), std::stoi(args[3]), std::stoi(args[4]));
+        }},
+        {"ppo #(\\d+) (\\d+) (\\d+) ([1-4])$", [this](std::vector<std::string> args) {
+            _players[std::stoi(args[0])]->setPosition({(float)std::stoi(args[1]), (float)std::stoi(args[2]), 0});
+            _players[std::stoi(args[0])]->setOrientation(std::stoi(args[3]));
+        }},
+        {"plv #(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
+            _players[std::stoi(args[0])]->setLevel(std::stoi(args[1]));
         }}
     };
 
