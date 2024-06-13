@@ -78,50 +78,62 @@ class Player:
         lambda self: (self.right(), self.forward(), self.left(), self.forward())
     ]
 
+    messages_queue = []
+
+    ##SELECT FUNCTIONS
+
+
+    def send_message(self, message : str) -> None:
+        '''send the message'''
+        print("Sending messages")
+        self.socket.sendall(message.encode())
+
+
+    def handle_server_response(self):
+        '''Handle incoming server messages'''
+        print("receive messages")
+        response = self.socket.recv(1024).decode()
+        print("Received:", response)
+        if response:
+            if response.startswith("message "):
+                print("Received broadcast")
+            else:
+                pass
+
+
+    def select_gestion(self) -> None:
+        '''select the function to call'''
+        while self.messages_queue:
+            message = self.messages_queue.pop(0)
+            print("Message:", message)
+            _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+            if ready_to_write:
+                self.send_message(message)
+            ready_to_read, _, _ = select.select([self.socket], [], [], 1)
+            if ready_to_read:
+                self.handle_server_response()
+
+
     ##IPC functions
 
     def forward(self) -> None:
         '''move forward'''
-        _ , ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall("Forward\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Forward:" + response)
+        self.messages_queue.append("Forward\n")
 
 
     def right(self) -> None:
         '''turn right'''
-        _ , ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall("Right\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Right:" + response)
+        self.messages_queue.append("Right\n")
 
 
     def left(self) -> None:
         '''turn left'''
-        _ , ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall("Left\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Left:" + response)
+        self.messages_queue.append("Left\n")
 
 
     def take(self, object : str) -> None:
         '''take object'''
-        _ , ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall(f"Take {object}\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Take:" + response)
+        self.messages_queue.append(f"Take {object}\n")
 
 
     def interpret_look(self, response : str) -> list:
@@ -136,92 +148,47 @@ class Player:
             if response[i] == ['']:
                 response[i] = []
         return response
-        pass
 
 
     def look(self) -> list:
         '''look around the player'''
-        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall("Look\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Look:" + response)
-            return self.interpret_look(response)
+        self.messages_queue.append("Look\n")
 
 
     def incantation(self) -> None:
         '''incantation'''
-        print("Incantation")
-        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall("Incantation\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Incantation:" + response)
-            if response != "ko\n":
-                self.level += 1
-                self.is_incanting = True
+        self.messages_queue.append("Incantation\n")
+        #if ready_to_read:
+        #    response = self.socket.recv(1024).decode()
+        #    print("Incantation:" + response)
+        #    if response != "ko\n":
+        #        self.level += 1
+        #        self.is_incanting = True
 
 
     def broadcast(self, message : str) -> None:
         '''broadcast a message'''
-        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall(f"Broadcast {message}\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Broadcast:" + response)
-            return
-        print("No broadcast")
+        self.messages_queue.append(f"Broadcast {message}\n")
 
 
     def connect_nbr(self) -> None:
         '''connect the player'''
-        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall("Connect_nbr\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Connect_nbr:" + response)
-            return
+        self.messages_queue.append("Connect_nbr\n")
 
 
     def fork(self) -> None:
         '''fork the player'''
-        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall("Fork\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Fork:" + response)
+        self.messages_queue.append("Fork\n")
 
 
     def eject(self) -> None:
         '''eject the player'''
-        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall("Eject\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Eject:" + response)
+        self.messages_queue.append("Eject\n")
 
 
     def set_object(self, object : str) -> None:
         '''set object'''
-        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall(f"Set {object}\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            print("Set:" + response)
+        self.messages_queue.append(f"Set {object}\n")
 
 
     def check_dict_inventory(self, key : str) -> bool:
@@ -256,20 +223,12 @@ class Player:
 
     def get_inventory(self) -> dict:
         '''get the inventory'''
-        print("Inventory")
-        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            print("Sending inventory")
-            self.socket.sendall("Inventory\n".encode())
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            print("Receiving inventory")
-            response = self.socket.recv(1024).decode()
-            return self.interpret_inventory(response)
-        print("No inventory")
+        self.messages_queue.append("Inventory\n")
+        return []
 
 
     ##AI functions
+
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
@@ -431,18 +390,6 @@ class Player:
         self.incantation()
 
 
-    def handle_server_response(self):
-        '''Handle incoming server messages'''
-        ready_to_read, _, _ = select.select([self.socket], [], [], 1)
-        if ready_to_read:
-            response = self.socket.recv(1024).decode()
-            if response:
-                print("Received:", response)
-                if response.startswith("message "):
-                    print("Received broadcast")
-                else:
-                    pass
-
     def run(self) -> None:
         '''run the player'''
         try:
@@ -463,14 +410,15 @@ class Player:
             self.right()
             self.left()
             self.look()
-            #self.get_inventory()
-            #self.incantation()
+            self.get_inventory()
+            self.incantation()
             self.broadcast("Salut !")
             self.connect_nbr()
-            #self.fork()
+            self.fork()
             self.eject()
             self.set_object("food")
             self.take("food")
+            self.select_gestion()
             #inventory = self.get_inventory()
             #if inventory['food'] < 5:
             #    self.survive()
