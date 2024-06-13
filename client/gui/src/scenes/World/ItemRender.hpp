@@ -11,10 +11,10 @@
 #include <raylib-cpp.hpp>
 #include <map>
 
-class Item {
+class ItemRender {
     public:
 
-        enum ItemType {
+        enum class ItemType {
             FOOD,
             LINEMATE,
             DERAUMERE,
@@ -33,16 +33,16 @@ class Item {
 
         static std::string GetPathFromType(ItemType type);
 
-        Item(float x, float y, float z, ItemType type, int quantity = 1);
-        ~Item() = default;
+        ItemRender(ItemType type, int quantity = 1, float y = 0.5f);
+        ~ItemRender() = default;
 
-        void draw(float delta = 0);
+        void draw(raylib::Vector2 pos, float delta = 0);
         void setPosition(float x, float y, float z);
 
     private:
-        raylib::Vector3 _position = {};
         int _quantity;
         ItemType _type;
+        float _y;
 
         raylib::Model _cubeModel;
         raylib::Texture _texture;
