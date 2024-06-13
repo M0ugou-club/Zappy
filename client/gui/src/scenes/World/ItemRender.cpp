@@ -7,8 +7,6 @@
 
 #include "ItemRender.hpp"
 
-#include <raylib-cpp.hpp>
-
 const raylib::Vector3 ItemRender::OFFSET = {0.5f, 0.0f, 0.5f};
 const std::map<ItemRender::ItemType, std::string> ItemRender::MODELFILENAMES = {
     {ItemRender::ItemType::FOOD, "food"},
@@ -34,17 +32,25 @@ ItemRender::ItemRender(const ItemType type, const raylib::Vector2 mapSize, int q
     _cubeModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = _texture;
 }
 
+float ItemRender::getOffsetRotationSeed(raylib::Vector2 pos)
+{
+    std::string combined = std::to_string(pos.GetX()) + "," + std::to_string(pos.GetY()) + ", " + std::to_string(_mapSize.GetX()) + ", " + std::to_string(_mapSize.GetY()) + ", " + std::to_string((int)_type);
+    std::size_t hash = std::hash<std::string>{}(combined);
+
+    float hash_float = static_cast<float>(hash) / static_cast<float>(std::numeric_limits<std::size_t>::max());
+    return hash_float;
+}
+
 void ItemRender::draw(raylib::Vector2 pos, float delta)
 {
     raylib::Vector3 pos3d = {pos.GetX(), 0.0f, pos.GetY()};
     raylib::Vector3 final_pos = pos3d + OFFSET - (raylib::Vector3(_mapSize.GetX() / 2, 0.0f, _mapSize.GetY() / 2));
     final_pos.SetY(_y);
     float yFloatingAnim = sinf(GetTime() * 2.0f) * Y_FLOATING_ANIM_HEIGHT;
-    _rotationAngle += ROTATION_SPEED * delta;
     _cubeModel.Draw(
         {final_pos.GetX(), final_pos.GetY() + yFloatingAnim + ITEM_HEIGHT_OFFSET, final_pos.GetZ()},
         {0.0f, 1.0f, 0.0f},
-        _rotationAngle,
+        (GetTime() * ROTATION_SPEED) + (getOffsetRotationSeed(pos) * 256.0f),
         {0.3f, 0.3f, 0.3f},
         WHITE
     );

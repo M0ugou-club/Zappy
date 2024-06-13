@@ -26,7 +26,6 @@ class Player {
         inline void setOrientation(int orientation) { _orientation = orientation; }
 
         void draw() const;
-        void move();
         raylib::Color getColor() const;
 
         static const raylib::Vector3 OFFSET;

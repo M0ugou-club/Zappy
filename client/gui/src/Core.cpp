@@ -35,7 +35,9 @@ void Core::start()
 {
     raylib::Window window(_width, _height, "Zappy");
 
-    window.SetTargetFPS(60);
+    window.SetConfigFlags(FLAG_MSAA_4X_HINT);
+    // window.SetTargetFPS(60);
+
     loadScenes(window);
     loadScene(_defaultScene);
     while (!window.ShouldClose() && !_scenes[_currentScene]->shouldClose()) {

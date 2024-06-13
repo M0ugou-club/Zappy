@@ -53,7 +53,3 @@ void Player::draw() const
 {
     DrawModel(_rectangleModel, _position + OFFSET - (raylib::Vector3(_mapSize.GetX() / 2, 0.0f, _mapSize.GetY() / 2)), 1.0f, getColor());
 }
-
-void Player::move()
-{
-}

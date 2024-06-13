@@ -22,10 +22,11 @@ class ItemRender {
             MENDIANE,
             SIBUR,
             THYSTAME,
+            COUNT
         };
 
-        static constexpr float Y_FLOATING_ANIM_HEIGHT = 0.1f;
-        static constexpr float ROTATION_SPEED = 16.0f;
+        static constexpr float Y_FLOATING_ANIM_HEIGHT = 0.05f;
+        static constexpr float ROTATION_SPEED = 64.0f;
         static constexpr float ITEM_HEIGHT_OFFSET = 0.2f;
 
         static const raylib::Vector3 OFFSET;
@@ -38,6 +39,8 @@ class ItemRender {
 
         void draw(raylib::Vector2 pos, float delta = 0);
         void setPosition(float x, float y, float z);
+        void changeMapSize(raylib::Vector2 mapSize) { _mapSize = mapSize; }
+        float getOffsetRotationSeed(raylib::Vector2 pos);
 
     private:
         ItemType _type;
@@ -47,7 +50,6 @@ class ItemRender {
 
         raylib::Model _cubeModel;
         raylib::Texture _texture;
-        float _rotationAngle = 0.0f;
 };
 
 #endif /* !ITEM_HPP_ */

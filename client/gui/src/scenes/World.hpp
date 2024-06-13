@@ -11,10 +11,14 @@
     #include <memory>
     #include <map>
     #include <regex>
+    #include <functional>
+    #include <vector>
+    #include <tuple>
     #include "AScene.hpp"
     #include "../Map.hpp"
     #include "../MyCamera.hpp"
     #include "World/Player.hpp"
+    #include "World/ItemRender.hpp"
     #include "../Defines.hpp"
 
 class World : public AScene {
@@ -32,10 +36,13 @@ class World : public AScene {
         void addPlayer(std::string teamName, int id, int x, int y, int orientation, int level);
         void removePlayer(int id);
 
+        void drawItems();
+
     private:
         MyCamera _camera;
         Map _map;
-        std::map<raylib::Vector2, std::vector<int>> _items;
+        std::map<std::tuple<float, float>, std::vector<int>> _items;
+        std::vector<std::unique_ptr<ItemRender>> _itemRenders;
         std::string &_newSceneName;
         std::vector<std::string> _teams;
         std::map<int, std::unique_ptr<Player>> _players;

@@ -6,12 +6,16 @@
 */
 
 #include "World.hpp"
+#include "raylib.h"
 
 World::World(const raylib::Window &window, std::string &newSceneName, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues)
     : _map(2, 2), _newSceneName(newSceneName)
 {
     _window = std::make_shared<raylib::Window>(window);
     _queues = queues;
+    for (int i = 0; (ItemRender::ItemType)i < ItemRender::ItemType::COUNT; i++) {
+        _itemRenders.push_back(std::make_unique<ItemRender>((ItemRender::ItemType)i, 0));
+    }
 }
 
 void World::parseEventQueue()
@@ -28,6 +32,9 @@ void World::parsePacket(std::string packet)
     const std::map<std::string, std::function<void(std::vector<std::string>)>> commands = {
         {"msz (\\d+) (\\d+)$", [this](std::vector<std::string> args) {
             _map.setSize(std::stoi(args[0]), std::stoi(args[1]));
+            for (auto &render : _itemRenders) {
+                render->changeMapSize(_map.getSize());
+            }
         }},
         {"sgt (\\d+)$", [this](std::vector<std::string> args) {
             _timeUnit = std::stoi(args[0]);
@@ -48,6 +55,16 @@ void World::parsePacket(std::string packet)
         {"pdi #?(\\d+)$", [this](std::vector<std::string> args) {
             removePlayer(std::stoi(args[0]));
         }},
+        {"bct (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\d+)$", [this](std::vector<std::string> args) {
+            raylib::Vector2 pos = {(float)std::stoi(args[0]), (float)std::stoi(args[1])};
+            int items[(int)ItemRender::ItemType::COUNT];
+            for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
+                items[i] = std::stoi(args[i + 2]);
+            }
+            for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
+                _items[std::make_tuple(pos.GetX(), pos.GetY())].push_back(items[i]);
+            }
+        }}
     };
 
     for (auto &command : commands) {
@@ -62,6 +79,19 @@ void World::parsePacket(std::string packet)
             return;
         }
     }
+}
+
+void World::drawItems()
+{
+    float delta = GetFrameTime();
+    for (auto &item : _items) {
+        for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
+            if (item.second[i] > 0) {
+                _itemRenders[i]->draw({std::get<0>(item.first), std::get<1>(item.first)}, delta);
+            }
+        }
+    }
+
 }
 
 void World::addPlayer(std::string teamName, int id, int x, int y, int orientation, int level)
@@ -103,7 +133,9 @@ void World::update()
     for (auto &player : _players) {
         player.second->draw();
     }
+    drawItems();
     _camera.getCamera().EndMode();
+    DrawFPS(10, 10);
     _window->EndDrawing();
 }
 
