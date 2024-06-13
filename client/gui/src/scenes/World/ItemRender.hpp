@@ -24,24 +24,25 @@ class ItemRender {
             THYSTAME,
         };
 
-        static constexpr float Y_FLOATING_ANIM_HEIGHT = 0.3f;
+        static constexpr float Y_FLOATING_ANIM_HEIGHT = 0.1f;
         static constexpr float ROTATION_SPEED = 16.0f;
-        static constexpr float SIZE = 1.5f;
-        static constexpr float ITEM_HEIGHT_OFFSET = 1.5f;
+        static constexpr float ITEM_HEIGHT_OFFSET = 0.2f;
 
+        static const raylib::Vector3 OFFSET;
         static const std::map<ItemType, std::string> MODELFILENAMES;
 
         static std::string GetPathFromType(ItemType type);
 
-        ItemRender(ItemType type, int quantity = 1, float y = 0.5f);
+        ItemRender(const ItemType type, const raylib::Vector2 mapSize, int quantity = 1, float y = 0.53f);
         ~ItemRender() = default;
 
         void draw(raylib::Vector2 pos, float delta = 0);
         void setPosition(float x, float y, float z);
 
     private:
-        int _quantity;
         ItemType _type;
+        raylib::Vector2 _mapSize;
+        int _quantity;
         float _y;
 
         raylib::Model _cubeModel;
