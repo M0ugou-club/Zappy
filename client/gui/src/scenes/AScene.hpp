@@ -10,8 +10,10 @@
 
     #include "IScene.hpp"
     #include "Window.hpp"
+    #include "../SafeQueue.hpp"
     #include <string>
     #include <memory>
+    #include <tuple>
 
 class AScene : public IScene {
     public:
@@ -24,10 +26,9 @@ class AScene : public IScene {
         void closeWindow();
         bool shouldClose() { return _shouldClose; }
 
-        void (*loadScene)(std::string sceneName) = nullptr;
-
     protected:
         std::shared_ptr<raylib::Window> _window;
+        std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> _queues;
         bool _shouldClose = false;
 };
 

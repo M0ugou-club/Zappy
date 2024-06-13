@@ -17,6 +17,9 @@ class Map {
         void initMap();
         void draw();
 
+        void setSize(int x, int y);
+        inline raylib::Vector2 getSize() const { return {static_cast<float>(_x), static_cast<float>(_y)}; }
+
     protected:
     private:
         int _x;

@@ -33,6 +33,14 @@ void Map::initMap()
     }
 }
 
+void Map::setSize(int x, int y)
+{
+    _x = x;
+    _y = y;
+    // _map.clear();
+    // initMap();
+}
+
 void Map::draw()
 {
     for (int i = 0; i < _x; i++) {
