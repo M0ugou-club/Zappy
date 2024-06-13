@@ -8,7 +8,7 @@
 #include "World.hpp"
 
 World::World(const raylib::Window &window, std::string &newSceneName, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues)
-    : _map(10, 10), _newSceneName(newSceneName)
+    : _map(2, 2), _newSceneName(newSceneName)
 {
     _window = std::make_shared<raylib::Window>(window);
     _queues = queues;
@@ -35,13 +35,19 @@ void World::parsePacket(std::string packet)
         {"pnw (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$", [this](std::vector<std::string> args) {
             addPlayer(args[5], std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2]), std::stoi(args[3]), std::stoi(args[4]));
         }},
-        {"ppo #(\\d+) (\\d+) (\\d+) ([1-4])$", [this](std::vector<std::string> args) {
-            _players[std::stoi(args[0])]->setPosition({(float)std::stoi(args[1]), (float)std::stoi(args[2]), 0});
+        {"ppo #?(\\d+) (\\d+) (\\d+) ([1-4])$", [this](std::vector<std::string> args) {
+            _players[std::stoi(args[0])]->setPosition({(float)std::stoi(args[1]), 0, (float)std::stoi(args[2])});
             _players[std::stoi(args[0])]->setOrientation(std::stoi(args[3]));
         }},
-        {"plv #(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
+        {"plv #?(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
             _players[std::stoi(args[0])]->setLevel(std::stoi(args[1]));
-        }}
+        }},
+        {"tna (\\w+)$", [this](std::vector<std::string> args) {
+            _teams.push_back(args[0]);
+        }},
+        {"pdi #?(\\d+)$", [this](std::vector<std::string> args) {
+            removePlayer(std::stoi(args[0]));
+        }},
     };
 
     for (auto &command : commands) {
@@ -69,18 +75,20 @@ void World::addPlayer(std::string teamName, int id, int x, int y, int orientatio
         }
     }
     _players[id] = std::make_unique<Player>(Player(teamIndex, _map.getSize()));
-    _players[id]->setPosition({(float)x, (float)y, 0});
+    _players[id]->setPosition({(float)x, 0, (float)y});
     _players[id]->setOrientation(orientation);
     _players[id]->setLevel(level);
 }
 
+
+void World::removePlayer(int id)
+{
+    _players.erase(id);
+}
+
 void World::load()
 {
-    // read map size (msz)
-    // read time unit (sgt)
-    // read map contents (bct)
-    // read teams (tna)
-
+    parseEventQueue();
     _map.initMap();
 }
 

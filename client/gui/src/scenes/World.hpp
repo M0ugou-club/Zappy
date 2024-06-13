@@ -30,6 +30,7 @@ class World : public AScene {
         void parsePacket(std::string packet);
 
         void addPlayer(std::string teamName, int id, int x, int y, int orientation, int level);
+        void removePlayer(int id);
 
     private:
         MyCamera _camera;
