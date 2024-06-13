@@ -12,14 +12,19 @@
     #define EXIT_SUCCESS 0
 
     #define BUFFER_SIZE 1024
+    #define MAX_REGEX_MATCHES 16
 
     #define SEND(conn, msg) write(conn->fd, msg, strlen(msg))
     #define SEND_FD(fd, msg) write(fd, msg, strlen(msg))
+
+    #define CMD_SUCCESS "ok\n"
+    #define CMD_ERROR "ko\n"
 
     #include <unistd.h>
     #include <stdlib.h>
     #include <string.h>
     #include <stdio.h>
+    #include <regex.h>
     #include "socket.h"
     #include "connection.h"
     #include "game.h"
@@ -65,6 +70,18 @@ typedef struct server_s {
     fd_set *writefds;
 } server_t;
 
+typedef struct regex_parse_s {
+    const char *str;
+    regmatch_t pmatch[MAX_REGEX_MATCHES];
+} regex_parse_t;
+
+typedef struct command_regex_s {
+    char *command;
+    bool spec_only;
+    float time;
+    void (*func)(server_t *srv, connection_t *cl, regex_parse_t *parse);
+} command_regex_t;
+
 void build_sets(server_t *srv, connection_t *conn);
 connection_t *get_client_by_fd(connection_t *cl, int sockfd);
 void remove_connection(connection_t **cl, int sockfd);
@@ -73,11 +90,39 @@ void read_connections(server_t *srv);
 void execute_connections(server_t *srv);
 
 void queue_message(connection_t *conn, char *msg);
+void queue_formatted_message(connection_t *conn, char *fmt, ...);
+void send_formatted_message(connection_t *conn, char *fmt, ...);
 void send_message(server_t *srv, connection_t *cl);
 void send_messages(server_t *srv);
 
 server_t *init_server(args_t *args);
 void free_server(server_t *server);
 void run_server(server_t *server);
+
+/* Commands */
+void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_left(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_inventory(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_broadcast(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_connect_nbr(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_fork(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_eject(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_take(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse);
+
+// GUI commands
+void cmd_bct(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_mct(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_msz(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_pin(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_plv(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_ppo(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_sgt(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_sst(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void cmd_tna(server_t *srv, connection_t *cl, regex_parse_t *parse);
+/* Commands */
 
 #endif /* !SERVER_H_ */

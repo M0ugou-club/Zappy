@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include <stdarg.h>
 
 int get_array_size(char **arr)
 {
@@ -24,4 +25,28 @@ void queue_message(connection_t *conn, char *msg)
         conn->send_queue, sizeof(char *) * (size + 2));
     conn->send_queue[size] = strdup(msg);
     conn->send_queue[size + 1] = NULL;
+}
+
+void queue_formatted_message(connection_t *conn, char *fmt, ...)
+{
+    va_list args;
+    char *msg;
+
+    va_start(args, fmt);
+    vasprintf(&msg, fmt, args);
+    va_end(args);
+    queue_message(conn, msg);
+    free(msg);
+}
+
+void send_formatted_message(connection_t *conn, char *fmt, ...)
+{
+    va_list args;
+    char *msg;
+
+    va_start(args, fmt);
+    vasprintf(&msg, fmt, args);
+    va_end(args);
+    SEND(conn, msg);
+    free(msg);
 }

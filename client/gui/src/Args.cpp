@@ -10,29 +10,6 @@
 
 #include <memory>
 
-int Args::main_example(int ac, char **av)
-{
-    Args args(ac, av);
-
-    try {
-        args.setArgs();
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << std::endl;
-        std::cerr << "Usage: ./zappy_gui -p port -h machine" << std::endl;
-        return 84;
-    }
-    std::string ip = args.getIp();
-    int port = args.getPort();
-
-    ServerConnection server(ip, port);
-    server.connectToServer();
-    std::string response = server.tryReceive();
-    std::cout << response << std::endl;
-    server.disconnectFromServer();
-
-    return 0;
-}
-
 bool Args::isNumber(const std::string &str)
 {
     for (const auto &c : str) {
@@ -47,16 +24,12 @@ Args::Args(int ac, char **av)
 {
 }
 
-Args::~Args()
-{
-}
-
 int Args::setArgs()
 {
     if (_av.size() < 5) {
-        throw BadArgumentException("Not enough arguments");
+        throw std::runtime_error("Not enough arguments");
     } else if (_av.size() > 5) {
-        throw BadArgumentException("Too many arguments");
+        throw std::runtime_error("Too many arguments");
     }
     for (int i = 1; i < _ac; i++) {
         if (_av[i][0] != '-')
@@ -66,7 +39,7 @@ int Args::setArgs()
         } else if (_av[i] == "-h") {
             _processIp(i + 1);
         } else {
-            throw BadArgumentException("Invalid arguments");
+            throw std::runtime_error("Invalid arguments");
         }
     }
     return 0;
@@ -90,11 +63,11 @@ void Args::_processIp(int i)
 void Args::_processPort(int i)
 {
     if (Args::isNumber(_av[i]) == false) {
-        throw BadArgumentException("Invalid port");
+        throw std::runtime_error("Invalid port");
     }
     try {
         _port = std::stoi(_av[i]);
     } catch (std::exception &e) {
-        throw BadArgumentException("Invalid port");
+        throw std::runtime_error("Invalid port");
     }
 }
