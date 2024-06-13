@@ -78,6 +78,7 @@ typedef struct regex_parse_s {
 typedef struct command_regex_s {
     char *command;
     bool spec_only;
+    float time;
     void (*func)(server_t *srv, connection_t *cl, regex_parse_t *parse);
 } command_regex_t;
 
