@@ -2,6 +2,7 @@ import random
 import socket
 import subprocess
 import select
+import asyncio
 
 class Player:
     def __init__(self, team, machine, port):
@@ -15,7 +16,15 @@ class Player:
         self.is_incanting = False
         self.team_mates = 0
         self.MTopt = False
-        self.inventory = {}
+        self.inventory = {
+            'food': 0,
+            'linemate': 0,
+            'deraumere': 0,
+            'sibur': 0,
+            'mendiane': 0,
+            'phiras': 0,
+            'thystame': 0
+        }
         self.looked = []
 
 
@@ -108,15 +117,16 @@ class Player:
                 pass
 
 
-    async def select_gestion(self) -> None:
+    def select_gestion(self) -> None:
         '''select the function to call'''
-        while self.messages_queue:
-            message = self.messages_queue.pop(0)
-            print("Message:", message)
-            _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-            if ready_to_write:
-                self.send_message(message)
-            self.handle_server_response()
+        while True:
+            if (len(self.messages_queue) != 0):
+                message = self.messages_queue.pop(0)
+                print("Message:", message)
+                _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+                if ready_to_write:
+                    self.send_message(message)
+                self.handle_server_response()
 
 
     ##IPC functions
@@ -393,17 +403,6 @@ class Player:
 
     def run(self) -> None:
         '''run the player'''
-        try:
-            self.socket.connect((self.machine, int(self.port)))
-        except socket.error as e:
-            print(f"Socket error: {e}")
-            return
-        self.socket.sendall("\n".encode())
-        while True:
-            self.socket.sendall((self.team + "\n").encode())
-            if self.socket.recv(1024).decode() == "ko\n":
-                break
-
         while True:
             # self.socket.sendall("Broadcast Salut !\n".encode())
             print("MY LEVEL IS : ", self.level)
@@ -412,7 +411,21 @@ class Player:
                 self.survive()
             if not self.is_incanting:
                 self.try_incantation()
-            self.select_gestion()
+
+
+    def connect(self) -> None:
+        '''connect the player'''
+        try:
+            self.socket.connect((self.machine, int(self.port)))
+        except socket.error as e:
+            print(f"Socket error: {e}")
+            return
+        self.socket.sendall("\n".encode())
+        while True:
+            print("Sending team")
+            self.socket.sendall((self.team + "\n").encode())
+            if self.socket.recv(1024).decode() == "ko\n":
+                break
 
 
     def disconnect(self) -> None:
