@@ -7,6 +7,19 @@
 
 #include "server.h"
 
+static void eject_player(player_t *player)
+{
+    if (player->direction == NORTH) {
+        player->square = player->square->south;
+    } else if (player->direction == SOUTH) {
+        player->square = player->square->north;
+    } else if (player->direction == EAST) {
+        player->square = player->square->west;
+    } else if (player->direction == WEST) {
+        player->square = player->square->east;
+    }
+}
+
 // Eject all players on the same tile
 // as the player in the direction they are facing
 void cmd_eject(server_t *srv, connection_t *cl, regex_parse_t *parse)
@@ -16,15 +29,7 @@ void cmd_eject(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     while (tmp != NULL) {
         if (tmp->square == player->square && tmp != player) {
-            if (tmp->direction == NORTH) {
-                tmp->square = tmp->square->south;
-            } else if (tmp->direction == SOUTH) {
-                tmp->square = tmp->square->north;
-            } else if (tmp->direction == EAST) {
-                tmp->square = tmp->square->west;
-            } else if (tmp->direction == WEST) {
-                tmp->square = tmp->square->east;
-            }
+            eject_player(tmp);
         }
         tmp = tmp->next;
     }
