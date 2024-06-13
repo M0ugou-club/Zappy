@@ -25,22 +25,26 @@ max_items_t *fill_density(int x, int y)
     return max_items;
 }
 
-void place_items_randomly(game_t *game, args_t *args)
+static void add_items(game_t *game, int i)
 {
     int x;
     int y;
-    int count;
+    int count = 0;
 
-    for (int i = 0; i < 7; i++) {
-        count = 0;
-        while (count < game->max_items->food) {
-            x = rand() % game->map_x;
-            y = rand() % game->map_y;
-            if (game->map[x][y].items[i] == 0) {
-                game->map[x][y].items[i] += 1;
-                count++;
-            }
+    while (count < game->max_items->food) {
+        x = rand() % game->map_x;
+        y = rand() % game->map_y;
+        if (game->map[x][y].items[i] == 0) {
+            game->map[x][y].items[i] += 1;
+            count++;
         }
+    }
+}
+
+void place_items_randomly(game_t *game, args_t *args)
+{
+    for (int i = 0; i < 7; i++) {
+        add_items(game, i);
     }
     place_eggs(game, args);
 }

@@ -16,8 +16,12 @@ void cmd_take(server_t *srv, connection_t *cl, regex_parse_t *parse)
         if (player->square->items[i] > 0) {
             player->inventory[i] += 1;
             player->square->items[i] -= 1;
+        } else {
+            queue_formatted_message(cl, "ko");
+            return;
         }
     }
+    queue_formatted_message(cl, "ok");
 }
 
 // Put an object on the ground
@@ -29,6 +33,10 @@ void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse)
         if (player->inventory[i] > 0) {
             player->inventory[i] -= 1;
             player->square->items[i] += 1;
+        } else {
+            queue_formatted_message(cl, "ko");
+            return;
         }
     }
+    queue_formatted_message(cl, "ok");
 }
