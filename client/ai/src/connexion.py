@@ -2,7 +2,6 @@
 import socket
 import sys
 import player
-import threading
 
 
 P_HELP = "is the port number"
@@ -51,16 +50,11 @@ def get_machine():
 def main():
     '''Main function to handle client connection and communication.'''
     print("Client started")
-    threads = []
     info = [get_port(), get_name(), get_machine()]
     IA1 = player.Player(info[1], info[2], info[0])
 
-    threads.append(threading.Thread(target=IA1.select_gestion))
-    IA1.connect()
-    threads[0].start()
     IA1.run()
     IA1.disconnect()
-    threads[0].join()
 
 
 if __name__ == "__main__":

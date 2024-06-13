@@ -424,7 +424,9 @@ class Player:
         while True:
             print("Sending team")
             self.socket.sendall((self.team + "\n").encode())
-            if self.socket.recv(1024).decode() == "ko\n":
+            response = self.socket.recv(1024).decode()
+            print("Received:", response)
+            if response == "ko\n":
                 break
 
 
