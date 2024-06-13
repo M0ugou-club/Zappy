@@ -51,13 +51,16 @@ void ServerConnection::disconnectFromServer()
 
 std::string ServerConnection::tryReceive()
 {
-    char buffer[1024] = {0};
+    char buffer[1024];
     int valread = 0;
     memset(buffer, 0, 1024);
     if (FD_ISSET(_fd, &_readfds)) {
         valread = read(_fd, buffer, 1024);
         if (valread == -1) {
             throw std::runtime_error("Error reading from server");
+        }
+        if (valread == 0) {
+            return "";
         }
         return std::string(buffer);
     }
@@ -95,6 +98,10 @@ void ServerConnection::_receiveLoop()
         std::cout << "<- : " << _buffer.substr(0, _buffer.find("\n")) << std::endl;
         _buffer = _buffer.substr(_buffer.find("\n") + 1);
     }
+    // if (_buffer.length() > 1 && _buffer[_buffer.length() - 1] != '\n') {
+    //     std::cout << "cut packet" << std::endl;
+    //     _buffer.pop_back();
+    // }
 }
 
 void ServerConnection::_sendLoop()
