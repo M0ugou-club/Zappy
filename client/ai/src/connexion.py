@@ -53,6 +53,7 @@ def main():
     info = [get_port(), get_name(), get_machine()]
     IA1 = player.Player(info[1], info[2], info[0])
 
+    IA1.connect()
     IA1.run()
     IA1.disconnect()
 

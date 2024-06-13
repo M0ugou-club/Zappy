@@ -16,16 +16,6 @@ class Player:
         self.is_incanting = False
         self.team_mates = 0
         self.MTopt = False
-        self.inventory = {
-            'food': 0,
-            'linemate': 0,
-            'deraumere': 0,
-            'sibur': 0,
-            'mendiane': 0,
-            'phiras': 0,
-            'thystame': 0
-        }
-        self.looked = []
 
 
     LEVEL_REQUIREMENTS = {
@@ -89,67 +79,56 @@ class Player:
         lambda self: (self.right(), self.forward(), self.left(), self.forward())
     ]
 
-    messages_queue = []
-
     ##SELECT FUNCTIONS
 
 
-    def send_message(self, message : str) -> None:
-        '''send the message'''
-        print("Sending messages")
-        self.socket.sendall(message.encode())
-
-
-    def handle_server_response(self) -> None:
+    def handle_server_response(self) -> str:
         '''Handle incoming server messages'''
-        print("receive messages")
         response = self.socket.recv(1024).decode()
         print("Received:", response)
         if response:
+            if response.startswith("dead"):
+                print("Player is dead")
+                self.disconnect()
             if response.startswith("[food"):
-                self.inventory = self.interpret_inventory(response)
+                return self.interpret_inventory(response)
             elif response.startswith("[player"):
-                self.looked = self.interpret_look(response)
+                return self.interpret_look(response)
             if response.startswith("message "):
                 print("Received broadcast")
+                return self.handle_server_response()
                 self.receive_broadcast(response)
             else:
-                pass
+                return response
 
 
-    def select_gestion(self) -> None:
+    def select_gestion(self, message_to_send : str) -> str:
         '''select the function to call'''
-        while True:
-            if (len(self.messages_queue) != 0):
-                message = self.messages_queue.pop(0)
-                print("Message:", message)
-                _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-                if ready_to_write:
-                    self.send_message(message)
-                self.handle_server_response()
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            print("Sending:", message_to_send)
+            self.socket.sendall(message_to_send.encode())
+        return self.handle_server_response()
 
 
     ##IPC functions
 
     def forward(self) -> None:
         '''move forward'''
-        self.messages_queue.append("Forward\n")
+        self.select_gestion("Forward\n")
 
 
     def right(self) -> None:
         '''turn right'''
-        self.messages_queue.append("Right\n")
-
+        self.select_gestion("Right\n")
 
     def left(self) -> None:
         '''turn left'''
-        self.messages_queue.append("Left\n")
-
+        self.select_gestion("Left\n")
 
     def take(self, object : str) -> None:
         '''take object'''
-        self.messages_queue.append(f"Take {object}\n")
-
+        self.select_gestion(f"Take {object}\n")
 
     def interpret_look(self, response : str) -> list:
         '''interpret the look response'''
@@ -167,44 +146,35 @@ class Player:
 
     def look(self) -> list:
         '''look around the player'''
-        self.messages_queue.append("Look\n")
-
+        response = self.select_gestion("Look\n")
+        return response
 
     def incantation(self) -> None:
         '''incantation'''
-        self.messages_queue.append("Incantation\n")
-        #if ready_to_read:
-        #    response = self.socket.recv(1024).decode()
-        #    print("Incantation:" + response)
-        #    if response != "ko\n":
-        #        self.level += 1
-        #        self.is_incanting = True
+        if self.select_gestion("Incantation\n") != "ko\n":
+            self.level += 1
+            self.is_incanting = True
 
 
     def broadcast(self, message : str) -> None:
         '''broadcast a message'''
-        self.messages_queue.append(f"Broadcast {message}\n")
-
+        self.select_gestion(f"Broadcast {message}\n")
 
     def connect_nbr(self) -> None:
         '''connect the player'''
-        self.messages_queue.append("Connect_nbr\n")
-
+        self.select_gestion("Connect_nbr\n")
 
     def fork(self) -> None:
         '''fork the player'''
-        self.messages_queue.append("Fork\n")
-
+        self.select_gestion("Fork\n")
 
     def eject(self) -> None:
         '''eject the player'''
-        self.messages_queue.append("Eject\n")
-
+        self.select_gestion("Eject\n")
 
     def set_object(self, object : str) -> None:
         '''set object'''
-        self.messages_queue.append(f"Set {object}\n")
-
+        self.select_gestion(f"Set {object}\n")
 
     def check_dict_inventory(self, key : str) -> bool:
         '''check the inventory'''
@@ -236,10 +206,10 @@ class Player:
         return inventory
 
 
-    def get_inventory(self) -> None:
+    def get_inventory(self) -> dict:
         '''get the inventory'''
-        self.messages_queue.append("Inventory\n")
-
+        reponse = self.select_gestion("Inventory\n")
+        return reponse
 
     ##AI functions
 
@@ -273,12 +243,12 @@ class Player:
                 self.take(item)
 
 
-    def get_correct_tile(self, searching_item : list) -> tuple[int, list]:
+    def get_correct_tile(self, looked: list,  searching_item : list) -> tuple[int, list]:
         '''get the correct tile'''
-        for i in range(len(self.looked)):
+        for i in range(len(looked)):
             for j in range(len(searching_item)):
-                if searching_item[j] in self.looked[i]:
-                    return i, self.looked[i]
+                if searching_item[j] in looked[i]:
+                    return i, looked[i]
         return None
 
 
@@ -293,9 +263,9 @@ class Player:
         return 0, 0
 
 
-    def search_object(self, searching_item : list) -> None:
+    def  search_object(self, looked: list, searching_item : list) -> None:
         '''search the object in the tile'''
-        correct_tile = self.get_correct_tile(searching_item)
+        correct_tile = self.get_correct_tile(looked, searching_item)
         if correct_tile:
             self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
         else :
@@ -305,49 +275,47 @@ class Player:
 
     def survive(self) -> None:
         '''survive'''
-        while self.inventory['food'] < 15:
-            self.get_inventory()
-            self.search_object(['food'])
+        while self.get_inventory()['food'] < 15:
+            self.search_object(self.look(), ['food'])
 
 
     def expedition(self) -> None:
         '''expeditions'''
-        print("Expedition")
         self.search_object(['linemate', 'deraumere', 'sibur', 'mendiane', 'phiras', 'thystame'])
 
 
-    def count_player(self, ) -> int:
+    def count_player(self, looked: list) -> int:
         '''count the player in the tile'''
         count = 0
-        for i in range(len(self.looked)):
-            if self.looked[i] == 'player':
+        for i in range(len(looked)):
+            if looked[i] == 'player':
                 count += 1
         return count
 
 
     def check_requirements(self, requirements: dict) -> bool:
         '''check the requirements'''
+        inventory = self.get_inventory()
+        look = self.look()
         for key in requirements:
-            self.get_inventory()
-            if key != 'player' and self.inventory[key] < requirements[key]:
+            if key != 'player' and inventory[key] < requirements[key]:
                 return 1
         for player in requirements:
-            self.get_inventory()
             if player == 'player':
-                if self.count_player(self.look[0]) < requirements[player]:
+                if self.count_player(look[0]) < requirements[player]:
                     return 2
         return 0
 
 
     def what_i_need(self, requirements: dict) -> list:
         '''return list of which item i need to search for'''
+        inventory = self.get_inventory()
         needed = []
         for key in requirements:
             print(key)
             if key == 'player':
                 continue
-            self.get_inventory()
-            if self.inventory[key] < requirements[key]:
+            if inventory[key] < requirements[key]:
                 needed.append(key)
         print(needed)
         return needed
@@ -381,20 +349,19 @@ class Player:
 
     def try_incantation(self) -> None:
         '''try the incantation'''
-        self.get_inventory()
-        if self.inventory['food'] < 5:
+        inventory = self.get_inventory()
+        if inventory['food'] < 5:
             return
         requirements = self.LEVEL_REQUIREMENTS[self.level]
         requirements_checked = self.check_requirements(requirements)
         while requirements_checked != 0:
             if requirements_checked == 1:
                 print("searching for items")
-                self.search_object(self.what_i_need(requirements))
+                self.search_object(self.look(), self.what_i_need(requirements))
             else:
                 print("calling teammates")
                 self.call_teammates()
-                self.get_inventory()
-                if self.inventory['food'] < 5:
+                if self.get_inventory()['food'] < 5:
                     return
             requirements_checked = self.check_requirements(requirements)
         self.put_requirements(requirements)
@@ -403,15 +370,14 @@ class Player:
 
     def run(self) -> None:
         '''run the player'''
-        while True:
-            # self.socket.sendall("Broadcast Salut !\n".encode())
+        while (True):
             print("MY LEVEL IS : ", self.level)
-            self.get_inventory()
-            if self.inventory['food'] < 5:
-                self.survive()
-            if not self.is_incanting:
+            inventory = self.get_inventory()
+            if inventory != {}:
+                if inventory['food'] < 5:
+                    self.survive()
+            if not self.is_incanting :
                 self.try_incantation()
-
 
     def connect(self) -> None:
         '''connect the player'''
