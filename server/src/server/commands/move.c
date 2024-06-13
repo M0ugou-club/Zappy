@@ -12,14 +12,19 @@ void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
     player_t *player = get_player_by_fd(cl, srv);
 
-    if (player->direction == NORTH) {
-        player->square = player->square->north;
-    } else if (player->direction == SOUTH) {
-        player->square = player->square->south;
-    } else if (player->direction == EAST) {
-        player->square = player->square->east;
-    } else if (player->direction == WEST) {
-        player->square = player->square->west;
+    switch (player->direction) {
+        case NORTH:
+            player->square = player->square->north;
+            break;
+        case SOUTH:
+            player->square = player->square->south;
+            break;
+        case EAST:
+            player->square = player->square->east;
+            break;
+        case WEST:
+            player->square = player->square->west;
+            break;
     }
     queue_formatted_message(cl, "ok");
 }
@@ -29,14 +34,19 @@ void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
     player_t *player = get_player_by_fd(cl, srv);
 
-    if (player->direction == NORTH) {
-        player->direction = EAST;
-    } else if (player->direction == SOUTH) {
-        player->direction = WEST;
-    } else if (player->direction == EAST) {
-        player->direction = SOUTH;
-    } else if (player->direction == WEST) {
-        player->direction = NORTH;
+    switch (player->direction) {
+        case NORTH:
+            player->direction = EAST;
+            break;
+        case SOUTH:
+            player->direction = WEST;
+            break;
+        case EAST:
+            player->direction = SOUTH;
+            break;
+        case WEST:
+            player->direction = NORTH;
+            break;
     }
     queue_formatted_message(cl, "ok");
 }
@@ -46,14 +56,19 @@ void cmd_left(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
     player_t *player = get_player_by_fd(cl, srv);
 
-    if (player->direction == NORTH) {
-        player->direction = WEST;
-    } else if (player->direction == SOUTH) {
-        player->direction = EAST;
-    } else if (player->direction == EAST) {
-        player->direction = NORTH;
-    } else if (player->direction == WEST) {
-        player->direction = SOUTH;
+    switch (player->direction) {
+        case NORTH:
+            player->direction = WEST;
+            break;
+        case SOUTH:
+            player->direction = EAST;
+            break;
+        case EAST:
+            player->direction = NORTH;
+            break;
+        case WEST:
+            player->direction = SOUTH;
+            break;
     }
     queue_formatted_message(cl, "ok");
 }

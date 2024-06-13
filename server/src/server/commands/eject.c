@@ -9,14 +9,19 @@
 
 static void eject_player(player_t *player)
 {
-    if (player->direction == NORTH) {
-        player->square = player->square->south;
-    } else if (player->direction == SOUTH) {
-        player->square = player->square->north;
-    } else if (player->direction == EAST) {
-        player->square = player->square->west;
-    } else if (player->direction == WEST) {
-        player->square = player->square->east;
+    switch (player->direction) {
+        case NORTH:
+            player->square = player->square->south;
+            break;
+        case SOUTH:
+            player->square = player->square->north;
+            break;
+        case EAST:
+            player->square = player->square->west;
+            break;
+        case WEST:
+            player->square = player->square->east;
+            break;
     }
 }
 
