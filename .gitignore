@@ -1,9 +1,9 @@
-*.out*
-*.o*
-*.a*
-.vscode*
+*.out
+*.o
+*.a
+.vscode
 *test*
-**.sh*
+**.sh
 *vgcore*
 .cache*
 compile_commands.json

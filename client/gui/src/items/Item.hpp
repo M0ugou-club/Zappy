@@ -9,15 +9,31 @@
     #define ITEM_HPP_
 
 #include <raylib-cpp.hpp>
+#include <map>
 
 class Item {
     public:
+
+        enum ItemType {
+            FOOD,
+            LINEMATE,
+            DERAUMERE,
+            PHIRAS,
+            MENDIANE,
+            SIBUR,
+            THYSTAME,
+        };
+
         static constexpr float Y_FLOATING_ANIM_HEIGHT = 0.3f;
         static constexpr float ROTATION_SPEED = 16.0f;
         static constexpr float SIZE = 1.5f;
         static constexpr float ITEM_HEIGHT_OFFSET = 1.5f;
 
-        Item(float x, float y, float z, int quantity = 1);
+        static const std::map<ItemType, std::string> MODELFILENAMES;
+
+        static std::string GetPathFromType(ItemType type);
+
+        Item(float x, float y, float z, ItemType type, int quantity = 1);
         ~Item() = default;
 
         void draw(float delta = 0);
@@ -26,9 +42,10 @@ class Item {
     private:
         raylib::Vector3 _position = {};
         int _quantity;
+        ItemType _type;
 
-        ::Mesh _cubeMesh = raylib::Mesh::Cube(SIZE, SIZE, SIZE / 10);
-        raylib::Model _cubeModel = raylib::Model(_cubeMesh);
+        raylib::Model _cubeModel;
+        raylib::Texture _texture;
         float _rotationAngle = 0.0f;
 };
 
