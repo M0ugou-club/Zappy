@@ -83,6 +83,14 @@ void World::parsePacket(std::string packet)
             for (auto &player : _players) {
                 player.second->setIncantating(false);
             }
+        }},
+        {"pgt #?(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
+            raylib::Vector2 pos = {_players[std::stoi(args[0])]->getPosition().GetX(), _players[std::stoi(args[0])]->getPosition().GetZ()};
+            _items[std::make_tuple((int)pos.GetX(), (int)pos.GetY())][std::stoi(args[1])]--;
+        }},
+        {"pdr #?(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
+            raylib::Vector2 pos = {_players[std::stoi(args[0])]->getPosition().GetX(), _players[std::stoi(args[0])]->getPosition().GetZ()};
+            _items[std::make_tuple((int)pos.GetX(), (int)pos.GetY())][std::stoi(args[1])]++;
         }}
     };
 
