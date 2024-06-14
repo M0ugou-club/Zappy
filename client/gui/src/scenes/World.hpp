@@ -20,6 +20,7 @@
     #include "World/Player.hpp"
     #include "World/ItemRender.hpp"
     #include "../Defines.hpp"
+    #include "rlgl.h"
 
 class World : public AScene {
     public:

@@ -6,7 +6,6 @@
 */
 
 #include "World.hpp"
-#include "raylib.h"
 
 World::World(const raylib::Window &window, std::string &newSceneName, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues)
     : _map(2, 2), _newSceneName(newSceneName)
@@ -64,6 +63,26 @@ void World::parsePacket(std::string packet)
             for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
                 _items[std::make_tuple(pos.GetX(), pos.GetY())].push_back(items[i]);
             }
+        }},
+        {"pic (\\d+) (\\d+) (\\d+) ([#0-9 ]+)$", [this](std::vector<std::string> args) {
+            std::cout << "Incantation started" << std::endl;
+            std::string search = args[3];
+            std::vector<std::string> players;
+            std::regex playerRegex = std::regex("#?(\\d+)");
+            std::smatch match;
+            while (std::regex_search(search, match, playerRegex)) {
+                players.push_back(match[1]);
+                search = match.suffix();
+            }
+            for (auto &player : players) {
+                std::cout << "Player " << player << " is incantating" << std::endl;
+                _players[std::stoi(player)]->setIncantating(true);
+            }
+        }},
+        {"pie (\\d+) (\\d+) (\\d+)$", [this](std::vector<std::string> args) {
+            for (auto &player : _players) {
+                player.second->setIncantating(false);
+            }
         }}
     };
 
@@ -104,7 +123,7 @@ void World::addPlayer(std::string teamName, int id, int x, int y, int orientatio
             break;
         }
     }
-    _players[id] = std::make_unique<Player>(Player(teamIndex, _map.getSize()));
+    _players[id] = std::make_unique<Player>(teamIndex, _map.getSize());
     _players[id]->setPosition({(float)x, 0, (float)y});
     _players[id]->setOrientation(orientation);
     _players[id]->setLevel(level);
