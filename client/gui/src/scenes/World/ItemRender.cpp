@@ -8,7 +8,7 @@
 #include "ItemRender.hpp"
 
 const raylib::Vector3 ItemRender::OFFSET = {0.5f, 0.0f, 0.5f};
-const std::map<ItemRender::ItemType, std::string> ItemRender::MODELFILENAMES = {
+const std::map<ItemRender::ItemType, std::string> ItemRender::MODEL_FILENAMES = {
     {ItemRender::ItemType::FOOD, "food"},
     {ItemRender::ItemType::LINEMATE, "linemate"},
     {ItemRender::ItemType::DERAUMERE, "deraumere"},
@@ -18,6 +18,16 @@ const std::map<ItemRender::ItemType, std::string> ItemRender::MODELFILENAMES = {
     {ItemRender::ItemType::THYSTAME, "thystame"},
 };
 
+const std::map<ItemRender::ItemType, raylib::Vector2> ItemRender::ITEMS_OFFSETS = {
+    {ItemRender::ItemType::FOOD, {0.2f, 0.0f}},
+    {ItemRender::ItemType::LINEMATE, {0.0f, 0.2f}},
+    {ItemRender::ItemType::DERAUMERE, {-0.2f, 0.0f}},
+    {ItemRender::ItemType::PHIRAS, {0.0f, -0.2f}},
+    {ItemRender::ItemType::MENDIANE, {0.2f, 0.2f}},
+    {ItemRender::ItemType::SIBUR, {-0.2f, -0.2f}},
+    {ItemRender::ItemType::THYSTAME, {0.0f, 0.0f}},
+};
+
 ItemRender::ItemRender(const ItemType type, const raylib::Vector2 mapSize, int quantity, float y)
 {
     _type = type;
@@ -25,9 +35,9 @@ ItemRender::ItemRender(const ItemType type, const raylib::Vector2 mapSize, int q
     _quantity = quantity;
     _y = y;
 
-    std::string obj_filename = "client/gui/assets/models/items/" + ItemRender::MODELFILENAMES.at(type) + ".obj";
+    std::string obj_filename = "client/gui/assets/models/items/" + ItemRender::MODEL_FILENAMES.at(type) + ".obj";
     _cubeModel.Load(obj_filename);
-    std::string texture_filename = "client/gui/assets/textures/items/" + ItemRender::MODELFILENAMES.at(type) + ".png";
+    std::string texture_filename = "client/gui/assets/textures/items/" + ItemRender::MODEL_FILENAMES.at(type) + ".png";
     _texture.Load(texture_filename);
     _cubeModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = _texture;
 }
@@ -46,6 +56,8 @@ void ItemRender::draw(raylib::Vector2 pos, float delta)
     float movementSeed = getOffsetRotationSeed(pos);
     raylib::Vector3 pos3d = {pos.GetX(), 0.0f, pos.GetY()};
     raylib::Vector3 final_pos = pos3d + OFFSET - (raylib::Vector3(_mapSize.GetX() / 2, 0.0f, _mapSize.GetY() / 2));
+    final_pos.SetX(final_pos.GetX() + ITEMS_OFFSETS.at(_type).GetX());
+    final_pos.SetZ(final_pos.GetZ() + ITEMS_OFFSETS.at(_type).GetY());
     final_pos.SetY(_y);
     float yFloatingAnim = sinf((GetTime() + (movementSeed * 128.0f)) * 2.0f) * Y_FLOATING_ANIM_HEIGHT;
     _cubeModel.Draw(

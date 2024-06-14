@@ -30,7 +30,8 @@ class ItemRender {
         static constexpr float ITEM_HEIGHT_OFFSET = 0.2f;
 
         static const raylib::Vector3 OFFSET;
-        static const std::map<ItemType, std::string> MODELFILENAMES;
+        static const std::map<ItemType, std::string> MODEL_FILENAMES;
+        static const std::map<ItemType, raylib::Vector2> ITEMS_OFFSETS;
 
         static std::string GetPathFromType(ItemType type);
 
