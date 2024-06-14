@@ -31,12 +31,18 @@ void cmd_eject(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
     player_t *player = get_player_by_fd(cl, srv);
     player_t *tmp = srv->game->players;
+    int check = 0;
 
     while (tmp != NULL) {
         if (tmp->square == player->square && tmp != player) {
             eject_player(tmp);
+            check = 1;
         }
         tmp = tmp->next;
+    }
+    if (check == 0) {   
+        queue_formatted_message(cl, "ko");
+        return;
     }
     player->square->eggs = NULL;
     queue_formatted_message(cl, "ok");
