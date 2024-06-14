@@ -43,14 +43,15 @@ float ItemRender::getOffsetRotationSeed(raylib::Vector2 pos)
 
 void ItemRender::draw(raylib::Vector2 pos, float delta)
 {
+    float movementSeed = getOffsetRotationSeed(pos);
     raylib::Vector3 pos3d = {pos.GetX(), 0.0f, pos.GetY()};
     raylib::Vector3 final_pos = pos3d + OFFSET - (raylib::Vector3(_mapSize.GetX() / 2, 0.0f, _mapSize.GetY() / 2));
     final_pos.SetY(_y);
-    float yFloatingAnim = sinf(GetTime() * 2.0f) * Y_FLOATING_ANIM_HEIGHT;
+    float yFloatingAnim = sinf((GetTime() + (movementSeed * 128.0f)) * 2.0f) * Y_FLOATING_ANIM_HEIGHT;
     _cubeModel.Draw(
         {final_pos.GetX(), final_pos.GetY() + yFloatingAnim + ITEM_HEIGHT_OFFSET, final_pos.GetZ()},
         {0.0f, 1.0f, 0.0f},
-        (GetTime() * ROTATION_SPEED) + (getOffsetRotationSeed(pos) * 256.0f),
+        (GetTime() * ROTATION_SPEED) + (movementSeed * 256.0f),
         {0.3f, 0.3f, 0.3f},
         WHITE
     );
