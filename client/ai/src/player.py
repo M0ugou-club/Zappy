@@ -85,19 +85,16 @@ class Player:
     def handle_server_response(self) -> str:
         '''Handle incoming server messages'''
         response = self.socket.recv(1024).decode()
-        print("Received:", response)
         if response:
             if response.startswith("dead"):
-                print("Player is dead")
                 self.disconnect()
             if response.startswith("[food"):
                 return self.interpret_inventory(response)
             elif response.startswith("[player"):
                 return self.interpret_look(response)
             if response.startswith("message "):
-                print("Received broadcast")
-                return self.handle_server_response()
                 self.receive_broadcast(response)
+                return self.handle_server_response()
             else:
                 return response
 
@@ -106,7 +103,6 @@ class Player:
         '''select the function to call'''
         _, ready_to_write, _ = select.select([], [self.socket], [], 1)
         if ready_to_write:
-            print("Sending:", message_to_send)
             self.socket.sendall(message_to_send.encode())
         return self.handle_server_response()
 
@@ -216,13 +212,11 @@ class Player:
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
-        print(direction)
         self.MOVEMENTS_DIRECTION[direction](self)
 
 
     def go_to(self, tile : list, pos : tuple, searching_item : list) -> None:
         '''go to the tile given in parameter'''
-        print(f"{pos=}")
         for _ in range(pos[1]):
             self.forward()
         if pos[0] > 0:
@@ -269,6 +263,7 @@ class Player:
         if correct_tile:
             self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
         else :
+            print(searching_item)
             print("Item not found")
             self.go_to_direction(random.randint(1, 3))
 
@@ -312,12 +307,11 @@ class Player:
         inventory = self.get_inventory()
         needed = []
         for key in requirements:
-            print(key)
             if key == 'player':
                 continue
             if inventory[key] < requirements[key]:
                 needed.append(key)
-        print(needed)
+        print("what i need", needed)
         return needed
 
 
@@ -335,6 +329,7 @@ class Player:
 
     def call_teammates(self) -> None:
         '''call the teammates'''
+        print("calling teammates")
         self.broadcast(self.team + ": ON EVOLUE OUUU ??" + str(self.level))
         return
 
@@ -357,6 +352,7 @@ class Player:
         while requirements_checked != 0:
             if requirements_checked == 1:
                 print("searching for items")
+                print(requirements)
                 self.search_object(self.look(), self.what_i_need(requirements))
             else:
                 print("calling teammates")
@@ -366,6 +362,7 @@ class Player:
             requirements_checked = self.check_requirements(requirements)
         self.put_requirements(requirements)
         self.incantation()
+        self.is_incanting = False
 
 
     def run(self) -> None:
