@@ -14,16 +14,16 @@
 
 class MyCamera {
     public:
-        typedef enum move {
+        enum class Direction {
             LEFT,
             RIGHT,
             FORWARD,
             BACKWARD
-        } move;
+        };
         MyCamera();
         ~MyCamera() = default;
         raylib::Camera3D getCamera() { return _camera; }
-        void moveCamera(move direction);
+        void moveCamera(Direction direction);
         void updateCamera();
 
     protected:

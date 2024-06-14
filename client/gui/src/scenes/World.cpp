@@ -102,11 +102,10 @@ void World::parsePacket(std::string packet)
 
 void World::drawItems()
 {
-    float delta = GetFrameTime();
     for (auto &item : _items) {
         for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
             if (item.second[i] > 0) {
-                _itemRenders[i]->draw({std::get<0>(item.first), std::get<1>(item.first)}, delta);
+                _itemRenders[i]->draw({std::get<0>(item.first), std::get<1>(item.first)}, item.second[i]);
             }
         }
     }

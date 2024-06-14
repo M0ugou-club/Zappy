@@ -51,7 +51,7 @@ float ItemRender::getOffsetRotationSeed(raylib::Vector2 pos)
     return hash_float;
 }
 
-void ItemRender::draw(raylib::Vector2 pos, float delta)
+void ItemRender::draw(raylib::Vector2 pos, int amount)
 {
     float movementSeed = getOffsetRotationSeed(pos);
     raylib::Vector3 pos3d = {pos.GetX(), 0.0f, pos.GetY()};
@@ -60,12 +60,14 @@ void ItemRender::draw(raylib::Vector2 pos, float delta)
     final_pos.SetZ(final_pos.GetZ() + ITEMS_OFFSETS.at(_type).GetY());
     final_pos.SetY(_y);
     float yFloatingAnim = sinf((GetTime() + (movementSeed * 128.0f)) * 2.0f) * Y_FLOATING_ANIM_HEIGHT;
-    _cubeModel.Draw(
-        {final_pos.GetX(), final_pos.GetY() + yFloatingAnim + ITEM_HEIGHT_OFFSET, final_pos.GetZ()},
-        {0.0f, 1.0f, 0.0f},
-        (GetTime() * ROTATION_SPEED) + (movementSeed * 256.0f),
-        {0.3f, 0.3f, 0.3f},
-        WHITE
-    );
     DrawCylinder(final_pos, 0.1f, 0.01f, 0.001f, 30, {0, 0, 0, 110});
+    for (int i = 0; i < amount; i++) {
+        _cubeModel.Draw(
+            {final_pos.GetX(), final_pos.GetY() + yFloatingAnim + (ITEM_HEIGHT_OFFSET * (i * 3)) + ITEM_HEIGHT_OFFSET, final_pos.GetZ()},
+            {0.0f, 1.0f, 0.0f},
+            (GetTime() * ROTATION_SPEED) + (movementSeed * 256.0f),
+            {0.3f, 0.3f, 0.3f},
+            WHITE
+        );
+    }
 }
