@@ -398,7 +398,7 @@ class Player:
                     return
             requirements_checked = self.check_requirements(requirements)
         self.put_requirements(requirements)
-        self.broadcast(self.team + ": ON INCANTE OUUUU ??")
+        self.broadcast(self.team + ": ON INCANTE OUUUU ??" + str(self.level))
         self.incantation()
         self.is_incanting = False
 
