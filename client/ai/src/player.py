@@ -99,7 +99,8 @@ class Player:
         responses = response.split("\n")
         for reponse in responses:
             if reponse.startswith("dead"):
-                self.disconnect()
+                print(self.inventory)
+                self.disconnect(int(42))
             if reponse.startswith("[food"):
                 self.interpret_inventory(reponse)
             elif reponse.startswith("[player"):
@@ -107,13 +108,13 @@ class Player:
                 self.interpret_look(reponse)
             if reponse.startswith("message "):
                 self.receive_broadcast(reponse)
-                return self.handle_server_response()
+                #return self.handle_server_response()
 
 
     def select_gestion(self, message_to_send : str) -> str:
         '''select the function to call'''
         if self.socket.fileno() == -1:
-            self.disconnect()
+            self.disconnect(2)
         _, ready_to_write, _ = select.select([], [self.socket], [], 1)
         if ready_to_write:
             self.socket.sendall(message_to_send.encode())
@@ -412,13 +413,13 @@ class Player:
             response = self.socket.recv(1024).decode()
             print("Received:", response)
             if response == "ko\n":
-                self.disconnect()
+                self.disconnect(6)
                 break
             else:
                 break
 
 
-    def disconnect(self) -> None:
+    def disconnect(self, error : int) -> None:
         '''disconnect the player'''
         self.socket.close()
-        sys.exit(0)
+        sys.exit(error)
