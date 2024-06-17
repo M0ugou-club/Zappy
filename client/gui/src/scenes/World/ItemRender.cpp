@@ -35,9 +35,9 @@ ItemRender::ItemRender(const ItemType type, const raylib::Vector2 mapSize, int q
     _quantity = quantity;
     _y = y;
 
-    std::string obj_filename = "client/gui/assets/models/items/" + ItemRender::MODEL_FILENAMES.at(type) + ".obj";
+    std::string obj_filename = "bonus/assets/models/items/" + ItemRender::MODEL_FILENAMES.at(type) + ".obj";
     _cubeModel.Load(obj_filename);
-    std::string texture_filename = "client/gui/assets/textures/items/" + ItemRender::MODEL_FILENAMES.at(type) + ".png";
+    std::string texture_filename = "bonus/assets/textures/items/" + ItemRender::MODEL_FILENAMES.at(type) + ".png";
     _texture.Load(texture_filename);
     _cubeModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = _texture;
 }

@@ -10,14 +10,14 @@
 
 const raylib::Vector3 Player::OFFSET = {0.5f, 0.5f, 0.5f};
 const std::vector<std::string> Player::MODELS = {
-    "client/gui/assets/models/player/knight.obj",
-    "client/gui/assets/models/player/knight.obj",
-    "client/gui/assets/models/player/knight.obj",
-    "client/gui/assets/models/player/knight.obj",
-    "client/gui/assets/models/player/knight.obj",
-    "client/gui/assets/models/player/knight.obj",
-    "client/gui/assets/models/player/knight.obj",
-    "client/gui/assets/models/player/knight.obj",
+    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/knight.obj",
 };
 
 const std::vector<raylib::Color> Player::COLORS = {
@@ -45,7 +45,7 @@ Player::Player(int teamIndex, const raylib::Vector2 &mapSize)
     _position.SetX(0.0f);
     _position.SetY(0.0f);
     _position.SetZ(0.0f);
-    _model.Load("client/gui/assets/models/player/knight.obj");
+    _model.Load("bonus/assets/models/player/knight.obj");
     _level = 1;
 }
 
