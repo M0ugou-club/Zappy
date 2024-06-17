@@ -17,6 +17,7 @@ class Player:
         self.is_incanting = False
         self.team_mates = 0
         self.MTopt = False
+        self.nbr_connect = 0
         self.inventory = {
             'food': 10,
             'linemate': 0,
@@ -108,7 +109,8 @@ class Player:
                 self.interpret_look(reponse)
             if reponse.startswith("message "):
                 self.receive_broadcast(reponse)
-                #return self.handle_server_response()
+            if reponse.isnumeric():
+                self.nbr_connect = int(reponse)
 
 
     def select_gestion(self, message_to_send : str) -> str:
@@ -167,6 +169,9 @@ class Player:
         if self.select_gestion("Incantation\n") != "ko\n":
             self.level += 1
             self.is_incanting = True
+            self.connect_nbr()
+            if (self.nbr_connect == 0):
+                self.fork()
 
 
     def broadcast(self, message : str) -> None:
@@ -353,6 +358,8 @@ class Player:
         if ordre.startswith("ON EVOLUE OUUU ??") and lvl == self.level:
             print("CAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             self.go_to_direction(int(direction))
+        if ordre.startswith("ON INCANTE OUUUU ??") and lvl == self.level:
+            self.incantation()
         return
 
     def call_teammates(self) -> None:
@@ -391,6 +398,7 @@ class Player:
                     return
             requirements_checked = self.check_requirements(requirements)
         self.put_requirements(requirements)
+        self.broadcast(self.team + ": ON INCANTE OUUUU ??")
         self.incantation()
         self.is_incanting = False
 
