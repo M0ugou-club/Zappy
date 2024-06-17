@@ -126,6 +126,7 @@ void pin(server_t *srv, connection_t *cl);
 void cmd_pin(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void plv(server_t *srv, connection_t *cl);
 void cmd_plv(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void ppo(server_t *srv, connection_t *cl);
 void cmd_ppo(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void sgt(server_t *srv, connection_t *cl);
 void cmd_sgt(server_t *srv, connection_t *cl, regex_parse_t *parse);
