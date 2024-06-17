@@ -413,6 +413,9 @@ class Player:
             print("Received:", response)
             if response == "ko\n":
                 self.disconnect()
+                break
+            else:
+                break
 
 
     def disconnect(self) -> None:
