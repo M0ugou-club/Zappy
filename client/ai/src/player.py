@@ -4,6 +4,18 @@ import subprocess
 import select
 import asyncio
 import sys
+import logging
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 class Player:
     def __init__(self, team, machine, port):
@@ -100,12 +112,10 @@ class Player:
         responses = response.split("\n")
         for reponse in responses:
             if reponse.startswith("dead"):
-                print(self.inventory)
                 self.disconnect(int(42))
             if reponse.startswith("[food"):
                 self.interpret_inventory(reponse)
             elif reponse.startswith("[player"):
-                print("player", reponse)
                 self.interpret_look(reponse)
             if reponse.startswith("message "):
                 self.receive_broadcast(reponse)
@@ -144,11 +154,9 @@ class Player:
 
     def interpret_look(self, response : str) -> list:
         '''interpret the look response'''
-        print("look", response)
         response = response[1:-1]
         response = response.split(',')
         for i in range(len(response)):
-            print(response[i])
             if (response[i][0] == ' '):
                 response[i] = response[i][1:]
             response[i] = response[i].split(' ')
@@ -228,7 +236,6 @@ class Player:
     def get_inventory(self) -> dict:
         '''get the inventory'''
         reponse = self.select_gestion("Inventory\n")
-        print(f"pipi {reponse}")
         return reponse
 
     ##AI functions
@@ -236,7 +243,6 @@ class Player:
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
-        print("going to direction", direction)
         if direction < 1 or direction > 8:
             return
         self.MOVEMENTS_DIRECTION[direction - 1](self)
@@ -259,8 +265,6 @@ class Player:
         '''take the item in the tile'''
         for item in searching_item:
             if item in tile:
-                print("Item found")
-                print(item)
                 self.take(item)
 
 
@@ -290,8 +294,6 @@ class Player:
         if correct_tile:
             self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
         else :
-            print(searching_item)
-            print("Item not found")
             self.go_to_direction(random.randint(1, 3))
 
 
@@ -341,7 +343,6 @@ class Player:
                 continue
             if self.inventory[key] < requirements[key]:
                 needed.append(key)
-        print("what i need", needed)
         return needed
 
 
@@ -351,12 +352,10 @@ class Player:
         message = message_received.split(", ")[1]
         if not message.startswith(self.team):
             return
-        print("MESSAGE : ", message)
         ordre = message.split(": ")[1]
         lvl = int(message.split("??")[1])
-        print("ORDRE : ", ordre)
-        print("LVL : ", lvl)
         if ordre.startswith("ON EVOLUE OUUU ??") and lvl == self.level:
+            print(bcolors.OKGREEN + ordre + " " + direction + bcolors.ENDC)
             self.go_to_direction(int(direction))
         if ordre.startswith("ON INCANTE OUUUU ??") and lvl == self.level:
             self.incantation()
@@ -364,7 +363,6 @@ class Player:
 
     def call_teammates(self) -> None:
         '''call the teammates'''
-        print("calling teammates")
         self.broadcast(self.team + ": ON EVOLUE OUUU ??" + str(self.level))
         return
 
@@ -386,19 +384,17 @@ class Player:
         requirements_checked = self.check_requirements(requirements)
         while requirements_checked != 0:
             if requirements_checked == 1:
-                print("searching for items")
-                print(requirements)
                 self.look()
                 self.search_object(self.looked, self.what_i_need(requirements))
             else:
-                print("calling teammates")
                 self.call_teammates()
                 self.get_inventory()
                 if self.inventory['food'] < 5:
                     return
             requirements_checked = self.check_requirements(requirements)
         self.put_requirements(requirements)
-        self.broadcast(self.team + ": ON INCANTE OUUUU ??" + str(self.level))
+        if (self.level != 1):
+            self.broadcast(self.team + ": ON INCANTE OUUUU ??" + str(self.level))
         self.incantation()
         self.is_incanting = False
 
@@ -406,7 +402,7 @@ class Player:
     def run(self) -> None:
         '''run the player'''
         while (True):
-            print("MY LEVEL IS : ", self.level)
+            print(bcolors.OKBLUE + f"Player {self.team} is lvl {self.level}" + bcolors.ENDC)
             self.get_inventory()
             if self.inventory['food'] < 5:
                 self.survive()
@@ -418,14 +414,11 @@ class Player:
         try:
             self.socket.connect((self.machine, int(self.port)))
         except socket.error as e:
-            print(f"Socket error: {e}")
             return
         self.socket.sendall("\n".encode())
         while True:
-            print("Sending team")
             self.socket.sendall((self.team + "\n").encode())
             response = self.socket.recv(1024).decode()
-            print("Received:", response)
             if response == "ko\n":
                 self.disconnect(6)
                 break
