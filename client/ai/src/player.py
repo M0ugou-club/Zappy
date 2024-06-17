@@ -16,6 +16,16 @@ class Player:
         self.is_incanting = False
         self.team_mates = 0
         self.MTopt = False
+        self.inventory = {
+            'food': 10,
+            'linemate': 0,
+            'deraumere': 0,
+            'sibur': 0,
+            'mendiane': 0,
+            'phiras': 0,
+            'thystame': 0
+        }
+        self.looked = []
 
 
     LEVEL_REQUIREMENTS = {
@@ -85,22 +95,24 @@ class Player:
     def handle_server_response(self) -> str:
         '''Handle incoming server messages'''
         response = self.socket.recv(1024).decode()
-        if response:
-            if response.startswith("dead"):
+        responses = response.split("\n")
+        for reponse in responses:
+            if reponse.startswith("dead"):
                 self.disconnect()
-            if response.startswith("[food"):
-                return self.interpret_inventory(response)
-            elif response.startswith("[player"):
-                return self.interpret_look(response)
-            if response.startswith("message "):
-                self.receive_broadcast(response)
+            if reponse.startswith("[food"):
+                self.interpret_inventory(reponse)
+            elif reponse.startswith("[player"):
+                print("player", reponse)
+                self.interpret_look(reponse)
+            if reponse.startswith("message "):
+                self.receive_broadcast(reponse)
                 return self.handle_server_response()
-            else:
-                return response
 
 
     def select_gestion(self, message_to_send : str) -> str:
         '''select the function to call'''
+        if self.socket.fileno() == -1:
+            return "ko\n"
         _, ready_to_write, _ = select.select([], [self.socket], [], 1)
         if ready_to_write:
             self.socket.sendall(message_to_send.encode())
@@ -128,15 +140,18 @@ class Player:
 
     def interpret_look(self, response : str) -> list:
         '''interpret the look response'''
-        response = response[1:-2]
+        print("look", response)
+        response = response[1:-1]
         response = response.split(',')
         for i in range(len(response)):
+            print(response[i])
             if (response[i][0] == ' '):
                 response[i] = response[i][1:]
             response[i] = response[i].split(' ')
         for i in range(len(response)):
             if response[i] == ['']:
                 response[i] = []
+        self.looked = response
         return response
 
 
@@ -199,12 +214,14 @@ class Player:
             else:
                 key = response[i][0]
                 inventory[key[3:]] = int(response[i][1])
+        self.inventory.update(inventory)
         return inventory
 
 
     def get_inventory(self) -> dict:
         '''get the inventory'''
         reponse = self.select_gestion("Inventory\n")
+        print(f"pipi {reponse}")
         return reponse
 
     ##AI functions
@@ -270,8 +287,10 @@ class Player:
 
     def survive(self) -> None:
         '''survive'''
-        while self.get_inventory()['food'] < 15:
-            self.search_object(self.look(), ['food'])
+        while self.inventory['food'] < 15:
+            self.look()
+            self.search_object(self.looked, ['food'])
+            self.get_inventory()
 
 
     def expedition(self) -> None:
@@ -290,10 +309,11 @@ class Player:
 
     def check_requirements(self, requirements: dict) -> bool:
         '''check the requirements'''
-        inventory = self.get_inventory()
-        look = self.look()
+        self.get_inventory()
+        self.look()
+        look = self.looked
         for key in requirements:
-            if key != 'player' and inventory[key] < requirements[key]:
+            if key != 'player' and self.inventory[key] < requirements[key]:
                 return 1
         for player in requirements:
             if player == 'player':
@@ -304,12 +324,12 @@ class Player:
 
     def what_i_need(self, requirements: dict) -> list:
         '''return list of which item i need to search for'''
-        inventory = self.get_inventory()
+        self.get_inventory()
         needed = []
         for key in requirements:
             if key == 'player':
                 continue
-            if inventory[key] < requirements[key]:
+            if self.inventory[key] < requirements[key]:
                 needed.append(key)
         print("what i need", needed)
         return needed
@@ -344,8 +364,8 @@ class Player:
 
     def try_incantation(self) -> None:
         '''try the incantation'''
-        inventory = self.get_inventory()
-        if inventory['food'] < 5:
+        self.get_inventory()
+        if self.inventory['food'] < 5:
             return
         requirements = self.LEVEL_REQUIREMENTS[self.level]
         requirements_checked = self.check_requirements(requirements)
@@ -353,11 +373,13 @@ class Player:
             if requirements_checked == 1:
                 print("searching for items")
                 print(requirements)
-                self.search_object(self.look(), self.what_i_need(requirements))
+                self.look()
+                self.search_object(self.looked, self.what_i_need(requirements))
             else:
                 print("calling teammates")
                 self.call_teammates()
-                if self.get_inventory()['food'] < 5:
+                self.get_inventory()
+                if self.inventory['food'] < 5:
                     return
             requirements_checked = self.check_requirements(requirements)
         self.put_requirements(requirements)
@@ -369,10 +391,9 @@ class Player:
         '''run the player'''
         while (True):
             print("MY LEVEL IS : ", self.level)
-            inventory = self.get_inventory()
-            if inventory != {}:
-                if inventory['food'] < 5:
-                    self.survive()
+            self.get_inventory()
+            if self.inventory['food'] < 5:
+                self.survive()
             if not self.is_incanting :
                 self.try_incantation()
 
