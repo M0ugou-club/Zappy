@@ -22,6 +22,8 @@ game_t *init_game(int x, int y, char **teams)
         game->map[xdx] = malloc(sizeof(square_t) * y);
         for (int ydy = 0; ydy < y; ydy++) {
             game->map[xdx][ydy].eggs = NULL;
+            game->map[xdx][ydy].pos_x = xdx;
+            game->map[xdx][ydy].pos_y = ydy;
             game->map[xdx][ydy].north = game->map[xdx + (ydy - 1) * x];
             game->map[xdx][ydy].south = game->map[xdx + (ydy + 1) * x];
             game->map[xdx][ydy].east = game->map[xdx + 1 + ydy * x];

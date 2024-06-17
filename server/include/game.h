@@ -36,6 +36,8 @@ typedef struct max_items_s {
 typedef struct square_s {
     char **eggs;
     int items[NONE];
+    int pos_x;
+    int pos_y;
     struct square_s *north;
     struct square_s *south;
     struct square_s *east;
