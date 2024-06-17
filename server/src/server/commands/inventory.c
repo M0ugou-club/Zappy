@@ -13,8 +13,8 @@ void cmd_inventory(server_t *srv, connection_t *cl, regex_parse_t *parse)
     player_t *player = get_player_by_fd(cl, srv);
 
     queue_formatted_message(cl,
-        "food = %d\nlinemate = %d\nderaumere = %d\nsibur "\
-        "= %d\nmendiane = %d\nphiras = %d\nthystame = %d",
+        "[food %d, linemate %d, deraumere %d, sibur %d, "\
+        "mendiane %d, phiras %d, thystame %d]\n",
         player->inventory[0],
         player->inventory[1],
         player->inventory[2],
