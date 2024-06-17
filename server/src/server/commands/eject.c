@@ -40,7 +40,7 @@ void cmd_eject(server_t *srv, connection_t *cl, regex_parse_t *parse)
         }
         tmp = tmp->next;
     }
-    if (check == 0) {   
+    if (check == 0) {
         queue_formatted_message(cl, "ko");
         return;
     }
