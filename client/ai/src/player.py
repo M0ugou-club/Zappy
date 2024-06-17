@@ -231,7 +231,8 @@ class Player:
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
-        self.MOVEMENTS_DIRECTION[direction](self)
+        print("going to direction", direction)
+        self.MOVEMENTS_DIRECTION[direction - 1](self)
 
 
     def go_to(self, tile : list, pos : tuple, searching_item : list) -> None:
@@ -343,9 +344,14 @@ class Player:
         message = message_received.split(", ")[1]
         if not message.startswith(self.team):
             return
+        print("CAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        print("MESSAGE : ", message)
         ordre = message.split(": ")[1]
         lvl = int(message.split("??")[1])
-        if ordre == "ON EVOLUE OUUU ??" and lvl == self.level:
+        print("ORDRE : ", ordre)
+        print("LVL : ", lvl)
+        if ordre.startswith("ON EVOLUE OUUU ??") and lvl == self.level:
+            print("CAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             self.go_to_direction(int(direction))
         return
 
