@@ -122,6 +122,7 @@ void mct(server_t *srv, connection_t *cl);
 void cmd_mct(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void msz(server_t *srv, connection_t *cl);
 void cmd_msz(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void pin(server_t *srv, connection_t *cl);
 void cmd_pin(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void plv(server_t *srv, connection_t *cl);
 void cmd_plv(server_t *srv, connection_t *cl, regex_parse_t *parse);
