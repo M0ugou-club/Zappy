@@ -3,6 +3,7 @@ import socket
 import subprocess
 import select
 import asyncio
+import sys
 
 class Player:
     def __init__(self, team, machine, port):
@@ -113,7 +114,6 @@ class Player:
         '''select the function to call'''
         if self.socket.fileno() == -1:
             self.disconnect()
-            return "ko\n"
         _, ready_to_write, _ = select.select([], [self.socket], [], 1)
         if ready_to_write:
             self.socket.sendall(message_to_send.encode())
@@ -343,7 +343,7 @@ class Player:
         if not message.startswith(self.team):
             return
         ordre = message.split(": ")[1]
-        lvl = int(message.split("?")[1])
+        lvl = int(message.split("??")[1])
         if ordre == "ON EVOLUE OUUU ??" and lvl == self.level:
             self.go_to_direction(int(direction))
         return
@@ -412,10 +412,10 @@ class Player:
             response = self.socket.recv(1024).decode()
             print("Received:", response)
             if response == "ko\n":
-                break
+                self.disconnect()
 
 
     def disconnect(self) -> None:
         '''disconnect the player'''
         self.socket.close()
-        pass
+        sys.exit(0)
