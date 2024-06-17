@@ -22,6 +22,7 @@ SRC = main.cpp \
 	  scenes/World.cpp \
 	  scenes/World/ItemRender.cpp \
 	  scenes/World/Player.cpp \
+	  scenes/World/Skybox.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 
