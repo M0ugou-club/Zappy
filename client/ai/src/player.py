@@ -112,6 +112,7 @@ class Player:
     def select_gestion(self, message_to_send : str) -> str:
         '''select the function to call'''
         if self.socket.fileno() == -1:
+            self.disconnect()
             return "ko\n"
         _, ready_to_write, _ = select.select([], [self.socket], [], 1)
         if ready_to_write:
