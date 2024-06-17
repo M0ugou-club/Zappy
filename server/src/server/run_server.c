@@ -22,6 +22,22 @@ static int get_max_fd(server_t *srv)
     return max;
 }
 
+static void handshake_graphic(server_t *srv, connection_t *cl)
+{
+    if (strcmp(cl->team, "GRAPHIC") == 0) {
+        send_formatted_message(cl, "msz %d %d\n", srv->args->x, srv->args->y);
+        send_formatted_message(cl, "sgt %zu\n", srv->args->frequency);
+        
+    }
+}
+
+static bool handshake(server_t *srv, char *team)
+{
+    if (strcmp(team, "GRAPHIC") == 0) {
+        return true;
+    }
+}
+
 // TODO: rewrite this function with game data:
 // check if team exists, if it doesn't, send ko and close connection
 // also close if team is full
