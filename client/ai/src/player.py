@@ -237,6 +237,8 @@ class Player:
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
         print("going to direction", direction)
+        if direction < 1 or direction > 8:
+            return
         self.MOVEMENTS_DIRECTION[direction - 1](self)
 
 
@@ -349,14 +351,12 @@ class Player:
         message = message_received.split(", ")[1]
         if not message.startswith(self.team):
             return
-        print("CAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         print("MESSAGE : ", message)
         ordre = message.split(": ")[1]
         lvl = int(message.split("??")[1])
         print("ORDRE : ", ordre)
         print("LVL : ", lvl)
         if ordre.startswith("ON EVOLUE OUUU ??") and lvl == self.level:
-            print("CAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             self.go_to_direction(int(direction))
         if ordre.startswith("ON INCANTE OUUUU ??") and lvl == self.level:
             self.incantation()
