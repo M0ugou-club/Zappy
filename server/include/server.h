@@ -116,7 +116,9 @@ void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse);
 
 // GUI commands
+void bct(server_t *srv, connection_t *cl, int x, int y);
 void cmd_bct(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void mct(server_t *srv, connection_t *cl);
 void cmd_mct(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_msz(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_pin(server_t *srv, connection_t *cl, regex_parse_t *parse);
@@ -124,6 +126,7 @@ void cmd_plv(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_ppo(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_sgt(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_sst(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void tna(server_t *srv, connection_t *cl);
 void cmd_tna(server_t *srv, connection_t *cl, regex_parse_t *parse);
 /* Commands */
 

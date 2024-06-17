@@ -22,20 +22,22 @@ static int get_max_fd(server_t *srv)
     return max;
 }
 
-static void handshake_graphic(server_t *srv, connection_t *cl)
-{
-    if (strcmp(cl->team, "GRAPHIC") == 0) {
-        send_formatted_message(cl, "msz %d %d\n", srv->args->x, srv->args->y);
-        send_formatted_message(cl, "sgt %zu\n", srv->args->frequency);
-        
-    }
-}
-
-static bool handshake(server_t *srv, char *team)
+static bool handshake(server_t *srv, char *team, connection_t *cl)
 {
     if (strcmp(team, "GRAPHIC") == 0) {
+        queue_formatted_message(cl, "msz %d %d\n", srv->args->x, srv->args->y);
+        queue_formatted_message(cl, "sgt %zu\n", srv->args->frequency);
+        mct(srv, cl);
+        tna(srv, cl);
         return true;
     }
+    if (team_exists(srv->game->teams, team)) {
+        queue_formatted_message(cl, "%d\n", 1);
+        queue_formatted_message(cl, " %d %d\n", srv->args->x, srv->args->y);
+        return true;
+    }
+    queue_formatted_message(cl, "ko\n", 0);
+    return false;
 }
 
 // TODO: rewrite this function with game data:
@@ -57,9 +59,12 @@ static void accept_connection(server_t *srv)
     read(newsockfd, buffer, 1024);
     new = new_connection(newsockfd,
         (struct sockaddr_in *)&cli_addr, buffer);
-    srv->cons = add_connection(srv->cons, new);
-    send_formatted_message(new, "%d\n", 1);
-    send_formatted_message(new, " %d %d\n", srv->args->x, srv->args->y);
+    if (handshake(srv, new->team, new))
+        srv->cons = add_connection(srv->cons, new);
+    else {
+        free_connection(new);
+        close(newsockfd);
+    }
     free(buffer);
 }
 

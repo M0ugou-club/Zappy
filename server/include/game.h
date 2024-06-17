@@ -10,6 +10,8 @@
 
     #include <stdlib.h>
     #include <time.h>
+    #include <stdbool.h>
+    #include <string.h>
 
 typedef enum direction_e {
     NORTH,
@@ -68,5 +70,6 @@ typedef struct game_s {
 game_t *init_game(int x, int y, char **teams);
 void free_game(game_t *game);
 max_items_t *fill_density(int x, int y);
+bool team_exists(char **teams, char *team);
 
 #endif /* !GAME_H_ */

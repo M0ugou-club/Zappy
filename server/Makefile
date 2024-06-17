@@ -21,6 +21,7 @@ SRC =	src/main.c \
 		src/game/player/remove_player.c \
 		src/game/player/get_player_by_fd.c \
 		src/game/player/new_player.c \
+		src/game/team_exists.c \
 		src/server/commands/broadcast.c \
 		src/server/commands/connect_nbr.c \
 		src/server/commands/eject.c \
