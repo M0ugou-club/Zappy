@@ -99,6 +99,8 @@ server_t *init_server(args_t *args);
 void free_server(server_t *server);
 void run_server(server_t *server);
 
+player_t *get_player_by_fd(player_t *players, int fd);
+
 /* Commands */
 void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse);

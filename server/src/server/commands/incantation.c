@@ -7,7 +7,7 @@
 
 #include "server.h"
 
-static const int incantation[7][6] =
+static const int incantation[7][7] =
 {
     {1, 1, 0, 0, 0, 0, 0},
     {2, 1, 1, 1, 0, 0, 0},
@@ -57,7 +57,7 @@ static void incantation_message(server_t *srv,
 // Begin an incantation
 void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
-    player_t *player = get_player_by_fd(cl, srv);
+    player_t *player = get_player_by_fd(srv->game->players, cl->fd);
     int i_inventory = 1;
 
     if (!check_incantation(srv, cl, player))

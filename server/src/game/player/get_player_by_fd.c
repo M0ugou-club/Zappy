@@ -8,12 +8,12 @@
 #include "server.h"
 #include "game.h"
 
-player_t *get_player_by_fd(connection_t *cl, server_t *srv)
+player_t *get_player_by_fd(player_t *players, int fd)
 {
-    player_t *tmp = srv->game->players;
+    player_t *tmp = players;
 
     while (tmp != NULL) {
-        if (tmp->fd == cl->fd)
+        if (tmp->fd == fd)
             return tmp;
         tmp = tmp->next;
     }

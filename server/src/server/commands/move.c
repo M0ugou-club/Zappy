@@ -10,7 +10,7 @@
 // Move the player forward
 void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
-    player_t *player = get_player_by_fd(cl, srv);
+    player_t *player = get_player_by_fd(srv->game->players, cl->fd);
 
     switch (player->direction) {
         case NORTH:
@@ -32,7 +32,7 @@ void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse)
 // Turn the player to the right
 void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
-    player_t *player = get_player_by_fd(cl, srv);
+    player_t *player = get_player_by_fd(srv->game->players, cl->fd);
 
     switch (player->direction) {
         case NORTH:
@@ -54,7 +54,7 @@ void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse)
 // Turn the player to the left
 void cmd_left(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
-    player_t *player = get_player_by_fd(cl, srv);
+    player_t *player = get_player_by_fd(srv->game->players, cl->fd);
 
     switch (player->direction) {
         case NORTH:

@@ -10,7 +10,7 @@
 // Look in a cone in front of the player
 void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
-    player_t *player = get_player_by_fd(cl, srv);
+    player_t *player = get_player_by_fd(srv->game->players, cl->fd);
     char response[1024] = "";
     int cone_width = 3;
 

@@ -64,7 +64,7 @@ static void run_cmd(const command_regex_t *cmd, server_t *srv,
     if (cmd->spec_only == false && strcmp(client->team, "GRAPHIC") == 0)
         return;
     if (!cmd->spec_only) {
-        player = get_player_by_id(srv->game->players, client->fd);
+        player = get_player_by_fd(srv->game->players, client_fd);
         if (difftime(time(NULL), player->last_action)
             < cmd->time / srv->args->frequency) {
             queue_message(client, "ko\n");
