@@ -30,13 +30,7 @@ typedef enum item_e {
 } item_t;
 
 typedef struct max_items_s {
-    int food;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
+    int items[NONE];
 } max_items_t;
 
 typedef struct square_s {
