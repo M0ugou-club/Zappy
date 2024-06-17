@@ -16,6 +16,5 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     for (int i = 1; i < player->level; i++) {
         cone_width += 2;
-        
     }
 }
