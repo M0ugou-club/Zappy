@@ -130,6 +130,7 @@ void ppo(server_t *srv, connection_t *cl);
 void cmd_ppo(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void sgt(server_t *srv, connection_t *cl);
 void cmd_sgt(server_t *srv, connection_t *cl, regex_parse_t *parse);
+void sst(server_t *srv, connection_t *cl, int time_unit);
 void cmd_sst(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void tna(server_t *srv, connection_t *cl);
 void cmd_tna(server_t *srv, connection_t *cl, regex_parse_t *parse);
