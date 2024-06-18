@@ -154,6 +154,12 @@ void pfk(server_t *srv, connection_t *cl, player_t *player);
 void pdr(server_t *srv, connection_t *cl, player_t *player, int res);
 void pgt(server_t *srv, connection_t *cl, player_t *player, int res);
 void pdi(server_t *srv, connection_t *cl, player_t *player);
-void enw(server_t *srv, connection_t *cl, egg_t *egg);
+void enw(server_t *srv, connection_t *cl, egg_t *egg, player_t *player);
+void ebo(server_t *srv, connection_t *cl, egg_t *egg);
+void edi(server_t *srv, connection_t *cl, egg_t *egg);
+void seg(server_t *srv, connection_t *cl, char *team_name);
+void smg(server_t *srv, connection_t *cl, char *message);
+void suc(server_t *srv, connection_t *cl);
+void sbp(server_t *srv, connection_t *cl);
 
 #endif /* !SERVER_H_ */
