@@ -55,7 +55,7 @@ def main():
 
     IA1.connect()
     IA1.run()
-    IA1.disconnect()
+    IA1.disconnect(0)
 
 
 if __name__ == "__main__":
