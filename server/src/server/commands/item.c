@@ -69,6 +69,5 @@ void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse)
     } else {
         queue_formatted_message(cl, "ko\n");
     }
-
     free(object);
 }
