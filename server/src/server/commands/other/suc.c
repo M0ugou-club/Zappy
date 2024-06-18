@@ -2,12 +2,12 @@
 ** EPITECH PROJECT, 2024
 ** Zappy [WSL: Fedora]
 ** File description:
-** spawn_player
+** suc
 */
 
 #include "server.h"
 
-void spawn_player(void)
+void suc(server_t *srv, connection_t *cl)
 {
-    return;
+    queue_formatted_message(cl, "suc\n");
 }

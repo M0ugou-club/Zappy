@@ -7,7 +7,8 @@
 
 #include "server.h"
 
-void enw(server_t *srv, connection_t *cl, egg_t *egg)
+void enw(server_t *srv, connection_t *cl, egg_t *egg, player_t *player)
 {
-    return;
+    queue_formatted_message(cl, "enw #%d #%d %d %d\n", egg->id, player->id,
+        player->square->pos_x, player->square->pos_y);
 }
