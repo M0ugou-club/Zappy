@@ -5,3 +5,9 @@
 ** spawn_player
 */
 
+#include "server.h"
+
+void spawn_player(void)
+{
+    return;
+}
