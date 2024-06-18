@@ -23,8 +23,6 @@ static int get_max_fd(server_t *srv)
     return max;
 }
 
-// broadcast_gui(srv, "pdi %d\n", player->fd);
-
 static bool handshake(server_t *srv, char *team, connection_t *cl)
 {
     if (strcmp(team, "GRAPHIC") == 0) {
@@ -32,7 +30,8 @@ static bool handshake(server_t *srv, char *team, connection_t *cl)
         queue_formatted_message(cl, "sgt %zu\n", srv->args->frequency);
         mct(srv, cl);
         tna(srv, cl);
-        for (player_t *tmp = srv->game->players; tmp != NULL; tmp = tmp->next) {
+        for (player_t *tmp = srv->game->players;
+            tmp != NULL; tmp = tmp->next) {
             pnw(srv, cl, tmp);
         }
         return true;
@@ -122,7 +121,7 @@ void run_server(server_t *srv)
         }
         read_connections(srv);
         execute_connections(srv);
-        // game_tick(srv);
+        game_tick(srv);
         send_messages(srv);
         disconnect_players(srv);
     }
