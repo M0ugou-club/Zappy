@@ -138,4 +138,6 @@ void tna(server_t *srv, connection_t *cl);
 void cmd_tna(server_t *srv, connection_t *cl, regex_parse_t *parse);
 /* Commands */
 
+void pnw(server_t *srv, connection_t *cl, player_t *player);
+
 #endif /* !SERVER_H_ */
