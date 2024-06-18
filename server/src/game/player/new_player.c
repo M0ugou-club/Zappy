@@ -14,7 +14,7 @@ player_t *new_player(char *team_name)
 
     if (player == NULL)
         return NULL;
-    player->id = id++;
+    player->id++;
     player->team = team_name;
     player->level = 1;
     player->fd = 0;

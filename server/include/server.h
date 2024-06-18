@@ -25,6 +25,7 @@
     #include <string.h>
     #include <stdio.h>
     #include <regex.h>
+    #include <sys/select.h>
     #include "socket.h"
     #include "connection.h"
     #include "game.h"
