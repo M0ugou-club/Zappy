@@ -22,19 +22,19 @@ all: server gui ai
 
 server:
 	@$(MAKE) -C $(SERVER_PATH)
-	@mv $(SERVER_PATH)/$(NAME_SERVER) .
+	@cp $(SERVER_PATH)/$(NAME_SERVER) .
 	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME_SERVER) $(COLOR_BLUE)\
 		moved to root directory$(COLOR_RESET)"
 
 ai:
 	@$(MAKE) -C $(AI_PATH)
-	@mv $(AI_PATH)/$(NAME_AI) .
+	@cp $(AI_PATH)/$(NAME_AI) .
 	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME_AI) $(COLOR_BLUE)\
 		moved to root directory$(COLOR_RESET)"
 
 gui:
 	@$(MAKE) -C $(GUI_PATH)
-	@mv $(GUI_PATH)/$(NAME_GUI) .
+	@cp $(GUI_PATH)/$(NAME_GUI) .
 	@echo -e "$(COLOR_GREEN)[OK] $(COLOR_YELLOW)$(NAME_GUI) $(COLOR_BLUE)\
 		moved to root directory$(COLOR_RESET)"
 
