@@ -14,59 +14,100 @@ int calculate_coordinate(int coord1, int coord2, int max_coord) {
     return (wrapped_dist1 < wrapped_dist2) ? wrapped_dist1 : -wrapped_dist2;
 }
 
-static int map_direction_north(int dx, int dy) {
-    if (dx == 0 && dy == 0) return 0;
-    if (dx == 0 && dy < 0) return 1;
-    if (dx > 0 && dy < 0) return 2;
-    if (dx > 0 && dy == 0) return 3;
-    if (dx > 0 && dy > 0) return 4;
-    if (dx == 0 && dy > 0) return 5;
-    if (dx < 0 && dy > 0) return 6;
-    if (dx < 0 && dy == 0) return 7;
-    if (dx < 0 && dy < 0) return 8;
+static int map_direction_north(int dx, int dy)
+{
+    if (dx == 0 && dy == 0)
+        return 0;
+    if (dx == 0 && dy < 0)
+        return 1;
+    if (dx > 0 && dy < 0)
+        return 2;
+    if (dx > 0 && dy == 0)
+        return 3;
+    if (dx > 0 && dy > 0)
+        return 4;
+    if (dx == 0 && dy > 0)
+        return 5;
+    if (dx < 0 && dy > 0)
+        return 6;
+    if (dx < 0 && dy == 0)
+        return 7;
+    if (dx < 0 && dy < 0)
+        return 8;
     return -1;
 }
 
-static int map_direction_east(int dx, int dy) {
-    if (dx == 0 && dy == 0) return 0;
-    if (dx > 0 && dy == 0) return 1;
-    if (dx > 0 && dy > 0) return 2;
-    if (dx == 0 && dy > 0) return 3;
-    if (dx < 0 && dy > 0) return 4;
-    if (dx < 0 && dy == 0) return 5;
-    if (dx < 0 && dy < 0) return 6;
-    if (dx == 0 && dy < 0) return 7;
-    if (dx > 0 && dy < 0) return 8;
+static int map_direction_east(int dx, int dy)
+{
+    if (dx == 0 && dy == 0)
+        return 0;
+    if (dx > 0 && dy == 0)
+        return 1;
+    if (dx > 0 && dy > 0)
+        return 2;
+    if (dx == 0 && dy > 0)
+        return 3;
+    if (dx < 0 && dy > 0)
+        return 4;
+    if (dx < 0 && dy == 0)
+        return 5;
+    if (dx < 0 && dy < 0)
+        return 6;
+    if (dx == 0 && dy < 0)
+        return 7;
+    if (dx > 0 && dy < 0)
+        return 8;
     return -1;
 }
 
-static int map_direction_south(int dx, int dy) {
-    if (dx == 0 && dy == 0) return 0;
-    if (dx == 0 && dy > 0) return 1;
-    if (dx < 0 && dy > 0) return 2;
-    if (dx < 0 && dy == 0) return 3;
-    if (dx < 0 && dy < 0) return 4;
-    if (dx == 0 && dy < 0) return 5;
-    if (dx > 0 && dy < 0) return 6;
-    if (dx > 0 && dy == 0) return 7;
-    if (dx > 0 && dy > 0) return 8;
+static int map_direction_south(int dx, int dy)
+{
+    if (dx == 0 && dy == 0)
+        return 0;
+    if (dx == 0 && dy > 0)
+        return 1;
+    if (dx < 0 && dy > 0)
+        return 2;
+    if (dx < 0 && dy == 0)
+        return 3;
+    if (dx < 0 && dy < 0)
+        return 4;
+    if (dx == 0 && dy < 0)
+        return 5;
+    if (dx > 0 && dy < 0)
+        return 6;
+    if (dx > 0 && dy == 0)
+        return 7;
+    if (dx > 0 && dy > 0)
+        return 8;
     return -1;
 }
 
-static int map_direction_west(int dx, int dy) {
-    if (dx == 0 && dy == 0) return 0;
-    if (dx < 0 && dy == 0) return 1;
-    if (dx < 0 && dy < 0) return 2;
-    if (dx == 0 && dy < 0) return 3;
-    if (dx > 0 && dy < 0) return 4;
-    if (dx > 0 && dy == 0) return 5;
-    if (dx > 0 && dy > 0) return 6;
-    if (dx == 0 && dy > 0) return 7;
-    if (dx < 0 && dy > 0) return 8;
+static int map_direction_west(int dx, int dy)
+{
+    if (dx == 0 && dy == 0)
+        return 0;
+    if (dx < 0 && dy == 0)
+        return 1;
+    if (dx < 0 && dy < 0)
+        return 2;
+    if (dx == 0 && dy < 0)
+        return 3;
+    if (dx > 0 && dy < 0)
+        return 4;
+    if (dx > 0 && dy == 0)
+        return 5;
+    if (dx > 0 && dy > 0)
+        return 6;
+    if (dx == 0 && dy > 0)
+        return 7;
+    if (dx < 0 && dy > 0)
+        return 8;
     return -1;
 }
 
-int map_direction_based_on_orientation(int dx, int dy, direction_t direction) {
+int map_direction_based_on_orientation(int dx, int dy, direction_t direction)
+{
     switch (direction) {
         case NORTH:
             return map_direction_north(dx, dy);
@@ -84,7 +125,8 @@ int map_direction_based_on_orientation(int dx, int dy, direction_t direction) {
 }
 
 
-int get_direction(player_t *player, player_t *player_connected, game_t *game) {
+int get_direction(player_t *player, player_t *player_connected, game_t *game)
+{
     int pos_x_rec = player->square->pos_x;
     int pos_y_rec = player->square->pos_y;
     int pos_x_sender = player_connected->square->pos_x;
