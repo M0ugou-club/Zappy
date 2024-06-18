@@ -66,7 +66,7 @@ bool check_egg(square_t *square, char *team_name)
     if (square->eggs == NULL)
         return false;
     for (int i = 0; square->eggs[i]->id == -1; i++) {
-        if (strcmp(square->eggs[i], team_name) == 0)
+        if (strcmp(square->eggs[i]->team, team_name) == 0)
             return true;
     }
     return false;
