@@ -7,7 +7,7 @@
 
 #include "server.h"
 
-void cmd_pex(server_t *srv, connection_t *cl, player_t *player)
+void pex(server_t *srv, connection_t *cl, player_t *player)
 {
     queue_formatted_message(cl, "pex #%d\n", player->id);
 }

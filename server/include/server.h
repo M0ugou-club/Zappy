@@ -139,5 +139,14 @@ void cmd_tna(server_t *srv, connection_t *cl, regex_parse_t *parse);
 /* Commands */
 
 void pnw(server_t *srv, connection_t *cl, player_t *player);
+void pex(server_t *srv, connection_t *cl, player_t *player);
+void pbc(server_t *srv, connection_t *cl, player_t *player, char *msg);
+void pic(server_t *srv, connection_t *cl, player_t *player);
+void pie(server_t *srv, connection_t *cl, player_t *player, char *result);
+void pfk(server_t *srv, connection_t *cl, player_t *player);
+void pdr(server_t *srv, connection_t *cl, player_t *player, int res);
+void pgt(server_t *srv, connection_t *cl, player_t *player, int res);
+void pdi(server_t *srv, connection_t *cl, player_t *player);
+void enw(server_t *srv, connection_t *cl, egg_t *egg);
 
 #endif /* !SERVER_H_ */

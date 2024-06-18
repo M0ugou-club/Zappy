@@ -2,14 +2,12 @@
 ** EPITECH PROJECT, 2024
 ** Zappy [WSL: Fedora]
 ** File description:
-** pic
+** enw
 */
 
-#include <stdarg.h>
-#include <stdio.h>
 #include "server.h"
 
-void pic(server_t *srv, connection_t *cl, int *players_nb)
+void enw(server_t *srv, connection_t *cl, egg_t *egg)
 {
     return;
 }

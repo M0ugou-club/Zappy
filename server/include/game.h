@@ -35,8 +35,13 @@ typedef struct max_items_s {
     int items[NONE];
 } max_items_t;
 
+typedef struct egg_s {
+    char *team;
+    size_t id;
+} egg_t;
+
 typedef struct square_s {
-    char **eggs;
+    egg_t **eggs;
     int items[NONE];
     int pos_x;
     int pos_y;
