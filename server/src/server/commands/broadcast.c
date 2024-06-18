@@ -8,9 +8,11 @@
 #include "server.h"
 
 
-int calculate_coordinate(int coord1, int coord2, int max_coord) {
+int calculate_coordinate(int coord1, int coord2, int max_coord)
+{
     int wrapped_dist1 = (coord2 - coord1 + max_coord) % max_coord;
     int wrapped_dist2 = (coord1 - coord2 + max_coord) % max_coord;
+
     return (wrapped_dist1 < wrapped_dist2) ? wrapped_dist1 : -wrapped_dist2;
 }
 
@@ -124,7 +126,6 @@ int map_direction_based_on_orientation(int dx, int dy, direction_t direction)
     return -1;
 }
 
-
 int get_direction(player_t *player, player_t *player_connected, game_t *game)
 {
     int pos_x_rec = player->square->pos_x;
@@ -133,12 +134,12 @@ int get_direction(player_t *player, player_t *player_connected, game_t *game)
     int pos_y_sender = player_connected->square->pos_y;
     int grid_width = game->map_x;
     int grid_height = game->map_y;
-
     int dx = calculate_coordinate(pos_x_rec, pos_x_sender, grid_width);
     int dy = calculate_coordinate(pos_y_rec, pos_y_sender, grid_height);
+    int dir = 0;
 
-    // Calculate the direction
-    return map_direction_based_on_orientation(dx, dy, player->direction);
+    dir = map_direction_based_on_orientation(dx, dy, player->direction);
+    return dir;
 }
 
 // Send a message to everyone connected
