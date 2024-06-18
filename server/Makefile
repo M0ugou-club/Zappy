@@ -17,10 +17,13 @@ SRC =	src/main.c \
 		src/server/send_message.c \
 		src/server/send_messages.c \
 		src/server/queue_message.c \
+		src/server/broadcast_gui.c \
 		src/game/player/add_player.c \
 		src/game/player/remove_player.c \
 		src/game/player/get_player_by_fd.c \
 		src/game/player/new_player.c \
+		src/game/player/disconnect_players.c \
+		src/game/tick.c \
 		src/game/team_exists.c \
 		src/server/commands/broadcast.c \
 		src/server/commands/connect_nbr.c \
@@ -40,6 +43,7 @@ SRC =	src/main.c \
 		src/server/commands/gui/sgt.c \
 		src/server/commands/gui/sst.c \
 		src/server/commands/gui/tna.c \
+		src/server/commands/other/pnw.c \
 		src/args/get_args.c \
 		src/args/free_args.c \
 		src/args/set/set_port.c \

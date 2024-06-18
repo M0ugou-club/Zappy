@@ -14,7 +14,7 @@ server_t *init_server(args_t *args)
     server->args = args;
     server->sock = init_socket(args->port);
     server->cons = NULL;
-    server->game = init_game(args->x, args->y, args->teams);
+    server->game = init_game(args->x, args->y, args->teams, args);
     server->readfds = malloc(sizeof(fd_set));
     server->writefds = malloc(sizeof(fd_set));
     FD_ZERO(server->readfds);

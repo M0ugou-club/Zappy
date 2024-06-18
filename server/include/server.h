@@ -88,6 +88,7 @@ void remove_connection(connection_t **cl, int sockfd);
 
 void read_connections(server_t *srv);
 void execute_connections(server_t *srv);
+void disconnect_players(server_t *srv);
 
 void queue_message(connection_t *conn, char *msg);
 void queue_formatted_message(connection_t *conn, char *fmt, ...);
@@ -98,6 +99,12 @@ void send_messages(server_t *srv);
 server_t *init_server(args_t *args);
 void free_server(server_t *server);
 void run_server(server_t *server);
+
+void place_eggs(game_t *game, args_t *args);
+void place_items_randomly(game_t *game, args_t *args);
+
+game_t *init_game(int x, int y, char **teams, args_t *args);
+void game_tick(server_t *srv);
 
 player_t *get_player_by_fd(player_t *players, int fd);
 

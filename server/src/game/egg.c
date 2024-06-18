@@ -5,11 +5,7 @@
 ** egg
 */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include "server.h"
-#include "game.h"
 
 static int count_str_array(char **arr)
 {

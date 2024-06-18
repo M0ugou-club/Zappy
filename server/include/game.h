@@ -13,11 +13,13 @@
     #include <stdbool.h>
     #include <string.h>
 
+    #define EAT_TIME 126.0f
+
 typedef enum direction_e {
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST
+    NORTH = 1,
+    SOUTH = 2,
+    EAST = 3,
+    WEST = 4
 } direction_t;
 
 typedef enum item_e {
@@ -55,6 +57,8 @@ typedef struct player_s {
     size_t level;
     unsigned int inventory[NONE];
     int fd;
+    time_t last_eat;
+    bool disconnect;
     struct player_s *next;
 } player_t;
 
@@ -67,9 +71,14 @@ typedef struct game_s {
     int max_players;
     char **teams;
     int *team_slots;
+    time_t time_elapsed;
+    ssize_t tick;
 } game_t;
 
-game_t *init_game(int x, int y, char **teams);
+void add_egg(square_t *square, char *team_name);
+void del_egg(square_t *square, char *team_name);
+bool check_egg(square_t *square, char *team_name);
+
 void free_game(game_t *game);
 max_items_t *fill_density(int x, int y);
 bool team_exists(char **teams, char *team);

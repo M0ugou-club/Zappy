@@ -25,6 +25,6 @@ typedef struct connection_s {
 
 connection_t *add_connection(connection_t *cons, connection_t *new);
 void free_connection(connection_t *cons);
-connection_t *new_connection(int fd, struct sockaddr_in *addr, char *team);
+connection_t *new_connection(int fd, struct sockaddr_in *addr);
 
 #endif /* !CONNECTION_H_ */
