@@ -24,13 +24,13 @@ static bool check_incantation(server_t *srv,
     int i_inventory = 1;
 
     if (player->level == 8) {
-        queue_formatted_message(cl, "ko");
+        queue_formatted_message(cl, "ko\n");
         return false;
     }
     for (int i = 0; i < 7; i++) {
         if (player->inventory[i_inventory] <
             incantation[player->level - 1][i]) {
-            queue_formatted_message(cl, "ko");
+            queue_formatted_message(cl, "ko\n");
             return false;
         }
         i_inventory++;

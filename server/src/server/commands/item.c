@@ -17,11 +17,11 @@ void cmd_take(server_t *srv, connection_t *cl, regex_parse_t *parse)
             player->inventory[i] += 1;
             player->square->items[i] -= 1;
         } else {
-            queue_formatted_message(cl, "ko");
+            queue_formatted_message(cl, "ko\n");
             return;
         }
     }
-    queue_formatted_message(cl, "ok");
+    queue_formatted_message(cl, "ok\n");
 }
 
 // Put an object on the ground
@@ -34,9 +34,9 @@ void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse)
             player->inventory[i] -= 1;
             player->square->items[i] += 1;
         } else {
-            queue_formatted_message(cl, "ko");
+            queue_formatted_message(cl, "ko\n");
             return;
         }
     }
-    queue_formatted_message(cl, "ok");
+    queue_formatted_message(cl, "ok\n");
 }

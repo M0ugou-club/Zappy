@@ -21,5 +21,6 @@ player_t *new_player(char *team_name)
     player->direction = rand() % 4;
     player->square = NULL;
     player->next = NULL;
+    player->disconnect = false;
     return player;
 }

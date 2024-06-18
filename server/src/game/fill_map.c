@@ -6,8 +6,7 @@
 */
 
 #include <time.h>
-#include "game.h"
-#include "egg.h"
+#include "server.h"
 
 static const float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
 
