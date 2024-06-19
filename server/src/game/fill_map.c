@@ -31,10 +31,8 @@ static void add_items(game_t *game, int i)
     while (count < game->max_items->items[i]) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;
-        if (game->map[x][y].items[i] == 0) {
-            game->map[x][y].items[i] += 1;
-            count++;
-        }
+        game->map[x][y].items[i] += 1;
+        count++;
     }
 }
 
@@ -44,8 +42,7 @@ static int count_items(game_t *game, int i)
 
     for (int x = 0; x < game->map_x; x++) {
         for (int y = 0; y < game->map_y; y++) {
-            if (game->map[x][y].items[i] != 0)
-                count += game->map[x][y].items[i];
+            count += game->map[x][y].items[i];
         }
     }
     return count;
@@ -64,10 +61,8 @@ void refill_map(game_t *game)
         while (count < game->max_items->items[i] - nb_items) {
             x = rand() % game->map_x;
             y = rand() % game->map_y;
-            if (game->map[x][y].items[i] == 0) {
-                game->map[x][y].items[i] += 1;
-                count++;
-            }
+            game->map[x][y].items[i] += 1;
+            count++;
         }
     }
 }
