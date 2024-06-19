@@ -146,6 +146,8 @@ void World::load()
 {
     parseEventQueue();
     _map.initMap();
+    std::cout << "light" << std::endl;
+    _lightManager.addLight({0, 2, 0});
 }
 
 void World::update()
@@ -155,11 +157,14 @@ void World::update()
     _window->BeginDrawing();
     _window->ClearBackground(raylib::Color::Black());
     _camera.getCamera().BeginMode();
+    _lightManager.getShader()->BeginMode();
     _map.draw();
     for (auto &player : _players) {
         player.second->draw();
     }
     drawItems();
+    _lightManager.update(_camera.getCamera());
+    _lightManager.getShader()->EndMode();
     _camera.getCamera().EndMode();
     DrawFPS(10, 10);
     _window->EndDrawing();

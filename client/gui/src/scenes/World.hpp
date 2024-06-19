@@ -19,6 +19,7 @@
     #include "../MyCamera.hpp"
     #include "World/Player.hpp"
     #include "World/ItemRender.hpp"
+    #include "World/LightManager.hpp"
     #include "../Defines.hpp"
     #include "rlgl.h"
 
@@ -42,6 +43,7 @@ class World : public AScene {
     private:
         MyCamera _camera;
         Map _map;
+        LightManager _lightManager;
         std::map<std::tuple<float, float>, std::vector<int>> _items;
         std::vector<std::unique_ptr<ItemRender>> _itemRenders;
         std::string &_newSceneName;
