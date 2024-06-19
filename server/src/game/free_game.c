@@ -13,11 +13,11 @@ static void free_eggs(square_t *square)
 
     if (!square->eggs)
         return;
-    while (square->eggs[idx]) {
+    while (square->eggs[idx]->id != -1) {
         free(square->eggs[idx]);
         idx++;
     }
-    free(square->eggs[idx + 1]);
+    free(square->eggs[idx]);
     free(square->eggs);
 }
 
