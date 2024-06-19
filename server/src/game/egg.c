@@ -22,7 +22,7 @@ void add_egg(square_t *square, char *team_name)
     int nb_eggs = 0;
 
     if (square->eggs == NULL) {
-        square->eggs = malloc(sizeof(char *) * 2);
+        square->eggs = malloc(sizeof(egg_t *) * 2);
         square->eggs[0]->id = id;
         square->eggs[0]->team = strdup(team_name);
         square->eggs[1]->id = -1;
@@ -31,7 +31,7 @@ void add_egg(square_t *square, char *team_name)
         return;
     }
     for (nb_eggs = 0; square->eggs[nb_eggs]->id != -1; nb_eggs++);
-    square->eggs = realloc(square->eggs, sizeof(char *) * (nb_eggs + 2));
+    square->eggs = realloc(square->eggs, sizeof(egg_t *) * (nb_eggs + 2));
     square->eggs[nb_eggs]->id = id;
     square->eggs[nb_eggs]->team = strdup(team_name);
     square->eggs[nb_eggs + 1]->id = -1;
@@ -58,7 +58,7 @@ void del_egg(square_t *square, char *team_name)
     for (int j = i; square->eggs[j]->id != -1; j++) {
         square->eggs[j] = square->eggs[j + 1];
     }
-    square->eggs = realloc(square->eggs, sizeof(char *) * (nb_eggs));
+    square->eggs = realloc(square->eggs, sizeof(egg_t *) * (nb_eggs));
 }
 
 bool check_egg(square_t *square, char *team_name)
