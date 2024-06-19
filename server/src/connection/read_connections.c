@@ -49,8 +49,6 @@ static void action(server_t *srv, connection_t *cli)
         close(cli->fd);
         return;
     }
-    if (strcount(cli->buffer, '\n') > MAX_COMMAND_QUEUE)
-        return;
     tmp[ret] = '\0';
     memcpy(cli->buffer + strlen(cli->buffer), tmp, ret);
 }
@@ -60,7 +58,8 @@ void read_connections(server_t *srv)
     connection_t *tmp = srv->cons;
 
     while (tmp != NULL) {
-        if (FD_ISSET(tmp->fd, srv->readfds))
+        if (FD_ISSET(tmp->fd, srv->readfds)
+            && strcount(tmp->buffer, '\n') < MAX_COMMAND_QUEUE)
             action(srv, tmp);
         tmp = tmp->next;
     }
