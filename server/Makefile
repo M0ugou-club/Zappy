@@ -18,6 +18,7 @@ SRC =	src/main.c \
 		src/server/send_messages.c \
 		src/server/queue_message.c \
 		src/server/broadcast_gui.c \
+		src/server/close_server.c \
 		src/game/player/add_player.c \
 		src/game/player/remove_player.c \
 		src/game/player/get_player_by_fd.c \

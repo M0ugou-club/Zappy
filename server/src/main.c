@@ -31,8 +31,9 @@ int main(int argc, char **argv)
         dprintf(2, "Error: Server could not be initialized\n");
         return EXIT_ERROR;
     }
+    signal(SIGINT, (void (*)(int))close_server);
+    close_server(-1, server);
     run_server(server);
     free_server(server);
-    free_args(args);
     return EXIT_SUCCESS;
 }

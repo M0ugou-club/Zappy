@@ -29,14 +29,17 @@ server_t *init_server(args_t *args)
     server->args = args;
     server->sock = init_socket(args->port);
     server->cons = NULL;
+    server->close = false;
     server->game = init_game(args->x, args->y, args->teams, args);
     server->readfds = malloc(sizeof(fd_set));
     server->writefds = malloc(sizeof(fd_set));
     FD_ZERO(server->readfds);
     FD_ZERO(server->writefds);
     if (find_errors(server)) {
-        free_socket(server->sock);
-        free_game(server->game);
+        if (server->sock)
+            free_socket(server->sock);
+        if (server->game)
+            free_game(server->game);
         free(server->readfds);
         free(server->writefds);
         free(server);

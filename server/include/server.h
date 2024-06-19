@@ -66,6 +66,7 @@ typedef struct server_s {
     struct args_s *args;
     sock_handle_t *sock;
     connection_t *cons;
+    bool close;
     game_t *game;
     fd_set *readfds;
     fd_set *writefds;
@@ -99,6 +100,7 @@ void send_messages(server_t *srv);
 
 server_t *init_server(args_t *args);
 void free_server(server_t *server);
+void close_server(const int signal, void *sr);
 void run_server(server_t *server);
 
 void place_eggs(game_t *game, args_t *args);
