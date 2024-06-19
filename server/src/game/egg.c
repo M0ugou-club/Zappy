@@ -22,7 +22,7 @@ static bool check_egg_in_eggs(square_t *square, char *team_name)
         square->eggs = malloc(sizeof(egg_t *) * 2);
         square->eggs[0] = malloc(sizeof(egg_t));
         square->eggs[0]->id = 0;
-        square->eggs[0]->team = strdup(team_name);
+        square->eggs[0]->team = team_name;
         square->eggs[1] = malloc(sizeof(egg_t));
         square->eggs[1]->id = -1;
         square->eggs[1]->team = NULL;
@@ -42,7 +42,7 @@ void add_egg(square_t *square, char *team_name)
     square->eggs = realloc(square->eggs, sizeof(egg_t *) * (nb_eggs + 2));
     square->eggs[nb_eggs] = malloc(sizeof(egg_t));
     square->eggs[nb_eggs]->id = id;
-    square->eggs[nb_eggs]->team = strdup(team_name);
+    square->eggs[nb_eggs]->team = team_name;
     square->eggs[nb_eggs + 1] = malloc(sizeof(egg_t));
     square->eggs[nb_eggs + 1]->id = -1;
     square->eggs[nb_eggs + 1]->team = NULL;
