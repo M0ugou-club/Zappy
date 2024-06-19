@@ -31,7 +31,8 @@ void apply_incantation(server_t *srv, player_t *ply)
 
     if (!ply->incantation)
         return;
-    if (difftime(time(NULL), ply->last_action) >= 300.0f / srv->args->frequency) {
+    if (difftime(time(NULL), ply->last_action)
+        >= 300.0f / srv->args->frequency) {
         ply->incantation = false;
         incantation_message(srv, cl, ply);
     }

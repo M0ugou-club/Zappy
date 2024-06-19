@@ -33,7 +33,6 @@ static int strcount(const char *str, char c)
     for (int i = 0; str[i]; i++)
         count += str[i] == c;
     return count;
-
 }
 
 static void action(server_t *srv, connection_t *cli)
