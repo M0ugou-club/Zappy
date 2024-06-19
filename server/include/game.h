@@ -84,6 +84,7 @@ typedef struct game_s {
 void add_egg(square_t *square, char *team_name);
 void del_egg(square_t *square, char *team_name);
 bool check_egg(square_t *square, char *team_name);
+bool check_eggs(game_t *game, char *team_name);
 
 void free_game(game_t *game);
 max_items_t *fill_density(int x, int y);

@@ -7,7 +7,7 @@
 
 #include "server.h"
 
-void spawn_player(void)
+void spawn_player(game_t *game)
 {
     return;
 }
