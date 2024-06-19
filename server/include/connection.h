@@ -14,6 +14,8 @@
     #include <stdbool.h>
     #include <string.h>
 
+    #define MAX_COMMAND_QUEUE 10
+
 typedef struct connection_s {
     int fd;
     struct sockaddr_in addr;

@@ -5,6 +5,7 @@
 ** read_connections
 */
 
+#include "connection.h"
 #include "server.h"
 
 static bool action_setup(connection_t *conn)
@@ -25,20 +26,31 @@ static bool action_setup(connection_t *conn)
     return false;
 }
 
-static void action(server_t *srv, int client_fd)
+static int strcount(const char *str, char c)
 {
-    connection_t *cli = get_client_by_fd(srv->cons, client_fd);
+    int count = 0;
+
+    for (int i = 0; str[i]; i++)
+        count += str[i] == c;
+    return count;
+
+}
+
+static void action(server_t *srv, connection_t *cli)
+{
     char tmp[BUFFER_SIZE];
     ssize_t ret;
 
     if (action_setup(cli))
         return;
-    ret = read(client_fd, tmp, BUFFER_SIZE - 1);
+    ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
     if (ret <= 0) {
-        remove_connection(&srv->cons, client_fd);
-        close(client_fd);
+        remove_connection(&srv->cons, cli->fd);
+        close(cli->fd);
         return;
     }
+    if (strcount(cli->buffer, '\n') > MAX_COMMAND_QUEUE)
+        return;
     tmp[ret] = '\0';
     memcpy(cli->buffer + strlen(cli->buffer), tmp, ret);
 }
@@ -49,7 +61,7 @@ void read_connections(server_t *srv)
 
     while (tmp != NULL) {
         if (FD_ISSET(tmp->fd, srv->readfds))
-            action(srv, tmp->fd);
+            action(srv, tmp);
         tmp = tmp->next;
     }
 }
