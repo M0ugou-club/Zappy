@@ -20,6 +20,7 @@
     #include "World/Player.hpp"
     #include "World/ItemRender.hpp"
     #include "../Defines.hpp"
+    #include "../ui/Chat.hpp"
     #include "rlgl.h"
 
 class World : public AScene {
@@ -42,6 +43,7 @@ class World : public AScene {
     private:
         MyCamera _camera;
         Map _map;
+        Chat _chat;
         std::map<std::tuple<float, float>, std::vector<int>> _items;
         std::vector<std::unique_ptr<ItemRender>> _itemRenders;
         std::string &_newSceneName;

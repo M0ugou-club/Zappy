@@ -146,6 +146,13 @@ void World::load()
 {
     parseEventQueue();
     _map.initMap();
+    _chat.sendMessage("Welcome to Zappy", raylib::Color::Green());
+    _chat.sendMessage("Map is " + std::to_string(static_cast<int>(_map.getSize().GetX())) + "x" +
+        std::to_string(static_cast<int>(_map.getSize().GetY())));
+    _chat.sendMessage("Here are the teams :");
+    for (auto &team : _teams) {
+        _chat.sendMessage(team, (raylib::Color){rand() % 255, rand() % 255, rand() % 255, 255});
+    }
 }
 
 void World::update()
@@ -153,7 +160,7 @@ void World::update()
     parseEventQueue();
     _camera.updateCamera();
     _window->BeginDrawing();
-    _window->ClearBackground(raylib::Color::Black());
+    _window->ClearBackground(raylib::Color::SkyBlue());
     _camera.getCamera().BeginMode();
     _map.draw();
     for (auto &player : _players) {
@@ -161,6 +168,7 @@ void World::update()
     }
     drawItems();
     _camera.getCamera().EndMode();
+    _chat.update();
     DrawFPS(10, 10);
     _window->EndDrawing();
 }
