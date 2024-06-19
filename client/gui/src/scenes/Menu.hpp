@@ -14,7 +14,7 @@
 
 class Menu : public AScene {
     public:
-        Menu(const raylib::Window &window, std::string &newSceneName);
+        Menu(const raylib::Window &window, std::string &newSceneName, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues);
         ~Menu() = default;
 
         void load();

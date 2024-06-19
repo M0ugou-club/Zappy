@@ -13,19 +13,7 @@
 #include <vector>
 
 class Args {
-
-    class BadArgumentException : public std::exception {
-        public:
-            BadArgumentException(const std::string &message) : _message(message) {}
-            ~BadArgumentException() throw() {}
-            const char *what() const throw() { return _message.c_str(); }
-
-        private:
-            std::string _message;
-    };
-
     public:
-        static int main_example(int ac, char **av);
         static bool isNumber(const std::string &str);
 
         Args(int ac, char **av);

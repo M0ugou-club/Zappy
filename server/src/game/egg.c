@@ -5,11 +5,7 @@
 ** egg
 */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include "server.h"
-#include "game.h"
 
 static int count_str_array(char **arr)
 {
@@ -22,53 +18,55 @@ static int count_str_array(char **arr)
 
 void add_egg(square_t *square, char *team_name)
 {
-    int str_array_len = 0;
+    size_t id = 0;
+    int nb_eggs = 0;
 
     if (square->eggs == NULL) {
         square->eggs = malloc(sizeof(char *) * 2);
-        square->eggs[0] = strdup(team_name);
-        square->eggs[1] = NULL;
+        square->eggs[0]->id = id;
+        square->eggs[0]->team = strdup(team_name);
+        square->eggs[1]->id = -1;
+        square->eggs[1]->team = NULL;
+        id++;
         return;
     }
-    str_array_len = count_str_array(square->eggs);
-    square->eggs = realloc(square->eggs, sizeof(char *) * (str_array_len + 2));
-    square->eggs[str_array_len] = strdup(team_name);
-    square->eggs[str_array_len + 1] = NULL;
+    for (nb_eggs = 0; square->eggs[nb_eggs]->id != -1; nb_eggs++);
+    square->eggs = realloc(square->eggs, sizeof(char *) * (nb_eggs + 2));
+    square->eggs[nb_eggs]->id = id;
+    square->eggs[nb_eggs]->team = strdup(team_name);
+    square->eggs[nb_eggs + 1]->id = -1;
+    square->eggs[nb_eggs + 1]->team = NULL;
+    id++;
 }
 
 void del_egg(square_t *square, char *team_name)
 {
-    int str_array_len = 0;
+    int i = 0;
+    int nb_eggs = 0;
 
     if (square->eggs == NULL)
         return;
-    str_array_len = count_str_array(square->eggs);
-    for (int i = 0; i < str_array_len; i++) {
-        if (strcmp(square->eggs[i], team_name) == 0) {
-            free(square->eggs[i]);
-            square->eggs[i] = NULL;
+    for (i = 0; square->eggs[i]->id == -1; i++) {
+        if (strcmp(square->eggs[i]->team, team_name) == 0) {
+            free(square->eggs[i]->team);
+            square->eggs[i]->team = NULL;
+            square->eggs[i]->id = -1;
             break;
         }
     }
-    for (int i = 0; i < str_array_len; i++) {
-        if (square->eggs[i] == NULL) {
-            free(square->eggs[i]);
-            square->eggs[i] = strdup(square->eggs[i + 1]);
-            free(square->eggs[i + 1]);
-            square->eggs[i + 1] = NULL;
-        }
+    for (nb_eggs = 0; square->eggs[nb_eggs]->id != -1; nb_eggs++);
+    for (int j = i; square->eggs[j]->id != -1; j++) {
+        square->eggs[j] = square->eggs[j + 1];
     }
+    square->eggs = realloc(square->eggs, sizeof(char *) * (nb_eggs));
 }
 
 bool check_egg(square_t *square, char *team_name)
 {
-    int str_array_len = 0;
-
     if (square->eggs == NULL)
         return false;
-    str_array_len = count_str_array(square->eggs);
-    for (int i = 0; i < str_array_len; i++) {
-        if (strcmp(square->eggs[i], team_name) == 0)
+    for (int i = 0; square->eggs[i]->id == -1; i++) {
+        if (strcmp(square->eggs[i]->team, team_name) == 0)
             return true;
     }
     return false;

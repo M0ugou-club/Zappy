@@ -19,18 +19,18 @@ MyCamera::MyCamera()
     _camera.projection = _type;
 }
 
-void MyCamera::moveCamera(move direction)
+void MyCamera::moveCamera(Direction direction)
 {
-    if (direction == LEFT) {
+    if (direction == Direction::LEFT) {
         _angle += _speed;
     }
-    if (direction == RIGHT) {
+    if (direction == Direction::RIGHT) {
         _angle -= _speed;
     }
-    if (direction == FORWARD) {
+    if (direction == Direction::FORWARD) {
         _distance_to_target -= _speed * 4;
     }
-    if (direction == BACKWARD) {
+    if (direction == Direction::BACKWARD) {
         _distance_to_target += _speed * 4;
     }
 
@@ -44,11 +44,11 @@ void MyCamera::moveCamera(move direction)
 void MyCamera::updateCamera()
 {
     if(IsKeyDown(KEY_W))
-        moveCamera(FORWARD);
+        moveCamera(Direction::FORWARD);
     if(IsKeyDown(KEY_S))
-        moveCamera(BACKWARD);
+        moveCamera(Direction::BACKWARD);
     if(IsKeyDown(KEY_A))
-        moveCamera(LEFT);
+        moveCamera(Direction::LEFT);
     if(IsKeyDown(KEY_D))
-        moveCamera(RIGHT);
+        moveCamera(Direction::RIGHT);
 }

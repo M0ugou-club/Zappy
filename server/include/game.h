@@ -9,12 +9,17 @@
     #define GAME_H_
 
     #include <stdlib.h>
+    #include <time.h>
+    #include <stdbool.h>
+    #include <string.h>
+
+    #define EAT_TIME 126.0f
 
 typedef enum direction_e {
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST
+    NORTH = 1,
+    SOUTH = 2,
+    EAST = 3,
+    WEST = 4
 } direction_t;
 
 typedef enum item_e {
@@ -29,24 +34,19 @@ typedef enum item_e {
 } item_t;
 
 typedef struct max_items_s {
-    int food;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
+    int items[NONE];
 } max_items_t;
 
+typedef struct egg_s {
+    char *team;
+    size_t id;
+} egg_t;
+
 typedef struct square_s {
-    char **eggs;
-    int food;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
+    egg_t **eggs;
+    int items[NONE];
+    int pos_x;
+    int pos_y;
     struct square_s *north;
     struct square_s *south;
     struct square_s *east;
@@ -56,25 +56,36 @@ typedef struct square_s {
 typedef struct player_s {
     size_t id;
     char *team;
-    struct square_s *square;
+    square_t *square;
     direction_t direction;
+    time_t last_action;
     size_t level;
-    item_t inventory[NONE];
+    unsigned int inventory[NONE];
+    int fd;
+    time_t last_eat;
+    bool disconnect;
+    struct player_s *next;
 } player_t;
 
 typedef struct game_s {
     int map_x;
     int map_y;
-    struct max_items_s *max_items;
-    struct square_s **map;
-    struct player_s *players;
+    max_items_t *max_items;
+    square_t **map;
+    player_t *players;
     int max_players;
     char **teams;
     int *team_slots;
+    time_t time_elapsed;
+    ssize_t tick;
 } game_t;
 
-game_t *init_game(int x, int y, char **teams);
+void add_egg(square_t *square, char *team_name);
+void del_egg(square_t *square, char *team_name);
+bool check_egg(square_t *square, char *team_name);
+
 void free_game(game_t *game);
 max_items_t *fill_density(int x, int y);
+bool team_exists(char **teams, char *team);
 
 #endif /* !GAME_H_ */

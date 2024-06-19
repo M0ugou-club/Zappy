@@ -8,28 +8,28 @@
 #include "server.h"
 
 static const command_regex_t CMDS[] = {
-    {"Forward$", false, cmd_forward},
-    {"Right$", false, cmd_right},
-    {"Left$", false, cmd_left},
-    {"Look$", false, cmd_look},
-    {"Inventory$", false, cmd_inventory},
-    {"Broadcast (.+)$", false, cmd_broadcast},
-    {"Connect_nbr$", false, cmd_connect_nbr},
-    {"Fork$", false, cmd_fork},
-    {"Eject$", false, cmd_eject},
-    {"Take ([a-z]+)$", false, cmd_take},
-    {"Set ([a-z]+)$", false, cmd_set},
-    {"Incantation$", false, cmd_incantation},
-    {"msz$", true, cmd_msz},
-    {"bct ([0-9]+) ([0-9]+)$", true, cmd_bct},
-    {"mct$", true, cmd_mct},
-    {"tna$", true, cmd_tna},
-    {"ppo #([0-9]+)$", true, cmd_ppo},
-    {"plv #([0-9]+)$", true, cmd_plv},
-    {"pin #([0-9]+)$", true, cmd_pin},
-    {"sgt$", true, cmd_sgt},
-    {"sst ([0-9]+)$", true, cmd_sst},
-    {NULL, false, NULL}
+    {"Forward$", false, 7.0f, cmd_forward},
+    {"Right$", false, 7.0f, cmd_right},
+    {"Left$", false, 7.0f, cmd_left},
+    {"Look$", false, 7.0f, cmd_look},
+    {"Inventory$", false, 1.0f, cmd_inventory},
+    {"Broadcast (.+)$", false, 7.0f, cmd_broadcast},
+    {"Connect_nbr$", false, 0.0f, cmd_connect_nbr},
+    {"Fork$", false, 42.0f, cmd_fork},
+    {"Eject$", false, 7.0f, cmd_eject},
+    {"Take ([a-z]+)$", false, 7.0f, cmd_take},
+    {"Set ([a-z]+)$", false, 7.0f, cmd_set},
+    {"Incantation$", false, 300.0f, cmd_incantation},
+    {"msz$", true, -1.0f, cmd_msz},
+    {"bct ([0-9]+) ([0-9]+)$", true, -1.0f, cmd_bct},
+    {"mct$", true, -1.0f, cmd_mct},
+    {"tna$", true, -1.0f, cmd_tna},
+    {"ppo #([0-9]+)$", true, -1.0f, cmd_ppo},
+    {"plv #([0-9]+)$", true, -1.0f, cmd_plv},
+    {"pin #([0-9]+)$", true, -1.0f, cmd_pin},
+    {"sgt$", true, -1.0f, cmd_sgt},
+    {"sst ([0-9]+)$", true, -1.0f, cmd_sst},
+    {NULL, false, 0.0f, NULL}
 };
 
 static char *get_arg(const char *src, size_t start, size_t end)
@@ -55,12 +55,25 @@ static void run_cmd(const command_regex_t *cmd, server_t *srv,
     int client_fd, regex_parse_t parse)
 {
     connection_t *client = get_client_by_fd(srv->cons, client_fd);
+    player_t *player = NULL;
 
     if (client == NULL)
         return;
     if (cmd->spec_only == true && strcmp(client->team, "GRAPHIC") != 0)
         return;
+    if (cmd->spec_only == false && strcmp(client->team, "GRAPHIC") == 0)
+        return;
+    if (!cmd->spec_only) {
+        player = get_player_by_fd(srv->game->players, client_fd);
+        if (difftime(time(NULL), player->last_action)
+            < cmd->time / srv->args->frequency) {
+            queue_message(client, "ko\n");
+            return;
+        }
+    }
     cmd->func(srv, client, &parse);
+    if (!cmd->spec_only && player != NULL)
+        player->last_action = time(NULL);
 }
 
 static void execute(char *cmd, int client_fd, server_t *srv)

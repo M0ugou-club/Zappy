@@ -6,8 +6,7 @@
 */
 
 #include <time.h>
-#include "game.h"
-#include "egg.h"
+#include "server.h"
 
 static const float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
 
@@ -15,115 +14,68 @@ max_items_t *fill_density(int x, int y)
 {
     max_items_t *max_items = malloc(sizeof(max_items_t));
 
-    max_items->food = x * y * 0.5;
-    max_items->linemate = x * y * 0.3;
-    max_items->deraumere = x * y * 0.15;
-    max_items->sibur = x * y * 0.1;
-    max_items->mendiane = x * y * 0.1;
-    max_items->phiras = x * y * 0.08;
-    max_items->thystame = x * y * 0.05;
+    if (max_items == NULL)
+        return NULL;
+    for (int i = 0; i < 7; i++) {
+        max_items->items[i] = density[i] * x * y;
+    }
     return max_items;
 }
 
-static void place_food(game_t *game)
+static void add_items(game_t *game, int i)
 {
     int x;
     int y;
-    int count;
+    int count = 0;
 
-    for (count = 0; count < game->max_items->food; count++) {
+    while (count < game->max_items->items[i]) {
         x = rand() % game->map_x;
         y = rand() % game->map_y;
-        game->map[x][y].food++;
+        if (game->map[x][y].items[i] == 0) {
+            game->map[x][y].items[i] += 1;
+            count++;
+        }
     }
 }
 
-static void place_linemate(game_t *game)
+static int count_items(game_t *game, int i)
 {
-    int x;
-    int y;
-    int count;
+    int count = 0;
 
-    for (count = 0; count < game->max_items->linemate; count++) {
-        x = rand() % game->map_x;
-        y = rand() % game->map_y;
-        game->map[x][y].linemate++;
+    for (int x = 0; x < game->map_x; x++) {
+        for (int y = 0; y < game->map_y; y++) {
+            if (game->map[x][y].items[i] != 0)
+                count += game->map[x][y].items[i];
+        }
     }
+    return count;
 }
 
-static void place_deraumere(game_t *game)
+void refill_map(game_t *game)
 {
     int x;
     int y;
-    int count;
+    int count = 0;
+    int nb_items = 0;
 
-    for (count = 0; count < game->max_items->deraumere; count++) {
-        x = rand() % game->map_x;
-        y = rand() % game->map_y;
-        game->map[x][y].deraumere++;
-    }
-}
-
-static void place_sibur(game_t *game)
-{
-    int x;
-    int y;
-    int count;
-
-    for (count = 0; count < game->max_items->sibur; count++) {
-        x = rand() % game->map_x;
-        y = rand() % game->map_y;
-        game->map[x][y].sibur++;
-    }
-}
-
-static void place_mendiane(game_t *game)
-{
-    int x;
-    int y;
-    int count;
-
-    for (count = 0; count < game->max_items->mendiane; count++) {
-        x = rand() % game->map_x;
-        y = rand() % game->map_y;
-        game->map[x][y].mendiane++;
-    }
-}
-
-static void place_phiras(game_t *game)
-{
-    int x;
-    int y;
-    int count;
-
-    for (count = 0; count < game->max_items->phiras; count++) {
-        x = rand() % game->map_x;
-        y = rand() % game->map_y;
-        game->map[x][y].phiras++;
-    }
-}
-
-static void place_thystame(game_t *game)
-{
-    int x;
-    int y;
-    int count;
-
-    for (count = 0; count < game->max_items->thystame; count++) {
-        x = rand() % game->map_x;
-        y = rand() % game->map_y;
-        game->map[x][y].thystame++;
+    for (int i = 0; i < 7; i++) {
+        count = 0;
+        nb_items = count_items(game, i);
+        while (count < game->max_items->items[i] - nb_items) {
+            x = rand() % game->map_x;
+            y = rand() % game->map_y;
+            if (game->map[x][y].items[i] == 0) {
+                game->map[x][y].items[i] += 1;
+                count++;
+            }
+        }
     }
 }
 
 void place_items_randomly(game_t *game, args_t *args)
 {
-    place_food(game);
-    place_linemate(game);
-    place_deraumere(game);
-    place_sibur(game);
-    place_mendiane(game);
-    place_phiras(game);
-    place_thystame(game);
+    for (int i = 0; i < 7; i++) {
+        add_items(game, i);
+    }
     place_eggs(game, args);
 }

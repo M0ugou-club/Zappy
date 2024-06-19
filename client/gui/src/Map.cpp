@@ -22,8 +22,7 @@ void Map::initMap()
         for (int j = 0; j < _y; j++) {
             MyCube cube;
             cube.setPosition(raylib::Vector3{(float)i - (_x / 2.0f - 0.5f), 0, (float)j - (_y / 2.0f - 0.5f)});
-            cube.setColor(color ? raylib::Color::White() : raylib::Color::Black());
-            cube.setBorderColor(color ? BLACK : WHITE);
+            cube.setColor(color ? raylib::Color(220, 220, 220, 255) : raylib::Color(35, 35, 35, 255));
             tmp.push_back(cube);
             color = !color;
         }
@@ -31,6 +30,14 @@ void Map::initMap()
         if (_y % 2 == 0)
             color = !color;
     }
+}
+
+void Map::setSize(int x, int y)
+{
+    _x = x;
+    _y = y;
+    // _map.clear();
+    // initMap();
 }
 
 void Map::draw()
