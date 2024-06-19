@@ -111,7 +111,9 @@ class Player:
         response = self.socket.recv(1024).decode()
         responses = response.split("\n")
         for reponse in responses:
+            print(bcolors.OKBLUE + f"Received message: {reponse}" + bcolors.ENDC)
             if reponse.startswith("dead"):
+                print(bcolors.FAIL + "Player is dead" + bcolors.ENDC)
                 self.disconnect(int(42))
             if reponse.startswith("[food"):
                 self.interpret_inventory(reponse)
@@ -128,8 +130,10 @@ class Player:
         if self.socket.fileno() == -1:
             self.disconnect(2)
         _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if ready_to_write:
-            self.socket.sendall(message_to_send.encode())
+        if self.is_incanting == False:
+            if ready_to_write:
+                print(bcolors.OKGREEN + f"Sending message: {message_to_send}" + bcolors.ENDC)
+                self.socket.sendall(message_to_send.encode())
         return self.handle_server_response()
 
 
@@ -137,15 +141,18 @@ class Player:
 
     def forward(self) -> None:
         '''move forward'''
+        print(bcolors.OKGREEN + "Forward" + bcolors.ENDC)
         self.select_gestion("Forward\n")
 
 
     def right(self) -> None:
         '''turn right'''
+        print(bcolors.OKGREEN + "Right" + bcolors.ENDC)
         self.select_gestion("Right\n")
 
     def left(self) -> None:
         '''turn left'''
+        print(bcolors.OKGREEN + "Left" + bcolors.ENDC)
         self.select_gestion("Left\n")
 
     def take(self, object : str) -> None:
@@ -174,12 +181,12 @@ class Player:
 
     def incantation(self) -> None:
         '''incantation'''
-        if self.select_gestion("Incantation\n") != "ko\n":
-            self.level += 1
-            self.is_incanting = True
-            self.connect_nbr()
-            if (self.nbr_connect == 0):
-                self.fork()
+        self.select_gestion("Incantation\n")
+        #self.is_incanting = True
+        #self.level += 1
+        #self.connect_nbr()
+        #if (self.nbr_connect == 0):
+        #    self.fork()
 
 
     def broadcast(self, message : str) -> None:
@@ -243,7 +250,8 @@ class Player:
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
-        if direction < 1 or direction > 8:
+        if direction == 0:
+            self.is_incanting = True
             return
         self.MOVEMENTS_DIRECTION[direction - 1](self)
 
@@ -354,15 +362,37 @@ class Player:
             return
         ordre = message.split(": ")[1]
         lvl = int(message.split("??")[1])
+
+
+
         if ordre.startswith("ON EVOLUE OUUU ??") and lvl == self.level:
             print(bcolors.OKGREEN + ordre + " " + direction + bcolors.ENDC)
+            if self.inventory['food'] < 5:
+                self.survive()
+            print(bcolors.OKGREEN + f"Player {self.team} is going to direction {direction}" + bcolors.ENDC)
             self.go_to_direction(int(direction))
+            #self.look()
+            #if self.count_player(self.looked[0]) > 1:
+            #    while self.is_incanting == False:
+            #        if self.inventory['food'] < 5:
+            #            break
+            #        print(bcolors.OKGREEN + "j'attend les autres" + bcolors.ENDC)
+            #        self.handle_server_response()
+
+
         if ordre.startswith("ON INCANTE OUUUU ??") and lvl == self.level:
-            self.incantation()
+            if self.inventory['food'] < 5:
+                self.survive()
+            self.is_incanting = True
+            self.level += 1
+
+        if ordre.startswith("ON SE LE LIBERE OUUU ??") and lvl == self.level:
+            self.is_incanting = False
         return
 
     def call_teammates(self) -> None:
         '''call the teammates'''
+        print(bcolors.WARNING + "CALLING TEAMMATES" + bcolors.ENDC)
         self.broadcast(self.team + ": ON EVOLUE OUUU ??" + str(self.level))
         return
 
@@ -374,7 +404,7 @@ class Player:
                 for _ in range(requirements[key]):
                     self.set_object(key)
 
-
+##faire un truc avec des id pour s'arreter
     def try_incantation(self) -> None:
         '''try the incantation'''
         self.get_inventory()
@@ -382,32 +412,45 @@ class Player:
             return
         requirements = self.LEVEL_REQUIREMENTS[self.level]
         requirements_checked = self.check_requirements(requirements)
+        call_inc = 0
         while requirements_checked != 0:
             if requirements_checked == 1:
                 self.look()
                 self.search_object(self.looked, self.what_i_need(requirements))
             else:
-                self.call_teammates()
+                if call_inc == 0:
+                    self.call_teammates()
                 self.get_inventory()
                 if self.inventory['food'] < 5:
                     return
+                call_inc += 1
+                if call_inc == 4:
+                    call_inc = 0
             requirements_checked = self.check_requirements(requirements)
         self.put_requirements(requirements)
         if (self.level != 1):
             self.broadcast(self.team + ": ON INCANTE OUUUU ??" + str(self.level))
+        self.get_inventory()
+        print(self.inventory)
+        print(bcolors.WARNING + "INCANTATION" + bcolors.ENDC)
         self.incantation()
+        print(bcolors.WARNING + "LIBERATION" + bcolors.ENDC)
+        self.broadcast(self.team + ": ON SE LE LIBERE OUUU ??" + str(self.level))
         self.is_incanting = False
 
 
     def run(self) -> None:
         '''run the player'''
+        self.socket.sendall("Cheat_infinite_resources\n".encode())
         while (True):
-            print(bcolors.OKBLUE + f"Player {self.team} is lvl {self.level}" + bcolors.ENDC)
-            self.get_inventory()
-            if self.inventory['food'] < 5:
-                self.survive()
-            if not self.is_incanting :
-                self.try_incantation()
+            ##print(bcolors.OKBLUE + f"Player {self.team} is lvl {self.level}" + bcolors.ENDC)
+            #if self.inventory['food'] < 20:
+            #    self.is_incanting = False
+            #    self.survive()
+            ##if not self.is_incanting :
+            ##    self.try_incantation()
+            self.incantation()
+
 
     def connect(self) -> None:
         '''connect the player'''
@@ -419,6 +462,7 @@ class Player:
         while True:
             self.socket.sendall((self.team + "\n").encode())
             response = self.socket.recv(1024).decode()
+            print(bcolors.OKBLUE + f"Received message: {response}" + bcolors.ENDC)
             if response == "ko\n":
                 self.disconnect(6)
                 break
@@ -430,3 +474,7 @@ class Player:
         '''disconnect the player'''
         self.socket.close()
         sys.exit(error)
+
+
+## plein de probleme de connexion
+## proble on passe pas de lvl
