@@ -16,6 +16,7 @@ connection_t *new_connection(int fd, struct sockaddr_in *addr)
     new->fd = fd;
     new->addr = *addr;
     new->buffer = malloc(sizeof(char) * 1024);
+    memset(new->buffer, 0, 1024);
     new->team = NULL;
     new->send_queue = NULL;
     new->next = NULL;

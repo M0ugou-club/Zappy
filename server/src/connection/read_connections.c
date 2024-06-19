@@ -35,31 +35,34 @@ static int strcount(const char *str, char c)
     return count;
 }
 
-static void action(server_t *srv, connection_t *cli)
+static bool action(server_t *srv, connection_t *cli)
 {
     char tmp[BUFFER_SIZE];
     ssize_t ret;
 
     if (action_setup(cli))
-        return;
+        return false;
     ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
     if (ret <= 0) {
         remove_connection(&srv->cons, cli->fd);
-        close(cli->fd);
-        return;
+        return true;
     }
     tmp[ret] = '\0';
     memcpy(cli->buffer + strlen(cli->buffer), tmp, ret);
+    return false;
 }
 
 void read_connections(server_t *srv)
 {
     connection_t *tmp = srv->cons;
+    bool ret = false;
 
     while (tmp != NULL) {
         if (FD_ISSET(tmp->fd, srv->readfds)
             && strcount(tmp->buffer, '\n') < MAX_COMMAND_QUEUE)
-            action(srv, tmp);
+            ret = action(srv, tmp);
+        if (ret)
+            break;
         tmp = tmp->next;
     }
 }

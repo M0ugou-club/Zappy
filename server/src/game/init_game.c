@@ -31,9 +31,18 @@ static void link_map(game_t *game, const int map_x, const int map_y)
     }
 }
 
+static void clear_items(game_t *game, const int x, const int y)
+{
+    for (int xdx = 0; xdx < x; xdx++) {
+        for (int ydy = 0; ydy < y; ydy++) {
+            memset(game->map[xdx][ydy].items, 0, sizeof(int) * 7);
+        }
+    }
+}
+
 static void init_map(game_t *game, const int x, const int y)
 {
-    game->map = malloc(sizeof(square_t) * x * y);
+    game->map = malloc(sizeof(square_t) * (x * y));
     for (int xdx = 0; xdx < x; xdx++) {
         game->map[xdx] = malloc(sizeof(square_t) * y);
         for (int ydy = 0; ydy < y; ydy++) {
@@ -43,6 +52,7 @@ static void init_map(game_t *game, const int x, const int y)
         }
     }
     link_map(game, x, y);
+    clear_items(game, x, y);
 }
 
 game_t *init_game(int x, int y, char **teams, args_t *args)

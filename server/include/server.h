@@ -94,8 +94,8 @@ void execute_connections(server_t *srv);
 void disconnect_players(server_t *srv);
 
 void queue_message(connection_t *conn, char *msg);
-void queue_formatted_message(connection_t *conn, char *fmt, ...);
-void send_formatted_message(connection_t *conn, char *fmt, ...);
+void queue_formatted_message(connection_t *conn, const char *fmt, ...);
+void send_formatted_message(connection_t *conn, const char *fmt, ...);
 void send_message(server_t *srv, connection_t *cl);
 void send_messages(server_t *srv);
 

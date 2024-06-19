@@ -15,7 +15,7 @@ void broadcast_gui(server_t *srv, char *format, ...)
     char *msg = NULL;
 
     va_start(args, format);
-    vasprintf(&msg, format, args);
+    vsprintf(msg, format, args);
     va_end(args);
     for (connection_t *tmp = srv->cons; tmp; tmp = tmp->next) {
         if (strcmp(tmp->team, "GRAPHIC") == 0)
