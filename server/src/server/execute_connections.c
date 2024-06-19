@@ -73,7 +73,7 @@ static void run_cmd(const command_regex_t *cmd, server_t *srv,
     }
     cmd->func(srv, client, &parse);
     if (!cmd->spec_only && player != NULL)
-        player->last_action = time(NULL);
+        player->last_action = time(NULL) + cmd->time / srv->args->frequency;
 }
 
 static void execute(char *cmd, int client_fd, server_t *srv)

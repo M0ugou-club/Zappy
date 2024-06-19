@@ -7,6 +7,21 @@
 
 #include "server.h"
 
+static bool find_errors(server_t *srv)
+{
+    if (srv == NULL)
+        return true;
+    if (srv->sock == NULL)
+        return true;
+    if (srv->game == NULL)
+        return true;
+    if (srv->readfds == NULL)
+        return true;
+    if (srv->writefds == NULL)
+        return true;
+    return false;
+}
+
 server_t *init_server(args_t *args)
 {
     server_t *server = malloc(sizeof(server_t));
@@ -19,5 +34,13 @@ server_t *init_server(args_t *args)
     server->writefds = malloc(sizeof(fd_set));
     FD_ZERO(server->readfds);
     FD_ZERO(server->writefds);
+    if (find_errors(server)) {
+        free_socket(server->sock);
+        free_game(server->game);
+        free(server->readfds);
+        free(server->writefds);
+        free(server);
+        return (NULL);
+    }
     return (server);
 }

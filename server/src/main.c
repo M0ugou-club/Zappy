@@ -5,7 +5,6 @@
 ** main
 */
 
-#include <time.h>
 #include "server.h"
 
 static int usage(int exit_code)
@@ -28,8 +27,10 @@ int main(int argc, char **argv)
     if (error_args(args))
         return usage(EXIT_ERROR);
     server = init_server(args);
-    if (server == NULL)
+    if (server == NULL) {
+        dprintf(2, "Error: Server could not be initialized\n");
         return EXIT_ERROR;
+    }
     run_server(server);
     free_server(server);
     free_args(args);

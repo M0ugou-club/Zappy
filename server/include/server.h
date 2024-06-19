@@ -123,6 +123,7 @@ void cmd_take(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse);
 
+void incantation_message(server_t *srv, connection_t *cl, player_t *ply);
 void broadcast_gui(server_t *srv, char *format, ...);
 
 // GUI commands

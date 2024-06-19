@@ -64,6 +64,7 @@ typedef struct player_s {
     int fd;
     time_t last_eat;
     bool disconnect;
+    bool incantation;
     struct player_s *next;
 } player_t;
 
