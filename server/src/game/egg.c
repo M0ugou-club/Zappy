@@ -85,10 +85,12 @@ bool check_egg(square_t *square, char *team_name)
 bool check_eggs(game_t *game, char *team_name)
 {
     bool res = false;
+    bool tmp = false;
 
     for (int x = 0; x < game->map_x; x++) {
         for (int y = 0; y < game->map_y; y++) {
-            check_egg(&game->map[x][y], team_name) ? res = true : 0;
+            tmp = check_egg(&game->map[x][y], team_name);
+            tmp == true ? res = true : 0;
         }
     }
     return res;
