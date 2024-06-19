@@ -12,7 +12,7 @@ World::World(const raylib::Window &window, std::string &newSceneName, std::tuple
 {
     _window = std::make_shared<raylib::Window>(window);
     _queues = queues;
-    for (int i = 0; (ItemRender::ItemType)i < ItemRender::ItemType::COUNT; i++) {
+    for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
         _itemRenders.push_back(std::make_unique<ItemRender>((ItemRender::ItemType)i, 0));
     }
 }
@@ -30,9 +30,18 @@ void World::parsePacket(std::string packet)
 {
     const std::map<std::string, std::function<void(std::vector<std::string>)>> commands = {
         {"msz (\\d+) (\\d+)$", [this](std::vector<std::string> args) {
-            _map.setSize(std::stoi(args[0]), std::stoi(args[1]));
+            int x = std::stoi(args[0]);
+            int y = std::stoi(args[1]);
+            _map.setSize(x, y);
             for (auto &render : _itemRenders) {
                 render->changeMapSize(_map.getSize());
+            }
+            for (int xdx = 0; xdx < x; xdx++) {
+                for (int ydx = 0; ydx < y; ydx++) {
+                    for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
+                        _items[std::make_tuple(xdx, ydx)][i] = 0;
+                    }
+                }
             }
         }},
         {"sgt (\\d+)$", [this](std::vector<std::string> args) {
@@ -61,7 +70,7 @@ void World::parsePacket(std::string packet)
                 items[i] = std::stoi(args[i + 2]);
             }
             for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
-                _items[std::make_tuple(pos.GetX(), pos.GetY())].push_back(items[i]);
+                _items[std::make_tuple(pos.GetX(), pos.GetY())][i] = items[i];
             }
         }},
         {"pic (\\d+) (\\d+) (\\d+) ([#0-9 ]+)$", [this](std::vector<std::string> args) {

@@ -42,7 +42,7 @@ class World : public AScene {
     private:
         MyCamera _camera;
         Map _map;
-        std::map<std::tuple<float, float>, std::vector<int>> _items;
+        std::map<std::tuple<float, float>, int[(int)ItemRender::ItemType::COUNT]> _items;
         std::vector<std::unique_ptr<ItemRender>> _itemRenders;
         std::string &_newSceneName;
         std::vector<std::string> _teams;
