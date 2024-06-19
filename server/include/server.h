@@ -149,7 +149,7 @@ void cmd_tna(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void pnw(server_t *srv, connection_t *cl, player_t *player);
 void pex(server_t *srv, connection_t *cl, player_t *player);
 void pbc(server_t *srv, connection_t *cl, player_t *player, char *msg);
-void pic(server_t *srv, connection_t *cl, player_t *player);
+void pic(server_t *srv, connection_t *cl, int *players_nb);
 void pie(server_t *srv, connection_t *cl, player_t *player, char *result);
 void pfk(server_t *srv, connection_t *cl, player_t *player);
 void pdr(server_t *srv, connection_t *cl, player_t *player, int res);
