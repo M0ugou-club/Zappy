@@ -24,6 +24,7 @@ SRC =	src/main.c \
 		src/game/player/get_player_by_fd.c \
 		src/game/player/new_player.c \
 		src/game/player/disconnect_players.c \
+		src/game/player/spawn_player.c \
 		src/game/tick.c \
 		src/game/team_exists.c \
 		src/server/commands/broadcast.c \
