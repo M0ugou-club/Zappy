@@ -7,7 +7,7 @@
 
 #include "server.h"
 
-static get_val_from_object(char *str)
+static int get_val_from_object(char *str)
 {
     char objects[7][10] = {
         "food",
@@ -46,6 +46,7 @@ void cmd_take(server_t *srv, connection_t *cl, regex_parse_t *parse)
     } else {
         queue_formatted_message(cl, "ko\n");
     }
+    broadcast_gui(srv, "pgt #%d %d\n", player->id, object_val);
     free(item);
 }
 
@@ -69,5 +70,6 @@ void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse)
     } else {
         queue_formatted_message(cl, "ko\n");
     }
+    broadcast_gui(srv, "pdr #%d %d\n", player->id, object_val);
     free(object);
 }
