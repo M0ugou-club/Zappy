@@ -7,55 +7,65 @@
 
 #include "server.h"
 
-square_t *get_square_start(player_t *player, int cone_gap, int cone_distance)
-{
-    direction_t orientation = player->direction;
-    square_t *square = player->square;
+const char *objects[] = {
+    "food",
+    "linemate",
+    "deraumere",
+    "sibur",
+    "mendiane",
+    "phiras",
+    "thystame"
+    };
 
-    for (int i = 0; i < cone_distance; i++) {
-        if (square == NULL) {
-            return NULL;
-        }
+static square_t *move_square_distance(square_t *square, direction_t orientation, int distance)
+{
+    for (int i = 0; i < distance; i++) {
         if (orientation == NORTH) {
             square = square->north;
-        } else if (orientation == EAST) {
+        }
+        if (orientation == EAST) {
             square = square->east;
-        } else if (orientation == SOUTH) {
+        }
+        if (orientation == SOUTH) {
             square = square->south;
-        } else if (orientation == WEST) {
+        }
+        if (orientation == WEST) {
             square = square->west;
         }
     }
-    for (int i = 0; i < cone_gap; i++) {
-        if (square == NULL) {
-            return NULL;
-        }
+    return square;
+}
+
+static square_t *move_square_gap(square_t *square, direction_t orientation, int gap)
+{
+    for (int i = 0; i < gap; i++) {
         if (orientation == NORTH) {
             square = square->west;
-        } else if (orientation == EAST) {
+        }
+        if (orientation == EAST) {
             square = square->north;
-        } else if (orientation == SOUTH) {
+        }
+        if (orientation == SOUTH) {
             square = square->east;
-        } else if (orientation == WEST) {
+        }
+        if (orientation == WEST) {
             square = square->south;
         }
     }
     return square;
 }
 
-char* get_square_content(square_t *square, server_t *srv)
+static square_t *get_square_start(player_t *player, int cone_gap, int cone_distance)
 {
-    static char response[1024];
-    strcpy(response, ""); // Reset the response buffer
-    char objects[7][10] = {
-        "food",
-        "linemate",
-        "deraumere",
-        "sibur",
-        "mendiane",
-        "phiras",
-        "thystame"
-    };
+    direction_t orientation = player->direction;
+    square_t *square = player->square;
+
+    square = move_square_distance(square, orientation, cone_distance);
+    square = move_square_gap(square, orientation, cone_gap);
+    return square;
+}
+
+int count_players_on_square(square_t *square, server_t *srv) {
     player_t *players = srv->game->players;
     int players_count = 0;
 
@@ -65,6 +75,23 @@ char* get_square_content(square_t *square, server_t *srv)
         }
         players = players->next;
     }
+    return players_count;
+}
+
+static void append_items_of_type(char *response, int item_count, const char *item_name) {
+    for (int j = 0; j < item_count; j++) {
+        if (strlen(response) > 0) {
+            strcat(response, " ");
+        }
+        strcat(response, item_name);
+    }
+}
+
+char* get_square_content(square_t *square, server_t *srv) {
+    static char response[1024];
+    int players_count = count_players_on_square(square, srv);
+
+    strcpy(response, "");
     while (players_count > 0) {
         strcat(response, "player");
         if (players_count > 1) {
@@ -73,14 +100,22 @@ char* get_square_content(square_t *square, server_t *srv)
         players_count--;
     }
     for (int i = 0; i < 7; i++) {
-        for (int j = 0; j < square->items[i]; j++) {
-            if (strlen(response) > 0) {
-                strcat(response, " ");
-            }
-            strcat(response, objects[i]);
-        }
+        append_items_of_type(response, square->items[i], objects[i]);
     }
     return response;
+}
+
+static square_t *move_square_widht(square_t *square, direction_t orientation)
+{
+    if (orientation == NORTH)
+        square = square->west;
+    if (orientation == EAST)
+        square = square->north;
+    if (orientation == SOUTH)
+        square = square->east;
+    if (orientation == WEST)
+        square = square->south;
+    return square;
 }
 
 char* get_lines_squares(player_t *player, int cone_width, square_t *square_start, server_t *srv)
@@ -88,26 +123,15 @@ char* get_lines_squares(player_t *player, int cone_width, square_t *square_start
     static char response[1024];
     direction_t orientation = player->direction;
     square_t *square = square_start;
-    int width = cone_width;
 
     strcpy(response, "");
-    for (int i = 0; i < width; i++) {
-        if (square != NULL) {
+    for (int i = 0; i < cone_width; i++) {
+        if (square != NULL)
             strcat(response, get_square_content(square, srv));
-        }
-        if (i != width - 1) {
+        if (i != cone_width - 1)
             strcat(response, ",");
-        }
         if (square != NULL) {
-            if (orientation == NORTH) {
-                square = square->east;
-            } else if (orientation == EAST) {
-                square = square->south;
-            } else if (orientation == SOUTH) {
-                square = square->west;
-            } else if (orientation == WEST) {
-                square = square->north;
-            }
+            square = move_square_widht(square, orientation);
         }
     }
     return response;
