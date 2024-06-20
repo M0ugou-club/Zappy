@@ -59,8 +59,8 @@ static square_t *get_start(player_t *player, int cone_gap, int cone_distance)
     direction_t orientation = player->direction;
     square_t *square = player->square;
 
-    square = move_square_distance(square, orientation, cone_distance);
-    square = move_square_gap(square, orientation, cone_gap);
+    square = mv_distance(square, orientation, cone_distance);
+    square = mv_gap(square, orientation, cone_gap);
     return square;
 }
 
