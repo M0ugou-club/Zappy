@@ -22,28 +22,32 @@ static bool find_errors(server_t *srv)
     return false;
 }
 
+static server_t *free_internal(server_t *srv)
+{
+    if (srv->sock)
+        free_socket(srv->sock);
+    if (srv->game)
+        free_game(srv->game);
+    free(srv->readfds);
+    free(srv->writefds);
+    free(srv);
+    return (NULL);
+}
+
 server_t *init_server(args_t *args)
 {
-    server_t *server = malloc(sizeof(server_t));
+    server_t *srv = malloc(sizeof(server_t));
 
-    server->args = args;
-    server->sock = init_socket(args->port);
-    server->cons = NULL;
-    server->close = false;
-    server->game = init_game(args->x, args->y, args->teams, args);
-    server->readfds = malloc(sizeof(fd_set));
-    server->writefds = malloc(sizeof(fd_set));
-    FD_ZERO(server->readfds);
-    FD_ZERO(server->writefds);
-    if (find_errors(server)) {
-        if (server->sock)
-            free_socket(server->sock);
-        if (server->game)
-            free_game(server->game);
-        free(server->readfds);
-        free(server->writefds);
-        free(server);
-        return (NULL);
-    }
-    return (server);
+    srv->args = args;
+    srv->sock = init_socket(args->port);
+    srv->cons = NULL;
+    srv->close = false;
+    srv->game = init_game(args->x, args->y, args->teams, args);
+    srv->readfds = malloc(sizeof(fd_set));
+    srv->writefds = malloc(sizeof(fd_set));
+    FD_ZERO(srv->readfds);
+    FD_ZERO(srv->writefds);
+    if (find_errors(srv))
+        return free_internal(srv);
+    return (srv);
 }
