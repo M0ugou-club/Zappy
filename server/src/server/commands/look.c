@@ -14,8 +14,7 @@ const char *objects[] = {
     "sibur",
     "mendiane",
     "phiras",
-    "thystame"
-    };
+    "thystame"};
 
 static square_t *mv_distance(square_t *square, direction_t ori, int distance)
 {
@@ -89,7 +88,7 @@ static void append_items(char *response, int item_count, const char *item_name)
     }
 }
 
-char* get_square_content(square_t *square, server_t *srv)
+char *get_square_content(square_t *square, server_t *srv)
 {
     static char response[1024];
     int players_count = count_players_on_square(square, srv);
@@ -121,7 +120,7 @@ static square_t *move_square_widht(square_t *square, direction_t orientation)
     return square;
 }
 
-char* get_ln_squa(player_t *p, int cn_width, square_t *sq_start, server_t *srv)
+char *get_ln_squa(player_t *p, int cn_width, square_t *sq_start, server_t *srv)
 {
     static char response[1024];
     direction_t orientation = p->direction;
