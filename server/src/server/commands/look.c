@@ -146,15 +146,15 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
     int cone_width = 3;
     int cone_gap = 1;
     int cone_distance = 1;
+    square_t *start_line = NULL;
 
     strcpy(response, "[");
     strcat(response, get_square_content(player->square, srv));
     for (int i = 1; i <= player->level; i++) {
-        square_t *start_line = get_start(player, cone_gap, cone_distance);
+        start_line = get_start(player, cone_gap, cone_distance);
         strcat(response, ",");
-        if (start_line != NULL) {
+        if (start_line != NULL)
             strcat(response, get_ln_squa(player, cone_width, start_line, srv));
-        }
         cone_width += 2;
         cone_gap += 1;
         cone_distance += 1;
