@@ -17,26 +17,26 @@ const char *objects[] = {
     "thystame"
     };
 
-static square_t *move_square_distance(square_t *square, direction_t orientation, int distance)
+static square_t *mv_distance(square_t *square, direction_t ori, int distance)
 {
     for (int i = 0; i < distance; i++) {
-        if (orientation == NORTH) {
+        if (ori == NORTH) {
             square = square->north;
         }
-        if (orientation == EAST) {
+        if (ori == EAST) {
             square = square->east;
         }
-        if (orientation == SOUTH) {
+        if (ori == SOUTH) {
             square = square->south;
         }
-        if (orientation == WEST) {
+        if (ori == WEST) {
             square = square->west;
         }
     }
     return square;
 }
 
-static square_t *move_square_gap(square_t *square, direction_t orientation, int gap)
+static square_t *mv_gap(square_t *square, direction_t orientation, int gap)
 {
     for (int i = 0; i < gap; i++) {
         if (orientation == NORTH) {
