@@ -142,6 +142,15 @@ int get_direction(player_t *player, player_t *player_connected, game_t *game)
     return dir;
 }
 
+static void send_msg(server_t *srv, player_t *player, char *object, int direction)
+{
+    connection_t *conn = get_client_by_fd(srv->cons, player->fd);
+
+    if (conn == NULL)
+        return;
+    queue_formatted_message(conn, "message %s, %d\n", object, direction);
+}
+
 // Send a message to everyone connected
 void cmd_broadcast(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
@@ -159,8 +168,7 @@ void cmd_broadcast(server_t *srv, connection_t *cl, regex_parse_t *parse)
     while (player != NULL) {
         direction = get_direction(player, player_connected, game);
         if (player->fd != cl->fd) {
-            queue_formatted_message(get_client_by_fd(srv->cons, player->fd),
-                "message %s, %d\n", object, direction);
+            send_msg(srv, player, object, direction);
         }
         player = player->next;
     }
