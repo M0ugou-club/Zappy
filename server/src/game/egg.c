@@ -82,18 +82,22 @@ bool check_egg(square_t *square, char *team_name)
     return false;
 }
 
+static bool is_team_egg(game_t *game, int x, char *team_name)
+{
+    for (int y = 0; y < game->map_y; y++) {
+        if (check_egg(&game->map[x][y], team_name) == true)
+            return true;
+    }
+    return false;
+}
+
 bool check_eggs(game_t *game, char *team_name)
 {
-    bool res = false;
-    bool tmp = false;
-
     for (int x = 0; x < game->map_x; x++) {
-        for (int y = 0; y < game->map_y; y++) {
-            tmp = check_egg(&game->map[x][y], team_name);
-            tmp == true ? res = true : 0;
-        }
+        if (is_team_egg(game, x, team_name) == true)
+            return true;
     }
-    return res;
+    return false;
 }
 
 void place_eggs(game_t *game, args_t *args)
