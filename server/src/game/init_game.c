@@ -7,20 +7,23 @@
 
 #include "server.h"
 
+static void link_cell(game_t *game, const int xdx, const int ydy)
+{
+    if (xdx != 0)
+        game->map[xdx][ydy].west = &game->map[xdx - 1][ydy];
+    if (xdx != game->map_x - 1)
+        game->map[xdx][ydy].east = &game->map[xdx + 1][ydy];
+    if (ydy != 0)
+        game->map[xdx][ydy].north = &game->map[xdx][ydy - 1];
+    if (ydy != game->map_y - 1)
+        game->map[xdx][ydy].south = &game->map[xdx][ydy + 1];
+}
+
 static void link_map(game_t *game, const int map_x, const int map_y)
 {
-    for (int xdx = 0; xdx < map_x; xdx++) {
-        for (int ydy = 0; ydy < map_y; ydy++) {
-            if (xdx != 0)
-                game->map[xdx][ydy].west = &game->map[xdx - 1][ydy];
-            if (xdx != map_x - 1)
-                game->map[xdx][ydy].east = &game->map[xdx + 1][ydy];
-            if (ydy != 0)
-                game->map[xdx][ydy].north = &game->map[xdx][ydy - 1];
-            if (ydy != map_y - 1)
-                game->map[xdx][ydy].south = &game->map[xdx][ydy + 1];
-        }
-    }
+    for (int xdx = 0; xdx < map_x; xdx++)
+        for (int ydy = 0; ydy < map_y; ydy++)
+            link_cell(game, xdx, ydy);
     for (int x = 0; x < map_x; x++) {
         game->map[x][0].north = &game->map[x][map_y - 1];
         game->map[x][map_y - 1].south = &game->map[x][0];
