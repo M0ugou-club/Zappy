@@ -149,16 +149,21 @@ void cmd_broadcast(server_t *srv, connection_t *cl, regex_parse_t *parse)
     player_t *player = game->players;
     player_t *player_connected = get_player_by_fd(game->players, cl->fd);
     int direction = 0;
+    char *object = strndup(parse->str + parse->pmatch[1].rm_so,
+        parse->pmatch[1].rm_eo - parse->pmatch[1].rm_so);
 
-    if (player == NULL)
+    if (player == NULL) {
+        free(object);
         return;
+    }
     while (player != NULL) {
         direction = get_direction(player, player_connected, game);
         if (player->fd != cl->fd) {
             queue_formatted_message(get_client_by_fd(srv->cons, player->fd),
-                "message %s, %d\n", parse->str, direction);
+                "message %s, %d\n", object, direction);
         }
         player = player->next;
     }
-    return;
+    broadcast_gui(srv, "pbc #%d %s\n", player->id, object);
+    free(object);
 }
