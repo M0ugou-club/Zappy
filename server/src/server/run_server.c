@@ -23,30 +23,7 @@ static int get_max_fd(server_t *srv)
     return max;
 }
 
-static bool handshake(server_t *srv, char *team, connection_t *cl)
-{
-    if (strcmp(team, "GRAPHIC") == 0) {
-        queue_formatted_message(cl,
-            "msz %zu %zu\n", srv->args->x, srv->args->y);
-        queue_formatted_message(cl, "sgt %zu\n", srv->args->frequency);
-        mct(srv, cl);
-        tna(srv, cl);
-        for (player_t *tmp = srv->game->players;
-            tmp != NULL; tmp = tmp->next) {
-            pnw(srv, cl, tmp);
-        }
-        return true;
-    }
-    if (team_exists(srv->game->teams, team)) {
-        queue_formatted_message(cl, "%d\n", 1);
-        queue_formatted_message(cl, " %d %d\n", srv->args->x, srv->args->y);
-        return true;
-    }
-    send_formatted_message(cl, "ko\n", 0);
-    return false;
-}
-
-static void clean_str(char *str)
+void clean_str(char *str)
 {
     for (int i = 0; str[i]; i++) {
         if (str[i] == '\n')
@@ -54,25 +31,6 @@ static void clean_str(char *str)
         if (str[i] == '\r')
             str[i] = '\0';
     }
-}
-
-static bool handle_handshake(server_t *srv, connection_t *new)
-{
-    char *buffer = malloc(sizeof(char) * 1024);
-    bool success = false;
-
-    memset(buffer, '\0', 1024);
-    read(new->fd, buffer, 1024);
-    clean_str(buffer);
-    if (handshake(srv, buffer, new)) {
-        srv->cons = add_connection(srv->cons, new);
-        success = true;
-    } else {
-        close(new->fd);
-        free_connection(new);
-    }
-    free(buffer);
-    return success;
 }
 
 // also close if team is full / no eggs available
@@ -89,9 +47,11 @@ static void accept_connection(server_t *srv)
     new = new_connection(newsockfd, (struct sockaddr_in *)&cli_addr);
     if (new == NULL)
         return;
-    SEND_FD(newsockfd, "WELCOME\n");
-    if (!handle_handshake(srv, new))
-        return;
+    printf("New connection from %s:%d\n", inet_ntoa(cli_addr.sin_addr),
+        ntohs(cli_addr.sin_port));
+    queue_message(new, "WELCOME\n");
+    new->handshake_step = TEAM;
+    srv->cons = add_connection(srv->cons, new);
 }
 
 static int get_connections_count(connection_t *cl)

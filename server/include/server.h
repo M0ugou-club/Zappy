@@ -27,6 +27,9 @@
     #include <regex.h>
     #include <sys/select.h>
     #include <sys/signal.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
     #include "socket.h"
     #include "connection.h"
     #include "game.h"
@@ -111,6 +114,7 @@ game_t *init_game(int x, int y, char **teams, args_t *args);
 void game_tick(server_t *srv);
 
 player_t *get_player_by_fd(player_t *players, int fd);
+void clean_str(char *str);
 
 /* Commands */
 void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse);
