@@ -91,6 +91,9 @@ void World::parsePacket(std::string packet)
         {"pdr #?(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
             raylib::Vector2 pos = {_players[std::stoi(args[0])]->getPosition().GetX(), _players[std::stoi(args[0])]->getPosition().GetZ()};
             _items[std::make_tuple((int)pos.GetX(), (int)pos.GetY())][std::stoi(args[1])]++;
+        }},
+        {"pbc #?(\\d+) (.+)", [this](std::vector<std::string> args) {
+            _chat.sendMessage(args[0] + ": " + args[1]);
         }}
     };
 
@@ -151,7 +154,7 @@ void World::load()
         std::to_string(static_cast<int>(_map.getSize().GetY())));
     _chat.sendMessage("Here are the teams :");
     for (auto &team : _teams) {
-        _chat.sendMessage(team, (raylib::Color){rand() % 255, rand() % 255, rand() % 255, 255});
+        _chat.sendMessage("\t- " + team, raylib::Color::White());
     }
 }
 

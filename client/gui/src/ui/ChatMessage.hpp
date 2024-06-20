@@ -16,7 +16,7 @@ class ChatMessage {
     public:
 
         static constexpr int LIFE_TIME = 300;
-        static constexpr int DECAY_TIME = 60;
+        static constexpr int DECAY_TIME = 40;
 
         ChatMessage(raylib::Font *font, std::string message, raylib::Color color);
         ~ChatMessage();
