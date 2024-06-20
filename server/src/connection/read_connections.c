@@ -79,6 +79,7 @@ static bool read_team(server_t *srv, connection_t *cli)
 {
     ssize_t ret;
     char tmp[BUFFER_SIZE];
+    player_t *ply = NULL;
 
     memset(tmp, '\0', BUFFER_SIZE);
     ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
@@ -91,6 +92,13 @@ static bool read_team(server_t *srv, connection_t *cli)
     if (handshake(srv, tmp, cli)) {
         cli->handshake_step = ESTABLISHED;
         cli->team = strdup(tmp);
+        if (strcmp(cli->team, "GRAPHIC") != 0) {
+            ply = spawn_player(srv->game, cli->team, cli->fd);
+            broadcast_gui(srv, "pnw #%zu %d %d %d %d %s\n",
+                srv->game->players->id, ply->square->pos_x,
+                ply->square->pos_y, ply->direction, ply->level,
+                ply->team);
+        }
         return true;
     }
     remove_connection(&srv->cons, cli->fd);

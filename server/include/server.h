@@ -25,6 +25,7 @@
     #include <string.h>
     #include <stdio.h>
     #include <regex.h>
+    #include <stdarg.h>
     #include <sys/select.h>
     #include <sys/signal.h>
     #include <sys/socket.h>
@@ -131,7 +132,7 @@ void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse);
 void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse);
 
 void incantation_message(server_t *srv, connection_t *cl, player_t *ply);
-void broadcast_gui(server_t *srv, char *format, ...);
+void broadcast_gui(server_t *srv, char *fmt, ...);
 
 // GUI commands
 void bct(server_t *srv, connection_t *cl, int x, int y);
