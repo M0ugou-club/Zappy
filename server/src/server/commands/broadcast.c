@@ -142,13 +142,13 @@ int get_direction(player_t *player, player_t *player_connected, game_t *game)
     return dir;
 }
 
-static void send_msg(server_t *srv, player_t *player, char *object, int direction)
+static void send_msg(server_t *srv, player_t *player, char *object, int dir)
 {
     connection_t *conn = get_client_by_fd(srv->cons, player->fd);
 
     if (conn == NULL)
         return;
-    queue_formatted_message(conn, "message %s, %d\n", object, direction);
+    queue_formatted_message(conn, "message %s, %d\n", object, dir);
 }
 
 // Send a message to everyone connected
