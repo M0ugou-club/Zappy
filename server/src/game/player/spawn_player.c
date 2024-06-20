@@ -37,7 +37,7 @@ void spawn_player(game_t *game, char *team, int fd)
     bool found = false;
 
     n_player->fd = fd;
-    while(!found) {
+    while (!found) {
         found = loop_in_map(game, n_player);
     }
     game->players = add_player(game->players, n_player);
