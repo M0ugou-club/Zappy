@@ -138,9 +138,8 @@ class Player:
             print(bcolors.FAIL + "Player is incanting" + bcolors.ENDC)
         print(bcolors.OKWHITE + f"Sending message: {message_to_send}" + bcolors.ENDC)
         _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-        if self.is_incanting == False:
-            if ready_to_write:
-                self.socket.sendall(message_to_send.encode())
+        if ready_to_write:
+            self.socket.sendall(message_to_send.encode())
         return self.handle_server_response()
 
 
@@ -271,6 +270,11 @@ class Player:
             print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             self.broadcast(self.team + ":chui;pret;mon;gars??" + str(self.level))
             self.is_incanting = True
+            while self.is_incanting:
+                self.get_inventory()
+                if self.inventory['food'] < 5:
+                    self.survive()
+                    break
             return
         self.MOVEMENTS_DIRECTION[direction - 1](self)
 
@@ -426,6 +430,7 @@ class Player:
             return
         requirements = self.LEVEL_REQUIREMENTS[self.level]
         requirements_checked = self.check_requirements(requirements)
+        count_call = 0
         while requirements_checked != 0:
             if requirements_checked == 1:
                 if self.inventory['food'] < 5:
@@ -433,7 +438,11 @@ class Player:
                 self.look()
                 self.search_object(self.what_i_need(requirements))
             else:
-                self.call_teammates()
+                if count_call == 0:
+                    self.call_teammates()
+                count_call += 1
+                if count_call == 4:
+                    count_call = 0
                 self.get_inventory()
                 if self.inventory['food'] < 5:
                     return
