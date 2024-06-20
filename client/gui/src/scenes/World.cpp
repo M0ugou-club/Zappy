@@ -104,6 +104,9 @@ void World::parsePacket(std::string packet)
         {"pdr #?(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
             raylib::Vector2 pos = {_players[std::stoi(args[0])]->getPosition().GetX(), _players[std::stoi(args[0])]->getPosition().GetZ()};
             _items[std::make_tuple((int)pos.GetX(), (int)pos.GetY())][std::stoi(args[1])]++;
+        }},
+        {"pbc #?(\\d+) (.+)", [this](std::vector<std::string> args) {
+            _chat.sendMessage(args[0] + ": " + args[1]);
         }}
     };
 
@@ -159,6 +162,13 @@ void World::load()
 {
     parseEventQueue();
     _map.initMap();
+    _chat.sendMessage("Welcome to Zappy", raylib::Color::Green());
+    _chat.sendMessage("Map is " + std::to_string(static_cast<int>(_map.getSize().GetX())) + "x" +
+        std::to_string(static_cast<int>(_map.getSize().GetY())));
+    _chat.sendMessage("Here are the teams :");
+    for (auto &team : _teams) {
+        _chat.sendMessage("\t- " + team, raylib::Color::White());
+    }
 }
 
 void World::update()
@@ -166,7 +176,7 @@ void World::update()
     parseEventQueue();
     _camera.updateCamera();
     _window->BeginDrawing();
-    _window->ClearBackground(raylib::Color::Black());
+    _window->ClearBackground(raylib::Color::SkyBlue());
     _camera.getCamera().BeginMode();
     _map.draw();
     for (auto &player : _players) {
@@ -174,6 +184,7 @@ void World::update()
     }
     drawItems();
     _camera.getCamera().EndMode();
+    _chat.update();
     DrawFPS(10, 10);
     _window->EndDrawing();
 }

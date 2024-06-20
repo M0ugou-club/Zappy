@@ -98,10 +98,6 @@ void ServerConnection::_receiveLoop()
         std::cout << "<- : " << _buffer.substr(0, _buffer.find("\n")) << std::endl;
         _buffer = _buffer.substr(_buffer.find("\n") + 1);
     }
-    // if (_buffer.length() > 1 && _buffer[_buffer.length() - 1] != '\n') {
-    //     std::cout << "cut packet" << std::endl;
-    //     _buffer.pop_back();
-    // }
 }
 
 void ServerConnection::_sendLoop()

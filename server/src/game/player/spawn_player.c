@@ -9,6 +9,8 @@
 
 static bool is_egg(game_t *game, int x, int y, player_t *n_player)
 {
+    if (game->map[x][y].eggs == NULL)
+        return false;
     for (int i = 0; game->map[x][y].eggs[i]->id != -1; i++) {
         if (strcmp(game->map[x][y].eggs[i]->team, n_player->team) == 0) {
             n_player->square = &game->map[x][y];
@@ -31,7 +33,7 @@ static bool loop_in_map(game_t *game, player_t *n_player)
     return found;
 }
 
-void spawn_player(game_t *game, char *team, int fd)
+player_t *spawn_player(game_t *game, char *team, int fd)
 {
     player_t *n_player = new_player(team);
     bool found = false;
@@ -41,4 +43,5 @@ void spawn_player(game_t *game, char *team, int fd)
         found = loop_in_map(game, n_player);
     }
     game->players = add_player(game->players, n_player);
+    return n_player;
 }

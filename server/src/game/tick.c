@@ -11,6 +11,8 @@ static bool eat(server_t *srv, player_t *ply)
 {
     connection_t *tmp = get_client_by_fd(srv->cons, ply->fd);
 
+    if (tmp == NULL)
+        return false;
     if (difftime(time(NULL), ply->last_eat)
         >= EAT_TIME / srv->args->frequency) {
         if (ply->inventory[FOOD] > 0) {
@@ -18,7 +20,7 @@ static bool eat(server_t *srv, player_t *ply)
             ply->last_eat = time(NULL);
             return true;
         } else {
-            queue_message(tmp, "dead\n");
+            send_formatted_message(tmp, "dead\n");
             return false;
         }
     }

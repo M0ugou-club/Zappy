@@ -93,5 +93,6 @@ bool team_exists(char **teams, char *team);
 player_t *new_player(char *team_name);
 player_t *add_player(player_t *player, player_t *new_player);
 void remove_player(player_t **player, player_t *to_remove);
+player_t * spawn_player(game_t *game, char *team, int fd);
 
 #endif /* !GAME_H_ */
