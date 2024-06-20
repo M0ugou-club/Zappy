@@ -28,7 +28,7 @@ void ChatMessage::update(int pos)
         _decayTime = 0;
     DrawRectangle(x, y, 600, 20, {0, 0, 0, (unsigned char)(100 * _decayTime / DECAY_TIME)});
     _text.SetColor(raylib::Color(_text.color.r, _text.color.g, _text.color.b, 255 * _decayTime / DECAY_TIME));
-    _text.Draw((raylib::Vector2){x + 5, y + 1});
+    _text.Draw((raylib::Vector2){x + 5.0f, y + 1.0f});
 }
 
 bool ChatMessage::isAlive()
