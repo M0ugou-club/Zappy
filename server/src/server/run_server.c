@@ -26,7 +26,8 @@ static int get_max_fd(server_t *srv)
 static bool handshake(server_t *srv, char *team, connection_t *cl)
 {
     if (strcmp(team, "GRAPHIC") == 0) {
-        queue_formatted_message(cl, "msz %zu %zu\n", srv->args->x, srv->args->y);
+        queue_formatted_message(cl,
+            "msz %zu %zu\n", srv->args->x, srv->args->y);
         queue_formatted_message(cl, "sgt %zu\n", srv->args->frequency);
         mct(srv, cl);
         tna(srv, cl);
