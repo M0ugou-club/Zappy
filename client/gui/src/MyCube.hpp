@@ -20,6 +20,7 @@ class MyCube {
         raylib::Vector3 getPosition() { return _position; }
         void setPosition(raylib::Vector3 position) { _position = position; }
         void setColor(raylib::Color color) { _color = color; }
+        raylib::Color getColor() { return _color; }
 
     protected:
     private:
