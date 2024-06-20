@@ -89,8 +89,12 @@ void World::parsePacket(std::string packet)
             }
         }},
         {"pie (\\d+) (\\d+) (\\d+)$", [this](std::vector<std::string> args) {
+            const int x = std::stoi(args[0]);
+            const int y = std::stoi(args[1]);
             for (auto &player : _players) {
-                player.second->setIncantating(false);
+                if ((int)player.second->getPosition().GetX() == x && (int)player.second->getPosition().GetZ() == y) {
+                    player.second->setIncantating(false);
+                }
             }
         }},
         {"pgt #?(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
