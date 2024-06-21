@@ -69,10 +69,10 @@ static void actions(server_t *srv)
 {
     read_connections(srv);
     game_tick(srv);
+    disconnect_players(srv);
     execute_connections(srv);
     execute_ai_commands(srv);
     send_messages(srv);
-    disconnect_players(srv);
 }
 
 void run_server(server_t *srv)

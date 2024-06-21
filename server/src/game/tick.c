@@ -46,7 +46,8 @@ void game_tick(server_t *srv)
     srv->game->tick++;
     while (ply != NULL) {
         ply->disconnect = !eat(srv, ply);
-        apply_incantation(srv, ply);
+        if (!ply->disconnect)
+            apply_incantation(srv, ply);
         ply = ply->next;
     }
 }
