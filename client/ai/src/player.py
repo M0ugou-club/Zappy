@@ -261,11 +261,21 @@ class Player:
         self.get_object(tile, searching_item)
 
 
+    def count_item(self, tile : list, item : str) -> int:
+        '''count the item in the tile'''
+        count = 0
+        for i in range(len(tile)):
+            if tile[i] == item:
+                count += 1
+        return count
+
     def get_object(self, tile : list , searching_item : list) -> None:
         '''take the item in the tile'''
         for item in searching_item:
+            nbr = self.count_item(tile, item)
             if item in tile:
-                self.take(item)
+                for _ in range(nbr):
+                    self.take(item)
 
 
     def get_correct_tile(self, looked: list,  searching_item : list) -> tuple[int, list]:
