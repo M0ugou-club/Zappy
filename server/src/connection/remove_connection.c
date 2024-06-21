@@ -26,6 +26,7 @@ void remove_connection(connection_t **cl, int sockfd)
     connection_t *tmp = *cl;
     connection_t *prev = NULL;
 
+    printf("Removing connection fd: %d\n", sockfd);
     if (remove_first(cl, sockfd, tmp))
         return;
     while (tmp != NULL && tmp->fd != sockfd) {

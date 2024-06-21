@@ -81,15 +81,18 @@ static bool read_team_internal(server_t *srv, char *tmp,
     if (handshake(srv, tmp, cli)) {
         cli->handshake_step = ESTABLISHED;
         cli->team = strdup(tmp);
-        if (strcmp(cli->team, "GRAPHIC") != 0) {
+        if (strcmp(cli->team, "GRAPHIC") == 0)
+            return true;
+        if (check_eggs(srv->game, cli->team)) {
             ply = spawn_player(srv->game, cli->team, cli->fd);
             broadcast_gui(srv, "pnw #%zu %d %d %d %d %s\n",
-                srv->game->players->id, ply->square->pos_x,
+                ply->id, ply->square->pos_x,
                 ply->square->pos_y, ply->direction, ply->level,
                 ply->team);
+            return true;
         }
-        return true;
     }
+    send_formatted_message(cli, "ko\n");
     remove_connection(&srv->cons, cli->fd);
     return false;
 }
