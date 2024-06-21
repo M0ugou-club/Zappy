@@ -10,14 +10,14 @@
 
 const raylib::Vector3 Player::OFFSET = {0.5f, 0.5f, 0.5f};
 const std::vector<std::string> Player::MODELS = {
+    "bonus/assets/models/player/pawn.obj",
     "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/pawn.obj",
     "bonus/assets/models/player/knight.obj",
-    "bonus/assets/models/player/knight.obj",
-    "bonus/assets/models/player/knight.obj",
-    "bonus/assets/models/player/knight.obj",
-    "bonus/assets/models/player/knight.obj",
-    "bonus/assets/models/player/knight.obj",
-    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/bishop.obj",
+    "bonus/assets/models/player/tower.obj",
+    "bonus/assets/models/player/queen.obj",
+    "bonus/assets/models/player/king.obj",
 };
 
 const std::vector<raylib::Color> Player::COLORS = {

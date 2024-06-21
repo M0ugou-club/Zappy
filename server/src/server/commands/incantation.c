@@ -29,7 +29,20 @@ static bool enough_players(server_t *srv, player_t *ply)
         tmp = tmp->next;
     }
     return players >= incantation[ply->level - 1][0];
+}
 
+static void players_incantation(server_t *srv, player_t *ply)
+{
+    player_t *tmp = srv->game->players;
+
+    while (tmp != NULL) {
+        if (tmp->square == ply->square) {
+            tmp->incantation = true;
+            tmp->action_cooldown = get_time() +
+                CALC_TIME(300.0f / srv->args->frequency);
+        }
+        tmp = tmp->next;
+    }
 }
 
 static bool check_incantation(server_t *srv,
@@ -52,20 +65,10 @@ static bool check_incantation(server_t *srv,
     return true;
 }
 
-static void incantation_message(server_t *srv,
-    connection_t *cl, player_t *player)
+void incantation_message(server_t *srv, connection_t *cl, player_t *ply)
 {
-    player_t *tmp = srv->game->players;
-    connection_t *t_cl = srv->cons;
-
-    for (int i = 0; tmp != NULL; i++) {
-        if (tmp->square == player->square) {
-            t_cl = get_client_by_fd(srv->cons, tmp->fd);
-            tmp->level++;
-            queue_formatted_message(t_cl, "Current level: %d", tmp->level);
-        }
-        tmp = tmp->next;
-    }
+    ply->level++;
+    queue_formatted_message(cl, "Current level: %d\n", ply->level);
 }
 
 // Begin an incantation
@@ -76,11 +79,12 @@ void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     if (!check_incantation(srv, cl, player))
         return;
-    queue_formatted_message(cl, "Elevation underway");
     for (int i = 0; i < 7; i++) {
         player->square->items[i_inventory] -=
             incantation[player->level - 1][i];
         i_inventory++;
     }
-    incantation_message(srv, cl, player);
+    player->incantation = true;
+    players_incantation(srv, player);
+    queue_formatted_message(cl, "Elevation underway\n");
 }
