@@ -58,7 +58,7 @@ typedef struct player_s {
     char *team;
     square_t *square;
     direction_t direction;
-    time_t last_action;
+    time_t action_cooldown;
     size_t level;
     unsigned int inventory[NONE];
     int fd;

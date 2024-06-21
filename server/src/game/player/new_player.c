@@ -25,7 +25,7 @@ player_t *new_player(char *team_name)
     player->incantation = false;
     memset(player->inventory, 0, 7);
     player->inventory[FOOD] = 10;
-    player->last_action = 0;
+    player->action_cooldown = 0;
     player->last_eat = 0;
     return player;
 }

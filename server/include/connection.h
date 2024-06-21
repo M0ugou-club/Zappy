@@ -27,6 +27,7 @@ typedef struct connection_s {
     struct sockaddr_in addr;
     char *buffer;
     char **send_queue;
+    char *command_queue[MAX_COMMAND_QUEUE];
     char *team;
     handshake_step_t handshake_step;
     struct connection_s *next;

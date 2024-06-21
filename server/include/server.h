@@ -20,6 +20,8 @@
     #define CMD_SUCCESS "ok\n"
     #define CMD_ERROR "ko\n"
 
+    #define calc_time(delay) (delay) * 1000
+
     #include <unistd.h>
     #include <stdlib.h>
     #include <string.h>
@@ -29,6 +31,7 @@
     #include <sys/select.h>
     #include <sys/signal.h>
     #include <sys/socket.h>
+    #include <sys/time.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
     #include "socket.h"
@@ -36,6 +39,7 @@
     #include "game.h"
 
 int get_array_size(char **arr);
+long get_time(void);
 
 typedef struct args_s {
     size_t port;
@@ -71,10 +75,10 @@ typedef struct server_s {
     struct args_s *args;
     sock_handle_t *sock;
     connection_t *cons;
-    bool close;
     game_t *game;
     fd_set *readfds;
     fd_set *writefds;
+    bool close;
 } server_t;
 
 typedef struct regex_parse_s {
@@ -84,7 +88,6 @@ typedef struct regex_parse_s {
 
 typedef struct command_regex_s {
     char *command;
-    bool spec_only;
     float time;
     void (*func)(server_t *srv, connection_t *cl, regex_parse_t *parse);
 } command_regex_t;
@@ -96,6 +99,8 @@ void remove_connection(connection_t **cl, int sockfd);
 void read_connections(server_t *srv);
 void execute_connections(server_t *srv);
 void disconnect_players(server_t *srv);
+void execute_ai_commands(server_t *srv);
+void player_enqueue(connection_t *cl, char *cmd);
 
 void queue_message(connection_t *conn, char *msg);
 void queue_formatted_message(connection_t *conn, const char *fmt, ...);

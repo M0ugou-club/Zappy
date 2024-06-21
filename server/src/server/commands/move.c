@@ -27,6 +27,7 @@ void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse)
             break;
     }
     queue_formatted_message(cl, "ok\n");
+    printf("Player #%zu moved to %d %d\n", player->id, player->square->pos_x, player->square->pos_y);
     broadcast_gui(srv, "ppo #%d %d %d %d\n", player->id,
         player->square->pos_x, player->square->pos_y, player->direction);
 }
@@ -38,6 +39,7 @@ void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     player->direction = (player->direction + 1) % 4;
     queue_formatted_message(cl, "ok\n");
+    printf("Player #%zu turned right\n", player->id);
     broadcast_gui(srv, "ppo #%d %d %d %d\n", player->id,
         player->square->pos_x, player->square->pos_y, player->direction);
 }
@@ -48,6 +50,7 @@ void cmd_left(server_t *srv, connection_t *cl, regex_parse_t *parse)
     player_t *player = get_player_by_fd(srv->game->players, cl->fd);
 
     player->direction = (player->direction + 3) % 4;
+    printf("Player #%zu turned left\n", player->id);
     queue_formatted_message(cl, "ok\n");
     broadcast_gui(srv, "ppo #%d %d %d %d\n", player->id,
         player->square->pos_x, player->square->pos_y, player->direction);

@@ -13,11 +13,11 @@ static bool eat(server_t *srv, player_t *ply)
 
     if (tmp == NULL)
         return false;
-    if (difftime(time(NULL), ply->last_eat)
-        >= EAT_TIME / srv->args->frequency) {
+    if (difftime(get_time(), ply->last_eat)
+        >= calc_time(EAT_TIME / srv->args->frequency)) {
         if (ply->inventory[FOOD] > 0) {
             ply->inventory[FOOD] -= 1;
-            ply->last_eat = time(NULL);
+            ply->last_eat = get_time();
             return true;
         } else {
             send_formatted_message(tmp, "dead\n");
@@ -33,8 +33,8 @@ void apply_incantation(server_t *srv, player_t *ply)
 
     if (!ply->incantation)
         return;
-    if (difftime(time(NULL), ply->last_action)
-        >= 300.0f / srv->args->frequency) {
+    if (difftime(get_time(), ply->action_cooldown)
+        >= calc_time(300.0f / srv->args->frequency)) {
         ply->incantation = false;
         incantation_message(srv, cl, ply);
     }

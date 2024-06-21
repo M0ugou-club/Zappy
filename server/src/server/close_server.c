@@ -7,12 +7,14 @@
 
 #include "server.h"
 
-void close_server(const int signal, void *sr)
+void close_server(const int signal, void *srv)
 {
-    server_t *srv = (server_t *)sr;
+    static server_t *saved = NULL;
 
+    if (saved == NULL)
+        saved = (server_t *)srv;
     if (signal == SIGINT) {
         printf("Server closing\n");
-        srv->close = true;
+        saved->close = true;
     }
 }

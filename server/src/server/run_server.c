@@ -68,6 +68,7 @@ static int get_connections_count(connection_t *cl)
 void run_server(server_t *srv)
 {
     int select_ret = 0;
+    int i = 0;
 
     printf("Server started on port %zu\n", srv->args->port);
     while (!srv->close) {
@@ -82,6 +83,7 @@ void run_server(server_t *srv)
         }
         read_connections(srv);
         execute_connections(srv);
+        execute_ai_commands(srv);
         game_tick(srv);
         send_messages(srv);
         disconnect_players(srv);

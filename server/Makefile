@@ -8,6 +8,7 @@
 NAME = zappy_server
 
 SRC =	src/main.c \
+		src/get_time.c \
 		src/server/init_server.c \
 		src/server/free_server.c \
 		src/server/run_server.c \
@@ -25,6 +26,7 @@ SRC =	src/main.c \
 		src/game/player/new_player.c \
 		src/game/player/disconnect_players.c \
 		src/game/player/spawn_player.c \
+		src/game/player/execute_commands.c \
 		src/game/tick.c \
 		src/game/team_exists.c \
 		src/server/commands/broadcast.c \
