@@ -1,5 +1,21 @@
 import random
 import socket
+import subprocess
+import select
+import asyncio
+import sys
+import logging
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 class Player:
     def __init__(self, team, machine, port):
@@ -12,6 +28,18 @@ class Player:
         self.survival = True
         self.is_incanting = False
         self.team_mates = 0
+        self.MTopt = False
+        self.nbr_connect = 0
+        self.inventory = {
+            'food': 10,
+            'linemate': 0,
+            'deraumere': 0,
+            'sibur': 0,
+            'mendiane': 0,
+            'phiras': 0,
+            'thystame': 0
+        }
+        self.looked = []
 
 
     LEVEL_REQUIREMENTS = {
@@ -75,48 +103,58 @@ class Player:
         lambda self: (self.right(), self.forward(), self.left(), self.forward())
     ]
 
+    ##SELECT FUNCTIONS
+
+
+    def handle_server_response(self) -> str:
+        '''Handle incoming server messages'''
+        response = self.socket.recv(1024).decode()
+        responses = response.split("\n")
+        for reponse in responses:
+            if reponse.startswith("dead"):
+                self.disconnect(int(42))
+            if reponse.startswith("[food"):
+                self.interpret_inventory(reponse)
+            elif reponse.startswith("[player"):
+                self.interpret_look(reponse)
+            if reponse.startswith("message "):
+                self.receive_broadcast(reponse)
+            if reponse.isnumeric():
+                self.nbr_connect = int(reponse)
+
+
+    def select_gestion(self, message_to_send : str) -> str:
+        '''select the function to call'''
+        if self.socket.fileno() == -1:
+            self.disconnect(2)
+        _, ready_to_write, _ = select.select([], [self.socket], [], 1)
+        if ready_to_write:
+            self.socket.sendall(message_to_send.encode())
+        return self.handle_server_response()
+
+
     ##IPC functions
 
     def forward(self) -> None:
         '''move forward'''
-        self.socket.sendall("Forward\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
+        self.select_gestion("Forward\n")
 
 
     def right(self) -> None:
         '''turn right'''
-        self.socket.sendall("Right\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
-
+        self.select_gestion("Right\n")
 
     def left(self) -> None:
         '''turn left'''
-        self.socket.sendall("Left\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
-
+        self.select_gestion("Left\n")
 
     def take(self, object : str) -> None:
-        '''take the object in the tile'''
-        self.socket.sendall(f"Take {object}\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            print("ko")
-            self.survival = False
-        pass
-
+        '''take object'''
+        self.select_gestion(f"Take {object}\n")
 
     def interpret_look(self, response : str) -> list:
         '''interpret the look response'''
-        response = response[1:-2]
+        response = response[1:-1]
         response = response.split(',')
         for i in range(len(response)):
             if (response[i][0] == ' '):
@@ -125,75 +163,56 @@ class Player:
         for i in range(len(response)):
             if response[i] == ['']:
                 response[i] = []
+        self.looked = response
         return response
-        pass
 
 
     def look(self) -> list:
         '''look around the player'''
-        self.socket.sendall("Look\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response != "ko\n":
-            response = self.interpret_look(response)
-            return response
-        else:
-            self.survival = False
-        pass
-
+        response = self.select_gestion("Look\n")
+        return response
 
     def incantation(self) -> None:
         '''incantation'''
-        print("Incantation")
-        self.socket.sendall("Incantation\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response != "ko\n":
+        if self.select_gestion("Incantation\n") != "ko\n":
             self.level += 1
-            self.fork()
-        else:
-            print(response)
+            self.is_incanting = True
+            self.connect_nbr()
+            if (self.nbr_connect == 0):
+                self.fork()
 
 
     def broadcast(self, message : str) -> None:
         '''broadcast a message'''
-        self.socket.sendall(f"Broadcast {message}\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
-
+        self.select_gestion(f"Broadcast {message}\n")
 
     def connect_nbr(self) -> None:
         '''connect the player'''
-        self.socket.sendall("Connect_nbr\n".encode())
-        pass
-
+        self.select_gestion("Connect_nbr\n")
 
     def fork(self) -> None:
         '''fork the player'''
-        self.socket.sendall("Fork\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
-
+        self.select_gestion("Fork\n")
 
     def eject(self) -> None:
         '''eject the player'''
-        self.socket.sendall("Eject\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
-
+        self.select_gestion("Eject\n")
 
     def set_object(self, object : str) -> None:
-        '''set object down'''
-        self.socket.sendall(f"Set {object}\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        pass
+        '''set object'''
+        self.select_gestion(f"Set {object}\n")
 
+    def check_dict_inventory(self, key : str) -> bool:
+        '''check the inventory'''
+        return key in [
+            "food",
+            "linemate",
+            "deraumere",
+            "sibur",
+            "mendiane",
+            "phiras",
+            "thystame"
+        ]
 
     def interpret_inventory(self, response : str) -> dict:
         '''interpret the inventory response'''
@@ -205,32 +224,32 @@ class Player:
         inventory = {}
         for i in range(len(response) - 1):
             response[i] = response[i].split(' ')
-            inventory[response[i][0]] = int(response[i][1])
+            if self.check_dict_inventory(response[i][0]):
+                inventory[response[i][0]] = int(response[i][1])
+            else:
+                key = response[i][0]
+                inventory[key[3:]] = int(response[i][1])
+        self.inventory.update(inventory)
         return inventory
 
 
     def get_inventory(self) -> dict:
-        '''get the inventory of the player'''
-        self.socket.sendall("Inventory\n".encode())
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n":
-            self.survival = False
-        response = self.interpret_inventory(response)
-        print(response)
-        return response
-
+        '''get the inventory'''
+        reponse = self.select_gestion("Inventory\n")
+        return reponse
 
     ##AI functions
 
+
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
-        print(direction)
-        self.MOVEMENTS_DIRECTION[direction](self)
+        if direction < 1 or direction > 8:
+            return
+        self.MOVEMENTS_DIRECTION[direction - 1](self)
 
 
     def go_to(self, tile : list, pos : tuple, searching_item : list) -> None:
         '''go to the tile given in parameter'''
-        print(f"{pos=}")
         for _ in range(pos[1]):
             self.forward()
         if pos[0] > 0:
@@ -242,13 +261,21 @@ class Player:
         self.get_object(tile, searching_item)
 
 
+    def count_item(self, tile : list, item : str) -> int:
+        '''count the item in the tile'''
+        count = 0
+        for i in range(len(tile)):
+            if tile[i] == item:
+                count += 1
+        return count
+
     def get_object(self, tile : list , searching_item : list) -> None:
         '''take the item in the tile'''
         for item in searching_item:
+            nbr = self.count_item(tile, item)
             if item in tile:
-                print("Item found")
-                print(item)
-                self.take(item)
+                for _ in range(nbr):
+                    self.take(item)
 
 
     def get_correct_tile(self, looked: list,  searching_item : list) -> tuple[int, list]:
@@ -271,28 +298,26 @@ class Player:
         return 0, 0
 
 
-    def search_object(self, looked: list, searching_item : list) -> None:
+    def  search_object(self, looked: list, searching_item : list) -> None:
         '''search the object in the tile'''
         correct_tile = self.get_correct_tile(looked, searching_item)
         if correct_tile:
             self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
         else :
-            print("Item not found")
             self.go_to_direction(random.randint(1, 3))
 
 
     def survive(self) -> None:
         '''survive'''
-        while self.get_inventory()['food'] < 15:
-            test = self.get_inventory()
-            print(test['food'])
-            self.search_object(self.look(), ['food'])
+        while self.inventory['food'] < 15:
+            self.look()
+            self.search_object(self.looked, ['food'])
+            self.get_inventory()
 
 
     def expedition(self) -> None:
         '''expeditions'''
-        print("Expedition")
-        self.search_object(self.look(), ['linemate', 'deraumere', 'sibur', 'mendiane', 'phiras', 'thystame'])
+        self.search_object(['linemate', 'deraumere', 'sibur', 'mendiane', 'phiras', 'thystame'])
 
 
     def count_player(self, looked: list) -> int:
@@ -306,10 +331,11 @@ class Player:
 
     def check_requirements(self, requirements: dict) -> bool:
         '''check the requirements'''
-        inventory = self.get_inventory()
-        look = self.look()
+        self.get_inventory()
+        self.look()
+        look = self.looked
         for key in requirements:
-            if key != 'player' and inventory[key] < requirements[key]:
+            if key != 'player' and self.inventory[key] < requirements[key]:
                 return 1
         for player in requirements:
             if player == 'player':
@@ -320,31 +346,29 @@ class Player:
 
     def what_i_need(self, requirements: dict) -> list:
         '''return list of which item i need to search for'''
-        inventory = self.get_inventory()
+        self.get_inventory()
         needed = []
         for key in requirements:
-            print(key)
             if key == 'player':
                 continue
-            if inventory[key] < requirements[key]:
+            if self.inventory[key] < requirements[key]:
                 needed.append(key)
-        print(needed)
         return needed
 
 
-    def receive_broadcast(self) -> None:
+    def receive_broadcast(self, message_received) -> None:
         '''receive the broadcast'''
-        response = self.socket.recv(1024).decode()
-        if response == "ko\n" or response.startswith("message") == False:
-            return
-        direction = response.split(", ")[0].split(" ")[1]
-        message = response.split(", ")[1]
+        direction = message_received.split(", ")[0].split(" ")[1]
+        message = message_received.split(", ")[1]
         if not message.startswith(self.team):
             return
         ordre = message.split(": ")[1]
-        lvl = int(message.split("?")[1])
-        if ordre == "ON EVOLUE OUUU ??" and lvl == self.level:
+        lvl = int(message.split("??")[1])
+        if ordre.startswith("ON EVOLUE OUUU ??") and lvl == self.level:
+            print(bcolors.OKGREEN + ordre + " " + direction + bcolors.ENDC)
             self.go_to_direction(int(direction))
+        if ordre.startswith("ON INCANTE OUUUU ??") and lvl == self.level:
+            self.incantation()
         return
 
     def call_teammates(self) -> None:
@@ -353,45 +377,66 @@ class Player:
         return
 
 
+    def put_requirements(self, requirements: dict) -> None:
+        '''put the requirements'''
+        for key in requirements:
+            if key != 'player':
+                for _ in range(requirements[key]):
+                    self.set_object(key)
+
+
     def try_incantation(self) -> None:
         '''try the incantation'''
-        inventory = self.get_inventory()
-        if inventory['food'] < 5:
+        self.get_inventory()
+        if self.inventory['food'] < 5:
             return
         requirements = self.LEVEL_REQUIREMENTS[self.level]
         requirements_checked = self.check_requirements(requirements)
         while requirements_checked != 0:
             if requirements_checked == 1:
-                print("searching for items")
-                self.search_object(self.look(), self.what_i_need(requirements))
+                self.look()
+                self.search_object(self.looked, self.what_i_need(requirements))
             else:
-                print("calling teammates")
                 self.call_teammates()
-                if self.get_inventory()['food'] < 5:
+                self.get_inventory()
+                if self.inventory['food'] < 5:
                     return
             requirements_checked = self.check_requirements(requirements)
+        self.put_requirements(requirements)
+        if (self.level != 1):
+            self.broadcast(self.team + ": ON INCANTE OUUUU ??" + str(self.level))
         self.incantation()
+        self.is_incanting = False
 
 
     def run(self) -> None:
         '''run the player'''
-        self.socket.connect((self.machine, int(self.port)))
-        self.socket.sendall("\n".encode())
-        while True:
-            self.socket.sendall((self.team + "\n").encode())
-            if self.socket.recv(1024).decode() == "ko\n":
-                break
-
         while (True):
-            print("MY LEVEL IS : ", self.level)
-            inventory = self.get_inventory()
-            if inventory['food'] < 5:
+            print(bcolors.OKBLUE + f"Player {self.team} is lvl {self.level}" + bcolors.ENDC)
+            self.get_inventory()
+            if self.inventory['food'] < 5:
                 self.survive()
-            ##self.receive_broadcast()
             if not self.is_incanting :
                 self.try_incantation()
 
-    def disconnect(self) -> None:
+    def connect(self) -> None:
+        '''connect the player'''
+        try:
+            self.socket.connect((self.machine, int(self.port)))
+        except socket.error as e:
+            return
+        self.socket.sendall("\n".encode())
+        while True:
+            self.socket.sendall((self.team + "\n").encode())
+            response = self.socket.recv(1024).decode()
+            if response == "ko\n":
+                self.disconnect(6)
+                break
+            else:
+                break
+
+
+    def disconnect(self, error : int) -> None:
         '''disconnect the player'''
-        if (self.fd != 0):
-            self.socket.close()
+        self.socket.close()
+        sys.exit(error)

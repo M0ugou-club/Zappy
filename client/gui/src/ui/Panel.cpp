@@ -10,7 +10,7 @@
 Panel::Panel(std::string skin, const raylib::Vector2 &position, const raylib::Vector2 &size, const ColorsMap &colors)
     : _position(position), _size(size), _colorMap(colors)
 {
-    _sprite.Load("client/gui/assets/" + skin);
+    _sprite.Load("bonus/assets/" + skin);
     _sourceRec = raylib::Rectangle(0, 0, _sprite.width, _sprite.height);
     _destRec = raylib::Rectangle(_position.x, _position.y, _size.x, _size.y);
     _npatchInfo.left = 12;

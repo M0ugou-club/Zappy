@@ -7,7 +7,7 @@
 
 #include "server.h"
 
-static const int incantation[7][6] =
+static const int incantation[7][7] =
 {
     {1, 1, 0, 0, 0, 0, 0},
     {2, 1, 1, 1, 0, 0, 0},
@@ -18,19 +18,46 @@ static const int incantation[7][6] =
     {6, 2, 2, 2, 2, 2, 1}
 };
 
+static bool enough_players(server_t *srv, player_t *ply)
+{
+    int players = 0;
+    player_t *tmp = srv->game->players;
+
+    while (tmp != NULL) {
+        if (tmp->square == ply->square)
+            players++;
+        tmp = tmp->next;
+    }
+    return players >= incantation[ply->level - 1][0];
+}
+
+static void players_incantation(server_t *srv, player_t *ply)
+{
+    player_t *tmp = srv->game->players;
+
+    while (tmp != NULL) {
+        if (tmp->square == ply->square) {
+            tmp->incantation = true;
+            tmp->action_cooldown = get_time() +
+                CALC_TIME(300.0f / srv->args->frequency);
+        }
+        tmp = tmp->next;
+    }
+}
+
 static bool check_incantation(server_t *srv,
     connection_t *cl, player_t *player)
 {
     int i_inventory = 1;
 
-    if (player->level == 8) {
-        queue_formatted_message(cl, "ko");
+    if (player->level == 8 || !enough_players(srv, player)) {
+        queue_formatted_message(cl, "ko\n");
         return false;
     }
     for (int i = 0; i < 7; i++) {
-        if (player->inventory[i_inventory] <
+        if (player->square->items[i_inventory] <
             incantation[player->level - 1][i]) {
-            queue_formatted_message(cl, "ko");
+            queue_formatted_message(cl, "ko\n");
             return false;
         }
         i_inventory++;
@@ -38,34 +65,26 @@ static bool check_incantation(server_t *srv,
     return true;
 }
 
-static void incantation_message(server_t *srv,
-    connection_t *cl, player_t *player)
+void incantation_message(server_t *srv, connection_t *cl, player_t *ply)
 {
-    player_t *tmp = srv->game->players;
-    connection_t *t_cl = srv->cons;
-
-    queue_formatted_message(cl, "Current level: %d", player->level);
-    for (int i = 0; tmp != NULL; i++) {
-        if (tmp->square == player->square && tmp->fd != cl->fd) {
-            t_cl = get_client_by_fd(srv->cons, tmp->fd);
-            queue_formatted_message(t_cl, "Current level: %d", player->level);
-        }
-        tmp = tmp->next;
-    }
+    ply->level++;
+    queue_formatted_message(cl, "Current level: %d\n", ply->level);
 }
 
 // Begin an incantation
 void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
-    player_t *player = get_player_by_fd(cl, srv);
+    player_t *player = get_player_by_fd(srv->game->players, cl->fd);
     int i_inventory = 1;
 
     if (!check_incantation(srv, cl, player))
         return;
-    queue_formatted_message(cl, "Elevation underway");
     for (int i = 0; i < 7; i++) {
-        player->inventory[i_inventory] -= incantation[player->level - 1][i];
+        player->square->items[i_inventory] -=
+            incantation[player->level - 1][i];
+        i_inventory++;
     }
-    player->level += 1;
-    incantation_message(srv, cl, player);
+    player->incantation = true;
+    players_incantation(srv, player);
+    queue_formatted_message(cl, "Elevation underway\n");
 }

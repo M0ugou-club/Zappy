@@ -14,14 +14,17 @@ SRC = main.cpp \
 	  Map.cpp \
 	  MyCamera.cpp \
 	  MyCube.cpp \
-	  items/Item.cpp \
 	  ui/ColorsMap.cpp \
 	  ui/Panel.cpp \
 	  ui/Button.cpp \
+	  ui/Chat.cpp \
+	  ui/ChatMessage.cpp \
 	  scenes/AScene.cpp \
 	  scenes/Menu.cpp \
 	  scenes/World.cpp \
+	  scenes/World/ItemRender.cpp \
 	  scenes/World/Player.cpp \
+	  scenes/World/Skybox.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 
@@ -34,7 +37,7 @@ COLOR_BLUE = \033[0;34m
 COLOR_YELLOW = \033[0;33m
 COLOR_RESET = \033[0m
 
-CXXFLAGS = -Wall -Wextra -std=c++17\
+CXXFLAGS = -Wall -Wextra -std=c++20\
 	$(shell uname -m | grep -q "arm" && echo "--start-no-unused-arguments"\
         && echo "-I/opt/homebrew/Cellar/raylib/5.0/include"\
         && echo "-L/opt/homebrew/Cellar/raylib/5.0/lib" || echo "")\

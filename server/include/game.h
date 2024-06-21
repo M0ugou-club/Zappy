@@ -10,12 +10,16 @@
 
     #include <stdlib.h>
     #include <time.h>
+    #include <stdbool.h>
+    #include <string.h>
+
+    #define EAT_TIME 126.0f
 
 typedef enum direction_e {
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST
+    NORTH = 1,
+    SOUTH = 2,
+    EAST = 3,
+    WEST = 4
 } direction_t;
 
 typedef enum item_e {
@@ -30,18 +34,19 @@ typedef enum item_e {
 } item_t;
 
 typedef struct max_items_s {
-    int food;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
+    int items[NONE];
 } max_items_t;
 
+typedef struct egg_s {
+    char *team;
+    size_t id;
+} egg_t;
+
 typedef struct square_s {
-    char **eggs;
+    egg_t **eggs;
     int items[NONE];
+    int pos_x;
+    int pos_y;
     struct square_s *north;
     struct square_s *south;
     struct square_s *east;
@@ -53,10 +58,13 @@ typedef struct player_s {
     char *team;
     square_t *square;
     direction_t direction;
-    time_t last_action;
+    time_t action_cooldown;
     size_t level;
     unsigned int inventory[NONE];
     int fd;
+    time_t last_eat;
+    bool disconnect;
+    bool incantation;
     struct player_s *next;
 } player_t;
 
@@ -69,16 +77,22 @@ typedef struct game_s {
     int max_players;
     char **teams;
     int *team_slots;
+    time_t time_elapsed;
+    ssize_t tick;
 } game_t;
 
-player_t *init_players(int max_players);
-player_t *add_player(player_t *players, int id, char *team);
-player_t pop_player(player_t *players, int id);
-player_t *get_player_by_id(player_t *players, int id);
-int get_player_count(player_t *players);
+void add_egg(square_t *square, char *team_name);
+void del_egg(square_t *square, char *team_name);
+bool check_egg(square_t *square, char *team_name);
+bool check_eggs(game_t *game, char *team_name);
 
-game_t *init_game(int x, int y, char **teams);
 void free_game(game_t *game);
 max_items_t *fill_density(int x, int y);
+bool team_exists(char **teams, char *team);
+
+player_t *new_player(char *team_name);
+player_t *add_player(player_t *player, player_t *new_player);
+void remove_player(player_t **player, player_t *to_remove);
+player_t *spawn_player(game_t *game, char *team, int fd);
 
 #endif /* !GAME_H_ */
