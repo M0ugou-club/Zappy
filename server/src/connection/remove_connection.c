@@ -14,6 +14,7 @@ static bool remove_first(connection_t **cl, int sockfd, connection_t *tmp)
         close(tmp->fd);
         free(tmp->team);
         free(tmp->buffer);
+        free(tmp->send_queue);
         free(tmp);
         return true;
     }
@@ -37,5 +38,6 @@ void remove_connection(connection_t **cl, int sockfd)
     close(tmp->fd);
     free(tmp->buffer);
     free(tmp->team);
+    free(tmp->send_queue);
     free(tmp);
 }

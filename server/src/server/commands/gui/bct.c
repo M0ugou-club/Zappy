@@ -9,12 +9,12 @@
 
 void bct(server_t *srv, connection_t *cl, int x, int y)
 {
-    square_t *square = &srv->game->map[y][x];
+    square_t square = srv->game->map[x][y];
 
     queue_formatted_message(cl, "bct %d %d %d %d %d %d %d %d %d\n", x, y,
-        square->items[0], square->items[1], square->items[2],
-        square->items[3], square->items[4],
-        square->items[5], square->items[6]);
+        square.items[0], square.items[1], square.items[2],
+        square.items[3], square.items[4],
+        square.items[5], square.items[6]);
 }
 
 // Send the contents of a tile

@@ -29,25 +29,35 @@ void queue_message(connection_t *conn, char *msg)
     conn->send_queue[size + 1] = NULL;
 }
 
-void queue_formatted_message(connection_t *conn, char *fmt, ...)
+void queue_formatted_message(connection_t *conn, const char *fmt, ...)
 {
     va_list args;
     char *msg;
+    size_t size = 0;
 
     va_start(args, fmt);
-    vasprintf(&msg, fmt, args);
+    size = vsnprintf(NULL, 0, fmt, args);
+    va_end(args);
+    msg = malloc(size + 1);
+    if (msg == NULL)
+        return;
+    va_start(args, fmt);
+    vsnprintf(msg, size + 1, fmt, args);
     va_end(args);
     queue_message(conn, msg);
     free(msg);
 }
 
-void send_formatted_message(connection_t *conn, char *fmt, ...)
+void send_formatted_message(connection_t *conn, const char *fmt, ...)
 {
     va_list args;
     char *msg;
+    size_t size = 0;
 
+    size = snprintf(NULL, 0, fmt, args);
+    msg = malloc(size + 1);
     va_start(args, fmt);
-    vasprintf(&msg, fmt, args);
+    vsprintf(msg, fmt, args);
     va_end(args);
     SEND(conn, msg);
     free(msg);

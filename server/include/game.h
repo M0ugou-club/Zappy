@@ -58,12 +58,13 @@ typedef struct player_s {
     char *team;
     square_t *square;
     direction_t direction;
-    time_t last_action;
+    time_t action_cooldown;
     size_t level;
     unsigned int inventory[NONE];
     int fd;
     time_t last_eat;
     bool disconnect;
+    bool incantation;
     struct player_s *next;
 } player_t;
 
@@ -83,9 +84,15 @@ typedef struct game_s {
 void add_egg(square_t *square, char *team_name);
 void del_egg(square_t *square, char *team_name);
 bool check_egg(square_t *square, char *team_name);
+bool check_eggs(game_t *game, char *team_name);
 
 void free_game(game_t *game);
 max_items_t *fill_density(int x, int y);
 bool team_exists(char **teams, char *team);
+
+player_t *new_player(char *team_name);
+player_t *add_player(player_t *player, player_t *new_player);
+void remove_player(player_t **player, player_t *to_remove);
+player_t *spawn_player(game_t *game, char *team, int fd);
 
 #endif /* !GAME_H_ */

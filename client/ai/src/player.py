@@ -307,6 +307,7 @@ class Player:
         '''take the item in the tile'''
         for item in searching_item:
             nbr = self.count_item(tile, item)
+            nbr = self.count_item(tile, item)
             if item in tile:
                 for _ in range(nbr):
                     print(bcolors.OKCYAN + f"Player {self.team} is taking {item}" + bcolors.ENDC)

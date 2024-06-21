@@ -5,7 +5,7 @@
 ** free_connection
 */
 
-#include "connection.h"
+#include "server.h"
 
 void free_connection(connection_t *cons)
 {
@@ -14,6 +14,7 @@ void free_connection(connection_t *cons)
 
     while (tmp != NULL) {
         next = tmp->next;
+        close(tmp->fd);
         free(tmp->buffer);
         free(tmp->team);
         free(tmp);
