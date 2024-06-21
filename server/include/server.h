@@ -20,7 +20,7 @@
     #define CMD_SUCCESS "ok\n"
     #define CMD_ERROR "ko\n"
 
-    #define calc_time(delay) (delay) * 1000
+    #define CALC_TIME(delay) (delay) * 1000
 
     #include <unistd.h>
     #include <stdlib.h>

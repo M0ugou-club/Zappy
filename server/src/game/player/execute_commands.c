@@ -54,7 +54,7 @@ static void execute_ai_command(server_t *srv, connection_t *cl, player_t *ply, c
         regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
         if (regex_ret == 0) {
             AI_COMMANDS[i].func(srv, cl, &parse);
-            ply->action_cooldown = get_time() + calc_time(AI_COMMANDS[i].time / srv->args->frequency);
+            ply->action_cooldown = get_time() + CALC_TIME(AI_COMMANDS[i].time / srv->args->frequency);
             regfree(regex);
             return;
         }
