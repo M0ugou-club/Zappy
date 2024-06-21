@@ -51,7 +51,8 @@ static void execute_graphical(char *cmd, int client_fd, server_t *srv)
     parse.str = cmd;
     memset(parse.pmatch, 0, sizeof(parse.pmatch));
     for (int i = 0; GRAPHICAL_COMMANDS[i].command != NULL; i++) {
-        regex_ret = regcomp(regex, GRAPHICAL_COMMANDS[i].command, REG_EXTENDED);
+        regex_ret =
+            regcomp(regex, GRAPHICAL_COMMANDS[i].command, REG_EXTENDED);
         if (regex_ret != 0)
             continue;
         regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
