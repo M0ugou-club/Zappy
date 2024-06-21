@@ -14,7 +14,7 @@ static bool eat(server_t *srv, player_t *ply)
     if (tmp == NULL)
         return false;
     if (difftime(get_time(), ply->last_eat)
-        >= calc_time(EAT_TIME / srv->args->frequency)) {
+        >= CALC_TIME(EAT_TIME / srv->args->frequency)) {
         if (ply->inventory[FOOD] > 0) {
             ply->inventory[FOOD] -= 1;
             ply->last_eat = get_time();
@@ -34,7 +34,7 @@ void apply_incantation(server_t *srv, player_t *ply)
     if (!ply->incantation)
         return;
     if (difftime(get_time(), ply->action_cooldown)
-        >= calc_time(300.0f / srv->args->frequency)) {
+        >= CALC_TIME(300.0f / srv->args->frequency)) {
         ply->incantation = false;
         incantation_message(srv, cl, ply);
     }

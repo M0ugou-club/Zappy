@@ -38,7 +38,7 @@ static void players_incantation(server_t *srv, player_t *ply)
     while (tmp != NULL) {
         if (tmp->square == ply->square) {
             tmp->incantation = true;
-            tmp->action_cooldown = get_time() + calc_time(300.0f / srv->args->frequency);
+            tmp->action_cooldown = get_time() + CALC_TIME(300.0f / srv->args->frequency);
         }
         tmp = tmp->next;
     }
