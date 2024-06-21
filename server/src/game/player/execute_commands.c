@@ -50,7 +50,6 @@ static void execute_ai_command(server_t *srv, connection_t *cl,
     memset(parse.pmatch, 0, sizeof(parse.pmatch));
     for (int i = 0; AI_COMMANDS[i].command != NULL; i++) {
         regex_ret = regcomp(regex, AI_COMMANDS[i].command, REG_EXTENDED);
-        if (regex_ret != 0) continue;
         regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
         if (regex_ret == 0) {
             AI_COMMANDS[i].func(srv, cl, &parse);
