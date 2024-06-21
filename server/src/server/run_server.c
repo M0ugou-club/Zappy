@@ -65,6 +65,16 @@ static int get_connections_count(connection_t *cl)
     return count;
 }
 
+static void actions(server_t *srv)
+{
+    read_connections(srv);
+    execute_connections(srv);
+    execute_ai_commands(srv);
+    game_tick(srv);
+    send_messages(srv);
+    disconnect_players(srv);
+}
+
 void run_server(server_t *srv)
 {
     int select_ret = 0;
@@ -81,11 +91,6 @@ void run_server(server_t *srv)
             accept_connection(srv);
             continue;
         }
-        read_connections(srv);
-        execute_connections(srv);
-        execute_ai_commands(srv);
-        game_tick(srv);
-        send_messages(srv);
-        disconnect_players(srv);
+        actions(srv);
     }
 }
