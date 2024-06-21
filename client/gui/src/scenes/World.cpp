@@ -47,7 +47,7 @@ void World::parsePacket(std::string packet)
         {"sgt (\\d+)$", [this](std::vector<std::string> args) {
             _timeUnit = std::stoi(args[0]);
         }},
-        {"pnw (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$", [this](std::vector<std::string> args) {
+        {"pnw #?(\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$", [this](std::vector<std::string> args) {
             addPlayer(args[5], std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2]), std::stoi(args[3]), std::stoi(args[4]));
         }},
         {"ppo #?(\\d+) (\\d+) (\\d+) ([1-4])$", [this](std::vector<std::string> args) {
@@ -167,7 +167,7 @@ void World::load()
         std::to_string(static_cast<int>(_map.getSize().GetY())));
     _chat.sendMessage("Here are the teams :");
     for (auto &team : _teams) {
-        _chat.sendMessage("\t- " + team, raylib::Color::White());
+        _chat.sendMessage((" - " + team), raylib::Color::White());
     }
 }
 

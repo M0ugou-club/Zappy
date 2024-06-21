@@ -25,7 +25,7 @@ void Chat::update()
         i++;
         message.update(i);
         if (!message.isAlive())
-            _messages.erase(_messages.begin() + i - 1);
+            _messages.pop_back();
     }
 }
 

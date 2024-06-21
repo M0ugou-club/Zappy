@@ -19,7 +19,7 @@ ChatMessage::~ChatMessage()
 void ChatMessage::update(int pos)
 {
     int x = 0;
-    int y = GetRenderHeight() - (60 + (20 * pos));
+    int y = (GetRenderHeight() / GetWindowScaleDPI().y) - (60 + (20 * pos));
     if (_lifeTime == 0)
         _decayTime--;
     else
