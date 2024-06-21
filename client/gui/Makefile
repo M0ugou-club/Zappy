@@ -17,11 +17,14 @@ SRC = main.cpp \
 	  ui/ColorsMap.cpp \
 	  ui/Panel.cpp \
 	  ui/Button.cpp \
+	  ui/Chat.cpp \
+	  ui/ChatMessage.cpp \
 	  scenes/AScene.cpp \
 	  scenes/Menu.cpp \
 	  scenes/World.cpp \
 	  scenes/World/ItemRender.cpp \
 	  scenes/World/Player.cpp \
+	  scenes/World/Skybox.cpp \
 
 SRC := $(addprefix src/, $(SRC))
 
