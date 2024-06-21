@@ -75,20 +75,9 @@ static bool handshake(server_t *srv, char *team, connection_t *cl)
     return false;
 }
 
-static bool read_team(server_t *srv, connection_t *cli)
+static bool read_team_internal(server_t *srv, char *tmp,
+    connection_t *cli, player_t *ply)
 {
-    ssize_t ret;
-    char tmp[BUFFER_SIZE];
-    player_t *ply = NULL;
-
-    memset(tmp, '\0', BUFFER_SIZE);
-    ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
-    if (ret <= 0) {
-        remove_connection(&srv->cons, cli->fd);
-        return true;
-    }
-    tmp[ret] = '\0';
-    clean_str(tmp);
     if (handshake(srv, tmp, cli)) {
         cli->handshake_step = ESTABLISHED;
         cli->team = strdup(tmp);
@@ -105,6 +94,23 @@ static bool read_team(server_t *srv, connection_t *cli)
     return false;
 }
 
+static bool read_team(server_t *srv, connection_t *cli)
+{
+    ssize_t ret;
+    char tmp[BUFFER_SIZE];
+    player_t *ply = NULL;
+
+    memset(tmp, '\0', BUFFER_SIZE);
+    ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
+    if (ret <= 0) {
+        remove_connection(&srv->cons, cli->fd);
+        return true;
+    }
+    tmp[ret] = '\0';
+    clean_str(tmp);
+    return read_team_internal(srv, tmp, cli, ply);
+}
+
 void read_connections(server_t *srv)
 {
     connection_t *tmp = srv->cons;
@@ -113,7 +119,8 @@ void read_connections(server_t *srv)
     while (tmp != NULL) {
         if (tmp->handshake_step == TEAM && FD_ISSET(tmp->fd, srv->readfds))
             ret = read_team(srv, tmp);
-        if (!ret && tmp->handshake_step == ESTABLISHED && FD_ISSET(tmp->fd, srv->readfds))
+        if (!ret && tmp->handshake_step == ESTABLISHED
+            && FD_ISSET(tmp->fd, srv->readfds))
             ret = action(srv, tmp);
         if (ret)
             break;
