@@ -39,7 +39,8 @@ static char *player_dequeue(connection_t *cl)
     return cmd;
 }
 
-static void execute_ai_command(server_t *srv, connection_t *cl, player_t *ply, char *cmd)
+static void execute_ai_command(server_t *srv, connection_t *cl,
+    player_t *ply, char *cmd)
 {
     int regex_ret = 0;
     regex_t *regex = malloc(sizeof(regex_t));
@@ -49,12 +50,12 @@ static void execute_ai_command(server_t *srv, connection_t *cl, player_t *ply, c
     memset(parse.pmatch, 0, sizeof(parse.pmatch));
     for (int i = 0; AI_COMMANDS[i].command != NULL; i++) {
         regex_ret = regcomp(regex, AI_COMMANDS[i].command, REG_EXTENDED);
-        if (regex_ret != 0)
-            continue;
+        if (regex_ret != 0) continue;
         regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
         if (regex_ret == 0) {
             AI_COMMANDS[i].func(srv, cl, &parse);
-            ply->action_cooldown = get_time() + CALC_TIME(AI_COMMANDS[i].time / srv->args->frequency);
+            ply->action_cooldown = get_time()
+                + CALC_TIME(AI_COMMANDS[i].time / srv->args->frequency);
             regfree(regex);
             return;
         }
@@ -66,12 +67,13 @@ static void execute_ai_command(server_t *srv, connection_t *cl, player_t *ply, c
 void execute_ai_commands(server_t *srv)
 {
     connection_t *cl = NULL;
+    char *cmd = NULL;
 
     for (player_t *tmp = srv->game->players; tmp; tmp = tmp->next) {
         if (get_time() < tmp->action_cooldown)
             continue;
         cl = get_client_by_fd(srv->cons, tmp->fd);
-        char *cmd = player_dequeue(cl);
+        cmd = player_dequeue(cl);
         if (!cmd)
             continue;
         execute_ai_command(srv, cl, tmp, cmd);
