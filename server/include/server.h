@@ -39,7 +39,8 @@
     #include "game.h"
 
 int get_array_size(char **arr);
-long get_time(void);
+bool time_passed(struct timeval *tv);
+void set_cooldown(struct timeval *tv, float time);
 
 typedef struct args_s {
     size_t port;

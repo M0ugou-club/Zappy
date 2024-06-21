@@ -53,8 +53,8 @@ static void execute_ai_command(server_t *srv, connection_t *cl,
         regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
         if (regex_ret == 0) {
             AI_COMMANDS[i].func(srv, cl, &parse);
-            ply->action_cooldown = get_time()
-                + CALC_TIME(AI_COMMANDS[i].time / srv->args->frequency);
+            set_cooldown(&ply->action_cooldown,
+                AI_COMMANDS[i].time / srv->args->frequency);
             regfree(regex);
             return;
         }
@@ -69,7 +69,7 @@ void execute_ai_commands(server_t *srv)
     char *cmd = NULL;
 
     for (player_t *tmp = srv->game->players; tmp; tmp = tmp->next) {
-        if (get_time() < tmp->action_cooldown)
+        if (!time_passed(&tmp->action_cooldown))
             continue;
         cl = get_client_by_fd(srv->cons, tmp->fd);
         cmd = player_dequeue(cl);

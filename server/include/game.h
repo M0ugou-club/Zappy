@@ -58,11 +58,11 @@ typedef struct player_s {
     char *team;
     square_t *square;
     direction_t direction;
-    time_t action_cooldown;
+    struct timeval action_cooldown;
     size_t level;
     unsigned int inventory[NONE];
     int fd;
-    time_t last_eat;
+    struct timeval eat_cooldown;
     bool disconnect;
     bool incantation;
     struct player_s *next;

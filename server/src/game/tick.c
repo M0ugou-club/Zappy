@@ -5,6 +5,7 @@
 ** tick
 */
 
+#include "game.h"
 #include "server.h"
 
 static bool eat(server_t *srv, player_t *ply)
@@ -13,11 +14,10 @@ static bool eat(server_t *srv, player_t *ply)
 
     if (tmp == NULL)
         return false;
-    if (difftime(get_time(), ply->last_eat)
-        >= CALC_TIME(EAT_TIME / srv->args->frequency)) {
+    if (time_passed(&ply->eat_cooldown)) {
         if (ply->inventory[FOOD] > 0) {
             ply->inventory[FOOD] -= 1;
-            ply->last_eat = get_time();
+            set_cooldown(&ply->eat_cooldown, EAT_TIME / srv->args->frequency);
             return true;
         } else {
             send_formatted_message(tmp, "dead\n");
@@ -33,8 +33,7 @@ void apply_incantation(server_t *srv, player_t *ply)
 
     if (!ply->incantation)
         return;
-    if (difftime(get_time(), ply->action_cooldown)
-        >= CALC_TIME(300.0f / srv->args->frequency)) {
+    if (time_passed(&ply->action_cooldown)) {
         ply->incantation = false;
         incantation_message(srv, cl, ply);
     }
