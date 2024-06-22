@@ -48,6 +48,28 @@ static void refill(server_t *srv)
         REFILL_TIME / srv->args->frequency);
 }
 
+static size_t get_winning_players(server_t *srv, char *team)
+{
+    size_t count = 0;
+
+    for (player_t *ply = srv->game->players; ply != NULL; ply = ply->next)
+        if (strcmp(ply->team, team) == 0 && ply->level == 8)
+            count++;
+    return count;
+}
+
+static void check_win(server_t *srv)
+{
+    for (int i = 0; srv->args->teams[i]; i++) {
+        if (get_winning_players(srv, srv->args->teams[i]) >= 6) {
+            printf("Team %s has won the game\n", srv->args->teams[i]);
+            broadcast_gui(srv, "seg %s\n", srv->args->teams[i]);
+            srv->close = true;
+            return;
+        }
+    }
+}
+
 void game_tick(server_t *srv)
 {
     player_t *ply = srv->game->players;
@@ -59,4 +81,5 @@ void game_tick(server_t *srv)
         ply = ply->next;
     }
     refill(srv);
+    check_win(srv);
 }
