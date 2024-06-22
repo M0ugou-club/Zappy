@@ -68,7 +68,7 @@ void execute_ai_commands(server_t *srv)
     char *cmd = NULL;
 
     for (player_t *tmp = srv->game->players; tmp; tmp = tmp->next) {
-        if (!time_passed(&tmp->action_cooldown))
+        if (tmp->incantation || !time_passed(&tmp->action_cooldown))
             continue;
         cl = get_client_by_fd(srv->cons, tmp->fd);
         if (!cl)

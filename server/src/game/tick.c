@@ -31,9 +31,9 @@ void apply_incantation(server_t *srv, player_t *ply)
 {
     connection_t *cl = get_client_by_fd(srv->cons, ply->fd);
 
-    if (!ply->incantation)
-        return;
-    if (time_passed(&ply->action_cooldown)) {
+    if (ply->incantation && time_passed(&ply->action_cooldown)) {
+        printf("Player %ld has leveled up (%ld -> %ld)\n",
+            ply->id, ply->level, ply->level + 1);
         ply->incantation = false;
         incantation_message(srv, cl, ply);
     }

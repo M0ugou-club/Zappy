@@ -14,6 +14,7 @@
     #include <string.h>
 
     #define EAT_TIME 126.0f
+    #define INCANTATION_TIME 300.0f
 
 typedef enum direction_e {
     NORTH = 1,
@@ -23,13 +24,13 @@ typedef enum direction_e {
 } direction_t;
 
 typedef enum item_e {
+    FOOD,
     LINEMATE,
     DERAUMERE,
     SIBUR,
     MENDIANE,
     PHIRAS,
     THYSTAME,
-    FOOD,
     NONE
 } item_t;
 
@@ -44,7 +45,7 @@ typedef struct egg_s {
 
 typedef struct square_s {
     egg_t **eggs;
-    int items[NONE];
+    unsigned int items[NONE];
     int pos_x;
     int pos_y;
     struct square_s *north;
