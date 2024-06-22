@@ -459,7 +459,6 @@ class Player:
             self.get_action()
             return
 
-
     def run(self) -> None:
         '''run the player'''
         while (True):
