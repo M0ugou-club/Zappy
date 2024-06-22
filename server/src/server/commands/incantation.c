@@ -19,7 +19,7 @@ static const int incantation[7][NONE] =
     {6, 2, 2, 2, 2, 2, 1}
 };
 
-static bool same_square(square_t *sq1, square_t *sq2)
+static bool same_square(cell_t *sq1, cell_t *sq2)
 {
     return sq1->pos_x == sq2->pos_x && sq1->pos_y == sq2->pos_y;
 }
@@ -44,7 +44,6 @@ static void players_incantation(server_t *srv, player_t *ply)
     while (tmp != NULL) {
         if (same_square(tmp->square, ply->square)
             && tmp->incantation == false) {
-            printf("Player %ld is incantating\n", tmp->id);
             broadcast_gui(srv, "pic %d %d %d #%d\n",
                 tmp->square->pos_x,
                 tmp->square->pos_y, ply->level + 1, ply->id);
@@ -68,25 +67,6 @@ static bool check_incantation(server_t *srv,
     for (int i = 0; i < NONE - 1; i++) {
         if (player->square->items[i_inventory] <
             incantation[player->level - 1][i_inventory]) {
-            printf("   square: [linemate %d, deraumere %d, sibur %d, "\
-                "mendiane %d, phiras %d, thystame %d]\n",
-                player->square->items[1],
-                player->square->items[2],
-                player->square->items[3],
-                player->square->items[4],
-                player->square->items[5],
-                player->square->items[6]);
-            printf("   required: [linemate %d, deraumere %d, sibur %d, "\
-                "mendiane %d, phiras %d, thystame %d]\n",
-                incantation[player->level - 1][1],
-                incantation[player->level - 1][2],
-                incantation[player->level - 1][3],
-                incantation[player->level - 1][4],
-                incantation[player->level - 1][5],
-                incantation[player->level - 1][6]);
-            printf("There isn't enough of item %d (need %d but only %d)\n",
-                i_inventory, incantation[player->level - 1][i_inventory],
-                player->square->items[i_inventory]);
             queue_formatted_message(cl, "ko\n");
             return false;
         }
@@ -111,7 +91,6 @@ void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse)
     player_t *player = get_player_by_fd(srv->game->players, cl->fd);
     int i_inventory = 1;
 
-    printf("Player %ld is trying to start incantation\n", player->id);
     if (!check_incantation(srv, cl, player))
         return;
     for (int i = 0; i < 7; i++) {
@@ -119,7 +98,6 @@ void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse)
             incantation[player->level - 1][i];
         i_inventory++;
     }
-    printf("Player %ld is starting incantation\n", player->id);
     players_incantation(srv, player);
     queue_formatted_message(cl, "Elevation underway\n");
 }

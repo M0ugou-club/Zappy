@@ -7,7 +7,7 @@
 
 #include "server.h"
 
-size_t count_eggs_square(square_t *sq, char *team)
+size_t count_eggs_square(cell_t *sq, char *team)
 {
     size_t count = 0;
 
@@ -22,7 +22,7 @@ size_t count_eggs_square(square_t *sq, char *team)
 
 size_t count_eggs(server_t *srv, char *team)
 {
-    square_t **map = srv->game->map;
+    cell_t **map = srv->game->map;
     size_t count = 0;
 
     for (int xdx = 0; xdx < srv->game->map_x; xdx++) {

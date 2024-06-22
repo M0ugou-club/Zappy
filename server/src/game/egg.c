@@ -16,7 +16,7 @@ static int count_str_array(char **arr)
     return i;
 }
 
-static bool check_egg_in_eggs(square_t *square, char *team_name)
+static bool check_egg_in_eggs(cell_t *square, char *team_name)
 {
     if (square->eggs == NULL) {
         square->eggs = malloc(sizeof(egg_t *) * 2);
@@ -29,7 +29,7 @@ static bool check_egg_in_eggs(square_t *square, char *team_name)
     return false;
 }
 
-void add_egg(square_t *square, char *team_name)
+void add_egg(cell_t *square, char *team_name)
 {
     size_t id = 1;
     int nb_eggs = 0;
@@ -45,7 +45,7 @@ void add_egg(square_t *square, char *team_name)
     id++;
 }
 
-void del_egg(square_t *square, char *team_name)
+void del_egg(cell_t *square, char *team_name)
 {
     int i = 0;
     int nb_eggs = 0;
@@ -66,7 +66,7 @@ void del_egg(square_t *square, char *team_name)
         square->eggs = realloc(square->eggs, sizeof(egg_t *) * (nb_eggs));
 }
 
-bool check_egg(square_t *square, char *team_name)
+bool check_egg(cell_t *square, char *team_name)
 {
     if (square->eggs == NULL)
         return false;

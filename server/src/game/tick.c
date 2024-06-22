@@ -27,7 +27,7 @@ static bool eat(server_t *srv, player_t *ply)
     return true;
 }
 
-void apply_incantation(server_t *srv, player_t *ply)
+static void apply_incantation(server_t *srv, player_t *ply)
 {
     connection_t *cl = get_client_by_fd(srv->cons, ply->fd);
 
@@ -39,15 +39,24 @@ void apply_incantation(server_t *srv, player_t *ply)
     }
 }
 
+static void refill(server_t *srv)
+{
+    if (!time_passed(&srv->game->refill_cooldown))
+        return;
+    refill_map(srv);
+    set_cooldown(&srv->game->refill_cooldown,
+        REFILL_TIME / srv->args->frequency);
+}
+
 void game_tick(server_t *srv)
 {
     player_t *ply = srv->game->players;
 
-    srv->game->tick++;
     while (ply != NULL) {
         ply->disconnect = !eat(srv, ply);
         if (!ply->disconnect)
             apply_incantation(srv, ply);
         ply = ply->next;
     }
+    refill(srv);
 }

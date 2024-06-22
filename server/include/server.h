@@ -20,8 +20,6 @@
     #define CMD_SUCCESS "ok\n"
     #define CMD_ERROR "ko\n"
 
-    #define CALC_TIME(delay) (delay) * 1000
-
     #include <unistd.h>
     #include <stdlib.h>
     #include <string.h>
@@ -123,6 +121,7 @@ void place_eggs(game_t *game, args_t *args);
 void place_items_randomly(game_t *game, args_t *args);
 
 game_t *init_game(int x, int y, char **teams, args_t *args);
+void refill_map(server_t *srv);
 void game_tick(server_t *srv);
 
 player_t *get_player_by_fd(player_t *players, int fd);

@@ -15,6 +15,7 @@
 
     #define EAT_TIME 126.0f
     #define INCANTATION_TIME 300.0f
+    #define REFILL_TIME 20.0f
 
 typedef enum direction_e {
     NORTH = 1,
@@ -43,21 +44,22 @@ typedef struct egg_s {
     size_t id;
 } egg_t;
 
-typedef struct square_s {
+typedef struct cell_s {
     egg_t **eggs;
     unsigned int items[NONE];
     int pos_x;
     int pos_y;
-    struct square_s *north;
-    struct square_s *south;
-    struct square_s *east;
-    struct square_s *west;
-} square_t;
+    bool updated;
+    struct cell_s *north;
+    struct cell_s *south;
+    struct cell_s *east;
+    struct cell_s *west;
+} cell_t;
 
 typedef struct player_s {
     size_t id;
     char *team;
-    square_t *square;
+    cell_t *square;
     direction_t direction;
     struct timeval action_cooldown;
     size_t level;
@@ -73,18 +75,17 @@ typedef struct game_s {
     int map_x;
     int map_y;
     max_items_t *max_items;
-    square_t **map;
+    cell_t **map;
     player_t *players;
+    struct timeval refill_cooldown;
     int max_players;
     char **teams;
     int *team_slots;
-    time_t time_elapsed;
-    ssize_t tick;
 } game_t;
 
-void add_egg(square_t *square, char *team_name);
-void del_egg(square_t *square, char *team_name);
-bool check_egg(square_t *square, char *team_name);
+void add_egg(cell_t *square, char *team_name);
+void del_egg(cell_t *square, char *team_name);
+bool check_egg(cell_t *square, char *team_name);
 bool check_eggs(game_t *game, char *team_name);
 
 void free_game(game_t *game);
