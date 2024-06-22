@@ -9,6 +9,7 @@ NAME = zappy_server
 
 SRC =	src/main.c \
 		src/get_time.c \
+		src/buffer.c \
 		src/server/init_server.c \
 		src/server/free_server.c \
 		src/server/run_server.c \

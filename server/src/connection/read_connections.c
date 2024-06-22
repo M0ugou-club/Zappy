@@ -8,24 +8,6 @@
 #include "connection.h"
 #include "server.h"
 
-static bool action_setup(connection_t *conn)
-{
-    if (conn == NULL)
-        return true;
-    if (conn->buffer == NULL) {
-        conn->buffer = malloc(BUFFER_SIZE);
-        if (conn->buffer == NULL)
-            return true;
-        memset(conn->buffer, 0, BUFFER_SIZE);
-    } else {
-        conn->buffer = realloc(conn->buffer,
-            sizeof(conn->buffer) + BUFFER_SIZE);
-        if (conn->buffer == NULL)
-            return true;
-    }
-    return false;
-}
-
 static int strcount(const char *str, char c)
 {
     int count = 0;
@@ -39,16 +21,18 @@ static bool action(server_t *srv, connection_t *cli)
 {
     char tmp[BUFFER_SIZE];
     ssize_t ret;
+    player_t *ply = get_player_by_fd(srv->game->players, cli->fd);
 
-    if (action_setup(cli))
-        return false;
-    ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
+    ret = read(cli->fd, tmp, BUFFER_SIZE);
     if (ret <= 0) {
+        if (ply) {
+            broadcast_gui(srv, "pdi #%d\n", ply->id);
+            remove_player(&srv->game->players, cli->fd);
+        }
         remove_connection(&srv->cons, cli->fd);
         return true;
     }
-    tmp[ret] = '\0';
-    memcpy(cli->buffer + strlen(cli->buffer), tmp, ret);
+    cli->buffer = append_buffer(cli->buffer, tmp, &cli->buffer_size, ret);
     return false;
 }
 
@@ -71,7 +55,6 @@ static bool handshake(server_t *srv, char *team, connection_t *cl)
         queue_formatted_message(cl, " %d %d\n", srv->args->x, srv->args->y);
         return true;
     }
-    SEND_FD(cl->fd, "ko\n");
     return false;
 }
 
@@ -81,15 +64,18 @@ static bool read_team_internal(server_t *srv, char *tmp,
     if (handshake(srv, tmp, cli)) {
         cli->handshake_step = ESTABLISHED;
         cli->team = strdup(tmp);
-        if (strcmp(cli->team, "GRAPHIC") != 0) {
+        if (strcmp(cli->team, "GRAPHIC") == 0)
+            return true;
+        if (check_eggs(srv->game, cli->team)) {
             ply = spawn_player(srv->game, cli->team, cli->fd);
             broadcast_gui(srv, "pnw #%zu %d %d %d %d %s\n",
-                srv->game->players->id, ply->square->pos_x,
+                ply->id, ply->square->pos_x,
                 ply->square->pos_y, ply->direction, ply->level,
                 ply->team);
+            return true;
         }
-        return true;
     }
+    send_formatted_message(cli, "ko\n");
     remove_connection(&srv->cons, cli->fd);
     return false;
 }

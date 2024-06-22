@@ -16,7 +16,7 @@ const char *objects[] = {
     "phiras",
     "thystame"};
 
-static square_t *mv_distance(square_t *square, direction_t ori, int distance)
+static cell_t *mv_distance(cell_t *square, direction_t ori, int distance)
 {
     for (int i = 0; i < distance; i++) {
         if (ori == NORTH) {
@@ -35,7 +35,7 @@ static square_t *mv_distance(square_t *square, direction_t ori, int distance)
     return square;
 }
 
-static square_t *mv_gap(square_t *square, direction_t orientation, int gap)
+static cell_t *mv_gap(cell_t *square, direction_t orientation, int gap)
 {
     for (int i = 0; i < gap; i++) {
         if (orientation == NORTH) {
@@ -54,17 +54,17 @@ static square_t *mv_gap(square_t *square, direction_t orientation, int gap)
     return square;
 }
 
-static square_t *get_start(player_t *player, int cone_gap, int cone_distance)
+static cell_t *get_start(player_t *player, int cone_gap, int cone_distance)
 {
     direction_t orientation = player->direction;
-    square_t *square = player->square;
+    cell_t *square = player->square;
 
     square = mv_distance(square, orientation, cone_distance);
     square = mv_gap(square, orientation, cone_gap);
     return square;
 }
 
-int count_players_on_square(square_t *square, server_t *srv)
+int count_players_on_square(cell_t *square, server_t *srv)
 {
     player_t *players = srv->game->players;
     int players_count = 0;
@@ -88,7 +88,7 @@ static void append_items(char *response, int item_count, const char *item_name)
     }
 }
 
-char *get_square_content(square_t *square, server_t *srv)
+char *get_square_content(cell_t *square, server_t *srv)
 {
     static char response[1024];
     int players_count = count_players_on_square(square, srv);
@@ -107,7 +107,7 @@ char *get_square_content(square_t *square, server_t *srv)
     return response;
 }
 
-static square_t *move_square_widht(square_t *square, direction_t orientation)
+static cell_t *move_square_widht(cell_t *square, direction_t orientation)
 {
     if (orientation == NORTH)
         square = square->west;
@@ -120,11 +120,11 @@ static square_t *move_square_widht(square_t *square, direction_t orientation)
     return square;
 }
 
-char *get_ln_squa(player_t *p, int cn_width, square_t *sq_start, server_t *srv)
+char *get_ln_squa(player_t *p, int cn_width, cell_t *sq_start, server_t *srv)
 {
     static char response[1024];
     direction_t orientation = p->direction;
-    square_t *square = sq_start;
+    cell_t *square = sq_start;
 
     strcpy(response, "");
     for (int i = 0; i < cn_width; i++) {
@@ -146,7 +146,7 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
     int cone_width = 3;
     int cone_gap = 1;
     int cone_distance = 1;
-    square_t *start_line = NULL;
+    cell_t *start_line = NULL;
 
     strcpy(response, "[");
     strcat(response, get_square_content(player->square, srv));

@@ -7,7 +7,7 @@
 
 #include "game.h"
 
-static void free_eggs(square_t *square)
+static void free_eggs(cell_t *square)
 {
     int idx = 0;
 

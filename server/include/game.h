@@ -14,6 +14,8 @@
     #include <string.h>
 
     #define EAT_TIME 126.0f
+    #define INCANTATION_TIME 300.0f
+    #define REFILL_TIME 20.0f
 
 typedef enum direction_e {
     NORTH = 1,
@@ -23,13 +25,13 @@ typedef enum direction_e {
 } direction_t;
 
 typedef enum item_e {
+    FOOD,
     LINEMATE,
     DERAUMERE,
     SIBUR,
     MENDIANE,
     PHIRAS,
     THYSTAME,
-    FOOD,
     NONE
 } item_t;
 
@@ -42,27 +44,28 @@ typedef struct egg_s {
     size_t id;
 } egg_t;
 
-typedef struct square_s {
+typedef struct cell_s {
     egg_t **eggs;
-    int items[NONE];
+    unsigned int items[NONE];
     int pos_x;
     int pos_y;
-    struct square_s *north;
-    struct square_s *south;
-    struct square_s *east;
-    struct square_s *west;
-} square_t;
+    bool updated;
+    struct cell_s *north;
+    struct cell_s *south;
+    struct cell_s *east;
+    struct cell_s *west;
+} cell_t;
 
 typedef struct player_s {
     size_t id;
     char *team;
-    square_t *square;
+    cell_t *square;
     direction_t direction;
-    time_t action_cooldown;
+    struct timeval action_cooldown;
     size_t level;
     unsigned int inventory[NONE];
     int fd;
-    time_t last_eat;
+    struct timeval eat_cooldown;
     bool disconnect;
     bool incantation;
     struct player_s *next;
@@ -72,18 +75,17 @@ typedef struct game_s {
     int map_x;
     int map_y;
     max_items_t *max_items;
-    square_t **map;
+    cell_t **map;
     player_t *players;
+    struct timeval refill_cooldown;
     int max_players;
     char **teams;
     int *team_slots;
-    time_t time_elapsed;
-    ssize_t tick;
 } game_t;
 
-void add_egg(square_t *square, char *team_name);
-void del_egg(square_t *square, char *team_name);
-bool check_egg(square_t *square, char *team_name);
+void add_egg(cell_t *square, char *team_name);
+void del_egg(cell_t *square, char *team_name);
+bool check_egg(cell_t *square, char *team_name);
 bool check_eggs(game_t *game, char *team_name);
 
 void free_game(game_t *game);
@@ -92,7 +94,7 @@ bool team_exists(char **teams, char *team);
 
 player_t *new_player(char *team_name);
 player_t *add_player(player_t *player, player_t *new_player);
-void remove_player(player_t **player, player_t *to_remove);
+void remove_player(player_t **players, int sockfd);
 player_t *spawn_player(game_t *game, char *team, int fd);
 
 #endif /* !GAME_H_ */

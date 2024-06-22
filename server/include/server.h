@@ -20,8 +20,6 @@
     #define CMD_SUCCESS "ok\n"
     #define CMD_ERROR "ko\n"
 
-    #define CALC_TIME(delay) (delay) * 1000
-
     #include <unistd.h>
     #include <stdlib.h>
     #include <string.h>
@@ -39,7 +37,8 @@
     #include "game.h"
 
 int get_array_size(char **arr);
-long get_time(void);
+bool time_passed(struct timeval *tv);
+void set_cooldown(struct timeval *tv, float time);
 
 typedef struct args_s {
     size_t port;
@@ -92,6 +91,11 @@ typedef struct command_regex_s {
     void (*func)(server_t *srv, connection_t *cl, regex_parse_t *parse);
 } command_regex_t;
 
+char *append_buffer(char *dst, char src[BUFFER_SIZE],
+    size_t *dst_len, size_t src_len);
+char *slice_buffer(char **buffer, size_t *buffer_size, size_t bytes);
+char *get_packet(char **buffer, size_t *buffer_size);
+
 void build_sets(server_t *srv, connection_t *conn);
 connection_t *get_client_by_fd(connection_t *cl, int sockfd);
 void remove_connection(connection_t **cl, int sockfd);
@@ -117,6 +121,7 @@ void place_eggs(game_t *game, args_t *args);
 void place_items_randomly(game_t *game, args_t *args);
 
 game_t *init_game(int x, int y, char **teams, args_t *args);
+void refill_map(server_t *srv);
 void game_tick(server_t *srv);
 
 player_t *get_player_by_fd(player_t *players, int fd);

@@ -9,7 +9,7 @@
 
 void bct(server_t *srv, connection_t *cl, int x, int y)
 {
-    square_t square = srv->game->map[x][y];
+    cell_t square = srv->game->map[x][y];
 
     queue_formatted_message(cl, "bct %d %d %d %d %d %d %d %d %d\n", x, y,
         square.items[0], square.items[1], square.items[2],

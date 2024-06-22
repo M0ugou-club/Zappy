@@ -11,7 +11,7 @@ static bool is_egg(game_t *game, int x, int y, player_t *n_player)
 {
     if (game->map[x][y].eggs == NULL)
         return false;
-    for (int i = 0; game->map[x][y].eggs[i]->id != -1; i++) {
+    for (int i = 0; game->map[x][y].eggs[i]; i++) {
         if (strcmp(game->map[x][y].eggs[i]->team, n_player->team) == 0) {
             n_player->square = &game->map[x][y];
             del_egg(&game->map[x][y], n_player->team);
