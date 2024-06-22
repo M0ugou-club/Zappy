@@ -167,9 +167,8 @@ void cmd_broadcast(server_t *srv, connection_t *cl, regex_parse_t *parse)
     }
     while (player != NULL) {
         direction = get_direction(player, player_connected, game);
-        if (player->fd != cl->fd) {
+        if (player->fd != cl->fd)
             send_msg(srv, player, object, direction);
-        }
         player = player->next;
     }
     queue_formatted_message(cl, "ok\n");
