@@ -28,7 +28,7 @@ class Player:
         self.machine = machine
         self.port = port
         self.socket = socket.socket()
-        self.survival = True
+        self.survival = False
         self.is_incanting = False
         self.player_ready = 1
         self.step = 0
@@ -156,18 +156,19 @@ class Player:
 
     def interpret_incantation(self, response : str) -> None:
         '''interpret the incantation response'''
+        print(bcolors.WARNING + "GG MON GRAS !!!" + bcolors.ENDC)
         response = response.split(": ")
         self.is_incanting = False
         self.level = int(response[1])
         self.player_ready = 1
+        if (self.nbr_connect == 0):
+            self.fork()
 
 
     def incantation(self) -> None:
         '''incantation'''
         self.messages_queue.append("Incantation\n")
         self.connect_nbr()
-        if (self.nbr_connect == 0):
-            self.fork()
 
 
     def broadcast(self, message : str) -> None:
@@ -266,20 +267,10 @@ class Player:
         '''take the item in the tile'''
         for item in searching_item:
             nbr = self.count_item(tile, item)
-            nbr = self.count_item(tile, item)
             if item in tile:
                 for _ in range(nbr):
                     print(bcolors.OKCYAN + f"Player {self.team} is taking {item}" + bcolors.ENDC)
                     self.take(item)
-
-
-    def how_many_food(self, tile : list) -> int:
-        '''count the food in the tile'''
-        count = 0
-        for i in range(len(tile)):
-            if tile[i] == 'food':
-                count += 1
-        return count
 
 
     def get_correct_tile(self, searching_item : list) -> tuple[int, list]:
@@ -288,8 +279,8 @@ class Player:
             food_count = 0
             index = 0
             for i in range(len(self.looked)):
-                if self.how_many_food(self.looked[i]) > food_count:
-                    food_count = self.how_many_food(self.looked[i])
+                if self.count_item(self.looked[i], "food") > food_count:
+                    food_count = self.count_item(self.looked[i], "food")
                     index = i
             if food_count > 0:
                 return index, self.looked[index]
@@ -360,6 +351,9 @@ class Player:
 
     def receive_broadcast(self, message_received) -> None:
         '''receive the broadcast'''
+        if self.survival:
+            print(bcolors.FAIL + "NAN MAIS OHHHHHHHHHHHHHHHH" + bcolors.UNDERLINE + bcolors.ENDC)
+            return
         direction = message_received.split(", ")[0].split(" ")[1]
         message = message_received.split(", ")[1]
         if not message.startswith(self.team):
@@ -368,8 +362,6 @@ class Player:
         lvl = int(message.split("??")[1])
         if ordre.startswith("ON;EVOLUE;OUUU;??") and lvl == self.level:
             self.messages_queue = []
-            if self.inventory['food'] < 6:
-                return
             self.go_to_direction(int(direction))
             self.step = 0
         if ordre.startswith("chui;pret;mon;gars??") and lvl == self.level:
@@ -410,6 +402,10 @@ class Player:
     def get_action(self) -> None:
         '''get the action'''
         if self.inventory['food'] < 6:
+            self.survival = True
+        if self.survival:
+            if self.inventory['food'] >= 15:
+                self.survival = False
             print(bcolors.FAIL + "Player is starving" + bcolors.ENDC)
             self.is_incanting = False
             self.search_object(['food'])
@@ -436,12 +432,13 @@ class Player:
             elif reponse.startswith("[ player"):
                 self.interpret_look(reponse)
             elif reponse.startswith("message "):
-                print(bcolors.OKPINK + f"MAMAMAMAMIAAAAAAAAAAAAAAAAA" + bcolors.ENDC)
                 self.receive_broadcast(reponse)
             elif reponse.isnumeric():
                 self.nbr_connect = int(reponse)
             elif reponse.startswith("Current level: "):
                 self.interpret_incantation(reponse)
+            elif reponse.startswith("ko"):
+                self.is_incanting = False
 
 
     def handle_server_sending(self) -> None:
