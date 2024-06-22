@@ -9,8 +9,8 @@
 
 void tna(server_t *srv, connection_t *cl)
 {
-    for (int i = 0; srv->game->teams[i]; i++) {
-        queue_formatted_message(cl, "tna %s\n", srv->game->teams[i]);
+    for (int i = 0; srv->args->teams[i]; i++) {
+        queue_formatted_message(cl, "tna %s\n", srv->args->teams[i]);
     }
 }
 

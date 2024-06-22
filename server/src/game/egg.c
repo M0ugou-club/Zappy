@@ -54,7 +54,6 @@ void del_egg(square_t *square, char *team_name)
         return;
     for (i = 0; square->eggs[i]; i++) {
         if (strcmp(square->eggs[i]->team, team_name) == 0) {
-            free(square->eggs[i]->team);
             square->eggs[i] = NULL;
             break;
         }

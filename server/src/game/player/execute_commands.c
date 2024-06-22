@@ -71,6 +71,8 @@ void execute_ai_commands(server_t *srv)
         if (!time_passed(&tmp->action_cooldown))
             continue;
         cl = get_client_by_fd(srv->cons, tmp->fd);
+        if (!cl)
+            continue;
         cmd = player_dequeue(cl);
         if (!cmd)
             continue;
@@ -83,7 +85,6 @@ void player_enqueue(connection_t *cl, char *cmd)
 {
     if (cl->queue_size >= MAX_COMMAND_QUEUE)
         return;
-    printf("enqueueing: \"%s\"\n", cmd);
     cl->command_queue[cl->queue_size] = strdup(cmd);
     cl->queue_size++;
 }

@@ -81,6 +81,9 @@ void run_server(server_t *srv)
     int i = 0;
 
     printf("Server started on port %zu\n", srv->args->port);
+    puts("Teams are:");
+    for (int i = 0; srv->args->teams[i]; i++)
+        printf("  - %s\n", srv->args->teams[i]);
     while (!srv->close) {
         build_sets(srv, srv->cons);
         select_ret = select(get_max_fd(srv) + 1, srv->readfds,

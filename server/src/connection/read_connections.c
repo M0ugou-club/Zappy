@@ -21,9 +21,14 @@ static bool action(server_t *srv, connection_t *cli)
 {
     char tmp[BUFFER_SIZE];
     ssize_t ret;
+    player_t *ply = get_player_by_fd(srv->game->players, cli->fd);
 
     ret = read(cli->fd, tmp, BUFFER_SIZE);
     if (ret <= 0) {
+        if (ply) {
+            broadcast_gui(srv, "pdi #%d\n", ply->id);
+            remove_player(&srv->game->players, cli->fd);
+        }
         remove_connection(&srv->cons, cli->fd);
         return true;
     }
