@@ -48,21 +48,24 @@ static int count_items(game_t *game, int i)
     return count;
 }
 
+static void broadcast_updated_cell(server_t *srv, cell_t *cell)
+{
+    if (cell->updated == true) {
+        broadcast_gui(srv, "bct %d %d %d %d %d %d %d %d %d\n",
+        cell->pos_x, cell->pos_y,
+        cell->items[0], cell->items[1],
+        cell->items[2], cell->items[3],
+        cell->items[4], cell->items[5],
+        cell->items[6]);
+        cell->updated = false;
+    }
+}
+
 static void broadcast_updated_cells(server_t *srv)
 {
-    for (int x = 0; x < srv->game->map_x; x++) {
-        for (int y = 0; y < srv->game->map_y; y++) {
-            if (srv->game->map[x][y].updated == true) {
-                broadcast_gui(srv, "bct %d %d %d %d %d %d %d %d %d\n", x, y,
-                srv->game->map[x][y].items[0], srv->game->map[x][y].items[1],
-                srv->game->map[x][y].items[2], srv->game->map[x][y].items[3],
-                srv->game->map[x][y].items[4], srv->game->map[x][y].items[5],
-                srv->game->map[x][y].items[6]);
-                srv->game->map[x][y].updated = false;
-            }
-        }
-    }
-
+    for (int x = 0; x < srv->game->map_x; x++)
+        for (int y = 0; y < srv->game->map_y; y++)
+            broadcast_updated_cell(srv, &srv->game->map[x][y]);
 }
 
 void refill_map(server_t *srv)
