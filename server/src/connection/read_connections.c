@@ -8,24 +8,6 @@
 #include "connection.h"
 #include "server.h"
 
-static bool action_setup(connection_t *conn)
-{
-    if (conn == NULL)
-        return true;
-    if (conn->buffer == NULL) {
-        conn->buffer = malloc(BUFFER_SIZE);
-        if (conn->buffer == NULL)
-            return true;
-        memset(conn->buffer, 0, BUFFER_SIZE);
-    } else {
-        conn->buffer = realloc(conn->buffer,
-            sizeof(conn->buffer) + BUFFER_SIZE);
-        if (conn->buffer == NULL)
-            return true;
-    }
-    return false;
-}
-
 static int strcount(const char *str, char c)
 {
     int count = 0;
@@ -40,15 +22,12 @@ static bool action(server_t *srv, connection_t *cli)
     char tmp[BUFFER_SIZE];
     ssize_t ret;
 
-    if (action_setup(cli))
-        return false;
-    ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
+    ret = read(cli->fd, tmp, BUFFER_SIZE);
     if (ret <= 0) {
         remove_connection(&srv->cons, cli->fd);
         return true;
     }
-    tmp[ret] = '\0';
-    memcpy(cli->buffer + strlen(cli->buffer), tmp, ret);
+    cli->buffer = append_buffer(cli->buffer, tmp, &cli->buffer_size, ret);
     return false;
 }
 
@@ -71,7 +50,6 @@ static bool handshake(server_t *srv, char *team, connection_t *cl)
         queue_formatted_message(cl, " %d %d\n", srv->args->x, srv->args->y);
         return true;
     }
-    SEND_FD(cl->fd, "ko\n");
     return false;
 }
 

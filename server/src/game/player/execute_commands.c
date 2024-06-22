@@ -28,14 +28,13 @@ static char *player_dequeue(connection_t *cl)
 {
     char *cmd = NULL;
 
-    if (!cl->command_queue[0])
+    if (cl->queue_size == 0)
         return NULL;
-    cmd = strdup(cl->command_queue[0]);
-    free(cl->command_queue[0]);
-    for (int i = 0; i < MAX_COMMAND_QUEUE - 1; i++) {
+    cmd = cl->command_queue[0];
+    for (int i = 0; i < cl->queue_size - 1; i++) {
         cl->command_queue[i] = cl->command_queue[i + 1];
     }
-    cl->command_queue[MAX_COMMAND_QUEUE - 1] = NULL;
+    cl->queue_size--;
     return cmd;
 }
 
@@ -80,24 +79,11 @@ void execute_ai_commands(server_t *srv)
     }
 }
 
-static int queue_item_count(connection_t *cl)
-{
-    int count = 0;
-
-    while (cl->command_queue[count] && count < MAX_COMMAND_QUEUE) {
-        count++;
-    }
-    return count;
-}
-
 void player_enqueue(connection_t *cl, char *cmd)
 {
-    if (queue_item_count(cl) >= MAX_COMMAND_QUEUE)
+    if (cl->queue_size >= MAX_COMMAND_QUEUE)
         return;
-    for (int i = 0; i < MAX_COMMAND_QUEUE; i++) {
-        if (!cl->command_queue[i]) {
-            cl->command_queue[i] = strdup(cmd);
-            break;
-        }
-    }
+    printf("enqueueing: \"%s\"\n", cmd);
+    cl->command_queue[cl->queue_size] = strdup(cmd);
+    cl->queue_size++;
 }

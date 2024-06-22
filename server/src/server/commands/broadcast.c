@@ -172,6 +172,7 @@ void cmd_broadcast(server_t *srv, connection_t *cl, regex_parse_t *parse)
         }
         player = player->next;
     }
-    broadcast_gui(srv, "pbc #%d %s\n", player->id, object);
+    queue_formatted_message(cl, "ok\n");
+    broadcast_gui(srv, "pbc #%d %s\n", player_connected->id, object);
     free(object);
 }

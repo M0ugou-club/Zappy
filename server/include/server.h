@@ -93,6 +93,11 @@ typedef struct command_regex_s {
     void (*func)(server_t *srv, connection_t *cl, regex_parse_t *parse);
 } command_regex_t;
 
+char *append_buffer(char *dst, char src[BUFFER_SIZE],
+    size_t *dst_len, size_t src_len);
+char *slice_buffer(char **buffer, size_t *buffer_size, size_t bytes);
+char *get_packet(char **buffer, size_t *buffer_size);
+
 void build_sets(server_t *srv, connection_t *conn);
 connection_t *get_client_by_fd(connection_t *cl, int sockfd);
 void remove_connection(connection_t **cl, int sockfd);

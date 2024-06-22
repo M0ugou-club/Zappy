@@ -63,7 +63,8 @@ void del_egg(square_t *square, char *team_name)
     for (int j = i; square->eggs[j]; j++) {
         square->eggs[j] = square->eggs[j + 1];
     }
-    square->eggs = realloc(square->eggs, sizeof(egg_t *) * (nb_eggs));
+    if (nb_eggs)
+        square->eggs = realloc(square->eggs, sizeof(egg_t *) * (nb_eggs));
 }
 
 bool check_egg(square_t *square, char *team_name)

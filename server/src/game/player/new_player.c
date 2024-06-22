@@ -24,7 +24,7 @@ player_t *new_player(char *team_name)
     player->next = NULL;
     player->disconnect = false;
     player->incantation = false;
-    memset(player->inventory, 0, 7);
+    memset(player->inventory, 0, NONE * sizeof(int));
     player->inventory[FOOD] = 10;
     memset(&player->action_cooldown, 0, sizeof(struct timeval));
     memset(&player->eat_cooldown, 0, sizeof(struct timeval));
