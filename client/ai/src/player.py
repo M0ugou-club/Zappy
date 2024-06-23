@@ -131,7 +131,8 @@ class Player:
             for message in messages:
                 if "message" in message:
                     self.broadcasts.append(message)
-                    self.receive()
+                    if not message[-1] == '\n':
+                        self.receive()
                 elif "dead" in message:
                     self.disconnect(0)
                 else:
