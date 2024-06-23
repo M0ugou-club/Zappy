@@ -149,12 +149,15 @@ char *look(server_t *srv, connection_t *cl, player_t *player, char *resp)
     char *li_cont = NULL;
 
     resp = begin_response(resp, player->square, srv);
+    printf("resp: %s\n", resp);
     for (int i = 1; i <= player->level; i++) {
         start_line = get_start(player, cone_gap, cone_distance);
         add_to_string(resp, ",");
+        printf("resp2: %s\n", resp);
         if (start_line != NULL) {
             li_cont = get_ln_squa(player, cone_width, start_line, srv);
             resp = add_to_string(resp, li_cont);
+            printf("resp3: %s\n", resp);
             free(li_cont);
         }
         add_vals(&cone_width, &cone_gap, &cone_distance);
@@ -170,7 +173,7 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     if (player == NULL)
         return;
-    resp = malloc(2);
+    resp = malloc(2 * sizeof(char));
     resp = strcpy(resp, "[");
     resp = look(srv, cl, player, resp);
     queue_formatted_message(cl, resp);
