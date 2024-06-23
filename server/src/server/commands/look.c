@@ -134,6 +134,7 @@ char *begin_response(char *resp, cell_t *square, server_t *srv)
 {
     char *sq_cont = get_square_content(square, srv);
 
+    printf("sq_cont: %s\n", sq_cont);
     resp = realloc(resp, strlen(resp) + strlen(sq_cont) + 1);
     strcat(resp, sq_cont);
     free(sq_cont);
