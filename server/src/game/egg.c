@@ -45,6 +45,13 @@ void add_egg(cell_t *square, char *team_name)
     id++;
 }
 
+static void move_square(cell_t *square, int i)
+{
+    for (int j = i; square->eggs[j]; j++) {
+        square->eggs[j] = square->eggs[j + 1];
+    }
+}
+
 void del_egg(cell_t *square, char *team_name)
 {
     if (!check_egg(square, team_name)) {
@@ -54,9 +61,7 @@ void del_egg(cell_t *square, char *team_name)
     for (int i = 0; square->eggs[i]; i++) {
         if (strcmp(square->eggs[i]->team, team_name) == 0) {
             free(square->eggs[i]);
-            for (int j = i; square->eggs[j]; j++) {
-                square->eggs[j] = square->eggs[j + 1];
-            }
+            move_square(square, i);
             break;
         }
     }
