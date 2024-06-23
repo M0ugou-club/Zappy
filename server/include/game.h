@@ -18,10 +18,10 @@
     #define REFILL_TIME 20.0f
 
 typedef enum direction_e {
-    NORTH = 1,
-    EAST = 2,
-    SOUTH = 3,
-    WEST = 4
+    NORTH = 0,
+    EAST = 1,
+    SOUTH = 2,
+    WEST = 3
 } direction_t;
 
 typedef enum item_e {

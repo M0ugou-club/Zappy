@@ -32,14 +32,13 @@ class Player:
         self.machine = machine
         self.port = port
         self.socket = socket.socket()
-        self.survival = False
-        self.is_incanting = False
         self.player_ready = 1
-        self.step = 0
         self.action = 0
         self.team_mates = 0
         self.mtopt = False
+        self.mode: Player.Mode = Player.Mode.EXPEDITION
         self.nbr_connect = 0
+        self.broadcasts = []
         self.inventory = {
             'food': 10,
             'linemate': 0,
@@ -50,6 +49,12 @@ class Player:
             'thystame': 0
         }
         self.looked = []
+
+
+    class Mode:
+        SURVIVAL = 0
+        WAITING = 1
+        EXPEDITION = 2
 
 
     LEVEL_REQUIREMENTS = {
@@ -113,99 +118,123 @@ class Player:
         lambda self: (self.right(), self.forward(), self.left(), self.forward())
     ]
 
-    messages_queue = []
-
 
     ##IPC functions
 
+    def receive(self, checks: bool = True) -> str:
+        print("I RECEIVE SOMETHING")
+        msg = self.socket.recv(1024).decode()
+        if not msg.endswith("\n"):
+            msg += self.receive()
+        if checks:
+            messages = msg.split("\n")
+            for message in messages:
+                if "message" in message:
+                    self.broadcasts.append(message)
+                    if not message[-1] == '\n':
+                        self.receive()
+                elif "dead" in message:
+                    self.disconnect(0)
+                else:
+                    return message
+        return msg
+
+
     def forward(self) -> None:
         '''move forward'''
-        self.messages_queue.append("Forward\n")
+        print(bcolors.OKGREEN + "Player is moving forward" + bcolors.ENDC)
+        self.socket.sendall("Forward\n".encode())
+        ok = self.receive()
 
 
     def right(self) -> None:
         '''turn right'''
-        self.messages_queue.append("Right\n")
+        print(bcolors.OKGREEN + "Player is turning right" + bcolors.ENDC)
+        self.socket.sendall("Right\n".encode())
+        ok = self.receive()
 
 
     def left(self) -> None:
         '''turn left'''
-        self.messages_queue.append("Left\n")
+        print(bcolors.OKGREEN + "Player is turning left" + bcolors.ENDC)
+        self.socket.sendall("Left\n".encode())
+        ok = self.receive()
 
 
     def take(self, object : str) -> None:
         '''take object'''
-        self.messages_queue.append(f"Take {object}\n")
-        self.step = 0
+        self.socket.sendall(f"Take {object}\n".encode())
+        ok = self.receive()
+        self.get_inventory()
 
 
-    def interpret_look(self, response : str) -> None:
-        '''interpret the look response'''
-        response = response[1:-1]
+    def look(self) -> None:
+        '''look around the player'''
+        self.socket.sendall("Look\n".encode())
+        res = self.receive()
+        response = res[1:-1]
         response = response.split(',')
         response = [cell.strip() for cell in response]
         self.looked = [cell.split(' ') for cell in response]
 
 
-    def look(self) -> None:
-        '''look around the player'''
-        response = self.messages_queue.append("Look\n")
-
-
-    def interpret_incantation(self, response : str) -> None:
-        '''interpret the incantation response'''
-        print(bcolors.WARNING + "GG MON GRAS !!!" + bcolors.ENDC)
-        response = response.split(": ")
-        self.is_incanting = False
-        self.level = int(response[1])
-        self.player_ready = 1
-        if self.nbr_connect == 0:
-            self.fork()
-
-
     def incantation(self) -> None:
         '''incantation'''
-        self.messages_queue.append("Incantation\n")
-        self.connect_nbr()
+        self.socket.sendall("Incantation\n".encode())
+        res = self.receive()
+        if "Elevation underway" in res:
+            res = self.receive()
+            if "Current level" in res:
+                self.level += 1
+                self.mode = self.Mode.EXPEDITION
+                if self.connect_nbr() <= 0:
+                    self.fork()
+        self.player_ready = 1
 
 
     def broadcast(self, message : str) -> None:
         '''broadcast a message'''
-        self.messages_queue.append(f"Broadcast {message}\n")
+        self.socket.sendall(f"Broadcast {message}\n".encode())
+        ok = self.receive()
 
 
-    def connect_nbr(self) -> None:
+    def connect_nbr(self) -> int:
         '''connect the player'''
-        self.messages_queue.append("Connect_nbr\n")
+        self.socket.sendall("Connect_nbr\n".encode())
+        ok: str = self.receive()
+        if not ok.isnumeric():
+            return -1
+        return int(ok)
 
 
     def fork(self) -> None:
         '''fork the player'''
-        self.messages_queue.append("Fork\n")
+        self.socket.sendall("Fork\n".encode())
+        ok = self.receive()
 
 
     def eject(self) -> None:
         '''eject the player'''
-        self.messages_queue.append("Eject\n")
+        self.socket.sendall("Eject\n".encode())
+        ok = self.receive()
 
 
     def set_object(self, object : str) -> None:
         '''set object'''
-        self.messages_queue.append(f"Set {object}\n")
-
-
-    def interpret_inventory(self, response : str) -> None:
-        '''interpret the inventory response'''
-        response = response[1:-1]
-        response = ' '.join(response.split())
-        response = response.replace(" ,", ",").replace(", ", ",")
-        response = response.replace(" ", "=")
-        self.inventory.update(eval(f"dict({response})"))
+        self.socket.sendall(f"Set {object}\n".encode())
+        ok = self.receive()
+        self.get_inventory()
 
 
     def get_inventory(self) -> None:
         '''get the inventory'''
-        self.messages_queue.append("Inventory\n")
+        self.socket.sendall("Inventory\n".encode())
+        res = self.receive().strip()
+        res = res[1:-1]
+        res = ' '.join(res.split())
+        res = res.replace(" ,", ",").replace(", ", ",").replace(",,", ",").strip(",")
+        res = res.replace(" ", "=")
+        self.inventory.update(eval(f"dict({res})"))
 
 
     ##AI functions
@@ -217,7 +246,7 @@ class Player:
             return
         if direction == 0:
             self.broadcast(self.team + ":chui;pret;mon;gars??" + str(self.level))
-            self.is_incanting = True
+            self.mode = self.Mode.WAITING
             return
         self.MOVEMENTS_DIRECTION[direction - 1](self)
 
@@ -286,12 +315,15 @@ class Player:
 
     def search_object(self, searching_item : list) -> None:
         '''search the object in the tile'''
+        print(bcolors.OKGREEN + f"Player is looking for f{self.looked}" + bcolors.ENDC)
+        self.look()
+        print(self.looked)
         correct_tile = self.get_correct_tile(searching_item)
+        print(correct_tile)
         if correct_tile:
             self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
-        else :
+        else:
             self.go_to_direction(random.randint(1, 8))
-            self.step = 0
 
 
     def check_requirements(self, requirements: dict) -> int:
@@ -320,9 +352,6 @@ class Player:
 
     def receive_broadcast(self, message_received) -> None:
         '''receive the broadcast'''
-        if self.survival:
-            print(bcolors.FAIL + "NAN MAIS OHHHHHHHHHHHHHHHH" + bcolors.UNDERLINE + bcolors.ENDC)
-            return
         direction = message_received.split(", ")[0].split(" ")[1]
         message = message_received.split(", ")[1]
         if not message.startswith(self.team):
@@ -330,10 +359,7 @@ class Player:
         ordre = message.split(":")[1]
         lvl = int(message.split("??")[1])
         if ordre.startswith("ON;EVOLUE;OUUU;??") and lvl == self.level:
-            print(bcolors.OKBLUE + "MAMAMIAAAAAAAAAAAAAAAAAAAAA" + bcolors.ENDC)
-            self.messages_queue = []
             self.go_to_direction(int(direction))
-            self.step = 0
         if ordre.startswith("chui;pret;mon;gars??") and lvl == self.level:
             self.player_ready += 1
 
@@ -359,76 +385,34 @@ class Player:
             print(bcolors.WARNING + "INCANTATION" + bcolors.ENDC)
             self.put_requirements(self.LEVEL_REQUIREMENTS[self.level])
             self.incantation()
-            self.step = 0
             return
         elif self.action == 1:
             self.search_object(self.what_i_need(self.LEVEL_REQUIREMENTS[self.level]))
             return
         elif self.action == 2:
             self.call_teammates()
-            self.step = 0
             return
+
 
     def get_action(self) -> None:
         '''get the action'''
+        self.get_inventory()
         if self.inventory['food'] < 6:
-            self.survival = True
-        if self.survival:
+            self.mode = self.Mode.SURVIVAL
+            self.player_ready = 1
+        if self.mode == self.Mode.SURVIVAL:
             if self.inventory['food'] >= 15:
-                self.survival = False
+                self.mode = self.Mode.EXPEDITION
             print(bcolors.FAIL + "Player is starving" + bcolors.ENDC)
-            self.is_incanting = False
             self.search_object(['food'])
             return
-        if self.is_incanting:
-            self.messages_queue = []
-            return
-        else:
+        if (self.broadcasts):
+            self.receive_broadcast(self.broadcasts[-1])
+            self.broadcasts.clear()
+        if self.mode == self.Mode.EXPEDITION:
             self.action = self.check_requirements(self.LEVEL_REQUIREMENTS[self.level])
             self.incantation_gestion()
-            return
 
-
-    def handle_server_response(self) -> None:
-        '''Handle incoming server messages'''
-        response = self.socket.recv(1024).decode()
-        responses = response.split("\n")
-        for reponse in responses:
-            if reponse.startswith("dead"):
-                print(bcolors.FAIL + "Player is dead" + bcolors.ENDC)
-                self.disconnect(int(42))
-            elif reponse.startswith("[ food") or reponse.startswith("[food"):
-                self.interpret_inventory(reponse)
-            elif reponse.startswith("[ player") or reponse.startswith("[player"):
-                self.interpret_look(reponse)
-            elif reponse.startswith("message "):
-                self.receive_broadcast(reponse)
-            elif reponse.isnumeric():
-                self.nbr_connect = int(reponse)
-            elif reponse.startswith("Current level: "):
-                self.interpret_incantation(reponse)
-            elif reponse.startswith("ko"):
-                self.is_incanting = False
-
-
-    def handle_server_sending(self) -> None:
-        '''Handle sending messages to the server'''
-        if self.step == 0:
-            if self.messages_queue:
-                sleep(1)
-                print(bcolors.OKYELLOW + f"Player is sending {self.messages_queue[0]}" + bcolors.ENDC)
-                self.socket.sendall(self.messages_queue[0].encode())
-                self.messages_queue.pop(0)
-                return
-            else:
-                print(bcolors.FAIL + "Player is looking" + bcolors.ENDC)
-                self.socket.sendall("Inventory\n".encode())
-                self.socket.sendall("Look\n".encode())
-                self.step = 1
-                return
-        elif self.step == 1:
-            self.get_action()
-            return
 
     def run(self) -> None:
         '''run the player'''
@@ -436,10 +420,7 @@ class Player:
             print(bcolors.OKBLUE + f"Player {self.team} is lvl {self.level}" + bcolors.ENDC)
             if self.socket.fileno() == -1:
                 self.disconnect(2)
-            _, ready_to_write, _ = select.select([], [self.socket], [], 1)
-            if ready_to_write:
-                self.handle_server_sending()
-            self.handle_server_response()
+            self.get_action()
 
 
     def connect(self) -> None:
@@ -448,11 +429,11 @@ class Player:
             self.socket.connect((self.machine, int(self.port)))
         except socket.error as e:
             return
-        reponsed = self.socket.recv(1024).decode()
+        reponsed = self.receive(False)
         print(bcolors.OKBLUE + f"Received message: {reponsed}" + bcolors.ENDC)
         while True:
             self.socket.sendall((self.team + "\n").encode())
-            response = self.socket.recv(1024).decode()
+            response = self.receive(False)
             print(bcolors.OKBLUE + f"Received message: {response}" + bcolors.ENDC)
             if not response:
                 continue

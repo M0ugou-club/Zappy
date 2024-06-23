@@ -62,6 +62,7 @@ void World::parsePacket(std::string packet)
         }},
         {"pdi #?(\\d+)$", [this](std::vector<std::string> args) {
             removePlayer(std::stoi(args[0]));
+            _chat.sendMessage(args[0] + " starved to death", raylib::Color::Red());
         }},
         {"bct (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\d+)$", [this](std::vector<std::string> args) {
             raylib::Vector2 pos = {(float)std::stoi(args[0]), (float)std::stoi(args[1])};

@@ -44,6 +44,7 @@ void cmd_take(server_t *srv, connection_t *cl, regex_parse_t *parse)
         player->inventory[object_val] += 1;
         queue_formatted_message(cl, "ok\n");
     } else {
+        printf("Player %ld failed to take object %s\n", player->id, item);
         queue_formatted_message(cl, "ko\n");
     }
     broadcast_gui(srv, "pgt %d %d\n", player->id, object_val);
@@ -68,6 +69,7 @@ void cmd_set(server_t *srv, connection_t *cl, regex_parse_t *parse)
         player->square->items[object_val] += 1;
         queue_formatted_message(cl, "ok\n");
     } else {
+        printf("Player %ld failed to set object %s\n", player->id, object);
         queue_formatted_message(cl, "ko\n");
     }
     broadcast_gui(srv, "pdr %d %d\n", player->id, object_val);
