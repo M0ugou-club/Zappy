@@ -12,7 +12,10 @@
 
 char *add_to_string(char *resp, char *li_cont)
 {
-    resp = realloc(resp, strlen(resp) + strlen(li_cont) + 1);
+    if (resp == NULL)
+        resp = strdup("[");
+    else
+        resp = realloc(resp, strlen(resp) + strlen(li_cont) + 1);
     strcat(resp, li_cont);
     return resp;
 }
