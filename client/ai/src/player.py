@@ -326,6 +326,8 @@ class Player:
         '''receive the broadcast'''
         if self.survival:
             return
+        if self.inventory['food'] < 6:
+            return
         direction = message_received.split(", ")[0].split(" ")[1]
         message = message_received.split(", ")[1]
         if not message.startswith(self.team):
