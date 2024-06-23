@@ -12,7 +12,6 @@ static bool remove_first(connection_t **cl, int sockfd, connection_t *tmp)
     if (tmp != NULL && tmp->fd == sockfd) {
         *cl = tmp->next;
         close(tmp->fd);
-        free(tmp->team);
         free(tmp->buffer);
         free(tmp->send_queue);
         free(tmp);
