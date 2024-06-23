@@ -32,11 +32,11 @@ class Player:
         self.machine = machine
         self.port = port
         self.socket = socket.socket()
-        self.survival = False
         self.player_ready = 1
         self.action = 0
         self.team_mates = 0
         self.mtopt = False
+        self.mode: Player.Mode = Player.Mode.EXPEDITION
         self.nbr_connect = 0
         self.broadcasts = []
         self.inventory = {
@@ -49,6 +49,12 @@ class Player:
             'thystame': 0
         }
         self.looked = []
+
+
+    class Mode:
+        SURVIVAL = 0
+        WAITING = 1
+        EXPEDITION = 2
 
 
     LEVEL_REQUIREMENTS = {
@@ -115,7 +121,7 @@ class Player:
 
     ##IPC functions
 
-    def receive(self, checks: bool = True) -> None:
+    def receive(self, checks: bool = True) -> str:
         msg = self.socket.recv(1024).decode()
         if not msg.endswith("\n"):
             msg += self.receive()
@@ -168,12 +174,13 @@ class Player:
 
     def incantation(self) -> None:
         '''incantation'''
-        self.socket.sendall("Incantation\n")
+        self.socket.sendall("Incantation\n".encode())
         res = self.receive()
         if "Elevation underway" in res:
             res = self.receive()
             if "Current level" in res:
                 self.level += 1
+                self.mode = self.Mode.EXPEDITION
         else:
             return
 
@@ -186,7 +193,7 @@ class Player:
 
     def connect_nbr(self) -> int:
         '''connect the player'''
-        self.socket.sendall("Connect_nbr\n")
+        self.socket.sendall("Connect_nbr\n".encode())
         ok: str = self.receive()
         if not ok.isnumeric():
             return -1
@@ -195,27 +202,27 @@ class Player:
 
     def fork(self) -> None:
         '''fork the player'''
-        self.socket.sendall("Fork\n")
+        self.socket.sendall("Fork\n".encode())
         ok = self.receive()
 
 
     def eject(self) -> None:
         '''eject the player'''
-        self.socket.sendall("Eject\n")
+        self.socket.sendall("Eject\n".encode())
         ok = self.receive()
 
 
     def set_object(self, object : str) -> None:
         '''set object'''
-        self.socket.sendall(f"Set {object}\n")
+        self.socket.sendall(f"Set {object}\n".encode())
         ok = self.receive()
         self.get_inventory()
 
 
     def get_inventory(self) -> None:
         '''get the inventory'''
-        self.socket.sendall("Inventory\n")
-        res = self.receive()
+        self.socket.sendall("Inventory\n".encode())
+        res = self.receive().strip()
         res = res[1:-1]
         res = ' '.join(res.split())
         res = res.replace(" ,", ",").replace(", ", ",")
@@ -232,6 +239,7 @@ class Player:
             return
         if direction == 0:
             self.broadcast(self.team + ":chui;pret;mon;gars??" + str(self.level))
+            self.mode = self.Mode.WAITING
             return
         self.MOVEMENTS_DIRECTION[direction - 1](self)
 
@@ -386,18 +394,16 @@ class Player:
         '''get the action'''
         self.get_inventory()
         if self.inventory['food'] < 6:
-            self.survival = True
-        if self.survival:
+            self.mode = self.Mode.SURVIVAL
+        if self.mode == self.Mode.SURVIVAL:
             if self.inventory['food'] >= 15:
-                self.survival = False
+                self.mode = self.Mode.EXPEDITION
             print(bcolors.FAIL + "Player is starving" + bcolors.ENDC)
-            self.is_incanting = False
             self.search_object(['food'])
             return
-        if not self.is_incanting:
+        if self.mode == self.Mode.EXPEDITION:
             self.action = self.check_requirements(self.LEVEL_REQUIREMENTS[self.level])
             self.incantation_gestion()
-            return
 
 
     def run(self) -> None:

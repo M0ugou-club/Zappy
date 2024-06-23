@@ -2,7 +2,7 @@
 import socket
 import sys
 import player
-
+import traceback
 
 P_HELP = "is the port number"
 N_HELP = "is the name of the team"
@@ -56,8 +56,9 @@ def main():
     try:
         ia.connect()
         ia.run()
-    except socket.error as e:
+    except Exception as e:
         print(f"Error: {e}")
+        print(traceback.format_exc())
     finally:
         ia.disconnect(0)
 
