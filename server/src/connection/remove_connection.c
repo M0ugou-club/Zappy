@@ -14,6 +14,7 @@ static bool remove_first(connection_t **cl, int sockfd, connection_t *tmp)
         close(tmp->fd);
         free(tmp->team);
         free(tmp->buffer);
+        free(tmp->send_queue);
         free(tmp);
         return true;
     }
@@ -25,6 +26,7 @@ void remove_connection(connection_t **cl, int sockfd)
     connection_t *tmp = *cl;
     connection_t *prev = NULL;
 
+    printf("Removing connection fd: %d\n", sockfd);
     if (remove_first(cl, sockfd, tmp))
         return;
     while (tmp != NULL && tmp->fd != sockfd) {
@@ -37,5 +39,6 @@ void remove_connection(connection_t **cl, int sockfd)
     close(tmp->fd);
     free(tmp->buffer);
     free(tmp->team);
+    free(tmp->send_queue);
     free(tmp);
 }

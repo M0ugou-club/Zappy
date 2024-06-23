@@ -8,17 +8,24 @@
 #include <stdbool.h>
 #include "game.h"
 
-void remove_player(player_t **player, player_t *to_remove)
+static bool remove_first(player_t **players, int sockfd, player_t *ply)
 {
-    player_t *tmp = *player;
+    if (ply != NULL && ply->fd == sockfd) {
+        *players = ply->next;
+        free(ply);
+        return true;
+    }
+    return false;
+}
+
+void remove_player(player_t **players, int sockfd)
+{
+    player_t *tmp = *players;
     player_t *prev = NULL;
 
-    if (tmp != NULL && tmp == to_remove) {
-        *player = tmp->next;
-        free(tmp);
+    if (remove_first(players, sockfd, tmp))
         return;
-    }
-    while (tmp != NULL && tmp != to_remove) {
+    while (tmp != NULL && tmp->fd != sockfd) {
         prev = tmp;
         tmp = tmp->next;
     }

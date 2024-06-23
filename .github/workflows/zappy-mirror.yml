@@ -7,7 +7,7 @@ on:
 
 env:
   SOURCE_REPO: "git@github.com:M0ugou-club/Zappy.git" #Insert source url of the git source repo
-  DEST_REPO: "github.com/EpitechPromo2027/B-YEP-400-TLS-4-1-zappy-alberic.flour-de-saegher.git" #Insert Destination url of the git dest rep
+  DEST_REPO: "git@github.com:EpitechPromo2027/B-YEP-400-TLS-4-1-zappy-alberic.flour-de-saegher.git" #Insert Destination url of the git dest rep
 
 jobs:
   check_repo:

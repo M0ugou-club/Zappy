@@ -9,8 +9,15 @@
 
 static void free_eggs(square_t *square)
 {
-    for (int i = 0; square->eggs[i]; i++)
-        free(square->eggs[i]);
+    int idx = 0;
+
+    if (!square->eggs)
+        return;
+    while (square->eggs[idx]->id != -1) {
+        free(square->eggs[idx]);
+        idx++;
+    }
+    free(square->eggs[idx]);
     free(square->eggs);
 }
 

@@ -5,6 +5,7 @@
 ** run_server
 */
 
+#include "connection.h"
 #include "server.h"
 
 static int get_max_fd(server_t *srv)
@@ -22,29 +23,35 @@ static int get_max_fd(server_t *srv)
     return max;
 }
 
-// TODO: rewrite this function with game data:
-// check if team exists, if it doesn't, send ko and close connection
-// also close if team is full
+void clean_str(char *str)
+{
+    for (int i = 0; str[i]; i++) {
+        if (str[i] == '\n')
+            str[i] = '\0';
+        if (str[i] == '\r')
+            str[i] = '\0';
+    }
+}
+
+// also close if team is full / no eggs available
 static void accept_connection(server_t *srv)
 {
     int newsockfd;
     struct sockaddr_in cli_addr;
     socklen_t len = sizeof(cli_addr);
-    char *buffer = malloc(sizeof(char) * 1024);
     connection_t *new = NULL;
 
-    memset(buffer, 0, 1024);
     newsockfd = accept(srv->sock->fd, (struct sockaddr *)&cli_addr, &len);
     if (newsockfd < 0)
         return;
-    SEND_FD(newsockfd, "WELCOME\n");
-    read(newsockfd, buffer, 1024);
-    new = new_connection(newsockfd,
-        (struct sockaddr_in *)&cli_addr, buffer);
+    new = new_connection(newsockfd, (struct sockaddr_in *)&cli_addr);
+    if (new == NULL)
+        return;
+    printf("New connection from %s:%d\n", inet_ntoa(cli_addr.sin_addr),
+        ntohs(cli_addr.sin_port));
+    queue_message(new, "WELCOME\n");
+    new->handshake_step = TEAM;
     srv->cons = add_connection(srv->cons, new);
-    send_formatted_message(new, "%d\n", 1);
-    send_formatted_message(new, " %d %d\n", srv->args->x, srv->args->y);
-    free(buffer);
 }
 
 static int get_connections_count(connection_t *cl)
@@ -58,13 +65,23 @@ static int get_connections_count(connection_t *cl)
     return count;
 }
 
-// TODO: add game tick at end of while loop and handle client disconnection
+static void actions(server_t *srv)
+{
+    read_connections(srv);
+    game_tick(srv);
+    disconnect_players(srv);
+    execute_connections(srv);
+    execute_ai_commands(srv);
+    send_messages(srv);
+}
+
 void run_server(server_t *srv)
 {
     int select_ret = 0;
+    int i = 0;
 
     printf("Server started on port %zu\n", srv->args->port);
-    while (true) {
+    while (!srv->close) {
         build_sets(srv, srv->cons);
         select_ret = select(get_max_fd(srv) + 1, srv->readfds,
             srv->writefds, NULL, NULL);
@@ -74,8 +91,6 @@ void run_server(server_t *srv)
             accept_connection(srv);
             continue;
         }
-        read_connections(srv);
-        execute_connections(srv);
-        send_messages(srv);
+        actions(srv);
     }
 }

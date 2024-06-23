@@ -12,7 +12,7 @@ World::World(const raylib::Window &window, std::string &newSceneName, std::tuple
 {
     _window = std::make_shared<raylib::Window>(window);
     _queues = queues;
-    for (int i = 0; (ItemRender::ItemType)i < ItemRender::ItemType::COUNT; i++) {
+    for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
         _itemRenders.push_back(std::make_unique<ItemRender>((ItemRender::ItemType)i, 0));
     }
 }
@@ -30,15 +30,24 @@ void World::parsePacket(std::string packet)
 {
     const std::map<std::string, std::function<void(std::vector<std::string>)>> commands = {
         {"msz (\\d+) (\\d+)$", [this](std::vector<std::string> args) {
-            _map.setSize(std::stoi(args[0]), std::stoi(args[1]));
+            int x = std::stoi(args[0]);
+            int y = std::stoi(args[1]);
+            _map.setSize(x, y);
             for (auto &render : _itemRenders) {
                 render->changeMapSize(_map.getSize());
+            }
+            for (int xdx = 0; xdx < x; xdx++) {
+                for (int ydx = 0; ydx < y; ydx++) {
+                    for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
+                        _items[std::make_tuple(xdx, ydx)][i] = 0;
+                    }
+                }
             }
         }},
         {"sgt (\\d+)$", [this](std::vector<std::string> args) {
             _timeUnit = std::stoi(args[0]);
         }},
-        {"pnw (\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$", [this](std::vector<std::string> args) {
+        {"pnw #?(\\d+) (\\d+) (\\d+) (\\d+) (\\d+) (\\w+)$", [this](std::vector<std::string> args) {
             addPlayer(args[5], std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2]), std::stoi(args[3]), std::stoi(args[4]));
         }},
         {"ppo #?(\\d+) (\\d+) (\\d+) ([1-4])$", [this](std::vector<std::string> args) {
@@ -61,7 +70,7 @@ void World::parsePacket(std::string packet)
                 items[i] = std::stoi(args[i + 2]);
             }
             for (int i = 0; i < (int)ItemRender::ItemType::COUNT; i++) {
-                _items[std::make_tuple(pos.GetX(), pos.GetY())].push_back(items[i]);
+                _items[std::make_tuple(pos.GetX(), pos.GetY())][i] = items[i];
             }
         }},
         {"pic (\\d+) (\\d+) (\\d+) ([#0-9 ]+)$", [this](std::vector<std::string> args) {
@@ -80,8 +89,12 @@ void World::parsePacket(std::string packet)
             }
         }},
         {"pie (\\d+) (\\d+) (\\d+)$", [this](std::vector<std::string> args) {
+            const int x = std::stoi(args[0]);
+            const int y = std::stoi(args[1]);
             for (auto &player : _players) {
-                player.second->setIncantating(false);
+                if ((int)player.second->getPosition().GetX() == x && (int)player.second->getPosition().GetZ() == y) {
+                    player.second->setIncantating(false);
+                }
             }
         }},
         {"pgt #?(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
@@ -91,6 +104,9 @@ void World::parsePacket(std::string packet)
         {"pdr #?(\\d+) (\\d+)$", [this](std::vector<std::string> args) {
             raylib::Vector2 pos = {_players[std::stoi(args[0])]->getPosition().GetX(), _players[std::stoi(args[0])]->getPosition().GetZ()};
             _items[std::make_tuple((int)pos.GetX(), (int)pos.GetY())][std::stoi(args[1])]++;
+        }},
+        {"pbc #?(\\d+) (.+)", [this](std::vector<std::string> args) {
+            _chat.sendMessage(args[0] + ": " + args[1]);
         }}
     };
 
@@ -148,6 +164,13 @@ void World::load()
     _map.initMap();
     std::cout << "light" << std::endl;
     _lightManager.addLight({0, 2, 0});
+    _chat.sendMessage("Welcome to Zappy", raylib::Color::Green());
+    _chat.sendMessage("Map is " + std::to_string(static_cast<int>(_map.getSize().GetX())) + "x" +
+        std::to_string(static_cast<int>(_map.getSize().GetY())));
+    _chat.sendMessage("Here are the teams :");
+    for (auto &team : _teams) {
+        _chat.sendMessage((" - " + team), raylib::Color::White());
+    }
 }
 
 void World::update()
@@ -155,7 +178,7 @@ void World::update()
     parseEventQueue();
     _camera.updateCamera();
     _window->BeginDrawing();
-    _window->ClearBackground(raylib::Color::Black());
+    _window->ClearBackground(raylib::Color::SkyBlue());
     _camera.getCamera().BeginMode();
     _lightManager.getShader()->BeginMode();
     _map.draw();
@@ -166,6 +189,7 @@ void World::update()
     _lightManager.update(_camera.getCamera());
     _lightManager.getShader()->EndMode();
     _camera.getCamera().EndMode();
+    _chat.update();
     DrawFPS(10, 10);
     _window->EndDrawing();
 }

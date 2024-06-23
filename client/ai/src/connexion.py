@@ -53,42 +53,10 @@ def main():
     info = [get_port(), get_name(), get_machine()]
     IA1 = player.Player(info[1], info[2], info[0])
 
+    IA1.connect()
     IA1.run()
-    IA1.disconnect()
+    IA1.disconnect(0)
 
-    # try:
-    #     client_socket.connect((info[2], int(info[0])))
-    #     print(f"Connected to {info[2]} on port {info[0]}")
-    #     client_socket.sendall("".encode())
-    #     while True:
-    #         message = input("Commande: ") + "\n"
-    #         client_socket.sendall(message.encode())
-    #         data = client_socket.recv(1024).decode()
-    #         print(data)
-    #         if data.strip() == "dead":
-    #             print("Client dead, On ferme en plus tu pu...")
-    #             break
-    # except Exception as e:
-    #     print(f"An error occurred: {e}")
-    # finally:
-    #     client_socket.close()
-    #     print("Connection closed.")
-
-
-
-    # client_socket.send("oui\n".encode())
-    # data = client_socket.recv(1024).decode()
-    # print(data)
-    # client_socket.send("oui\n".encode())
-    # data = client_socket.recv(1024).decode()
-    # print(data)
-    # message = input()
-
-    # while message.lower().strip() != 'END\n':
-    #     client_socket.send(message.encode())
-    #     data = client_socket.recv(1024).decode()
-    #     print('Received from server: ' + data)
-    #     message = input()
 
 if __name__ == "__main__":
     main()
