@@ -134,8 +134,6 @@ char *begin_response(char *resp, cell_t *square, server_t *srv)
 {
     char *sq_cont = get_square_content(square, srv);
 
-    resp = malloc(2);
-    strcpy(resp, "[");
     resp = realloc(resp, strlen(resp) + strlen(sq_cont) + 1);
     strcat(resp, sq_cont);
     free(sq_cont);
@@ -172,6 +170,8 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     if (player == NULL)
         return;
+    resp = malloc(2);
+    resp = strcpy(resp, "[");
     resp = look(srv, cl, player, resp);
     queue_formatted_message(cl, resp);
     free(resp);
