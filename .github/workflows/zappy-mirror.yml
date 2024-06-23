@@ -10,6 +10,21 @@ env:
   DEST_REPO: "git@github.com:EpitechPromo2027/B-YEP-400-TLS-4-1-zappy-alberic.flour-de-saegher.git" #Insert Destination url of the git dest rep
 
 jobs:
+  check_repo:
+    name: "Check if the repo is clean"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: check_repo
+        run: |
+          BAD_FILES=$(find . -type f -not -path "./.git/*" -wholename "*tmp/*" -or -name "*~" -or -name "*.o" -or -name "*.a" -or -name "*.so" -or -name "*.gcno" -or -name "*.gdca" -or -name "*.gcov")
+          for FILES in $BAD_FILES; do
+            echo "::error file=${FILE#./}, title=Unwanted file detected::${FILE#./}"
+          done
+          if [ "$BAD_FILES" != ""]; then
+            exit 1
+          fi
+
   git-sync:
     needs: check_repo
     runs-on: ubuntu-latest
