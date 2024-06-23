@@ -72,7 +72,6 @@ static bool check_incantation(server_t *srv,
         }
         i_inventory++;
     }
-    printf("test\n");
     return true;
 }
 
