@@ -5,6 +5,7 @@ import select
 import asyncio
 import sys
 import logging
+from time import sleep
 
 class bcolors:
     HEADER = '\033[95m'
@@ -361,6 +362,7 @@ class Player:
         ordre = message.split(":")[1]
         lvl = int(message.split("??")[1])
         if ordre.startswith("ON;EVOLUE;OUUU;??") and lvl == self.level:
+            print(bcolors.OKBLUE + "MAMAMIAAAAAAAAAAAAAAAAAAAAA" + bcolors.ENDC)
             self.messages_queue = []
             self.go_to_direction(int(direction))
             self.step = 0
@@ -445,6 +447,7 @@ class Player:
         '''Handle sending messages to the server'''
         if self.step == 0:
             if self.messages_queue:
+                sleep(1)
                 print(bcolors.OKYELLOW + f"Player is sending {self.messages_queue[0]}" + bcolors.ENDC)
                 self.socket.sendall(self.messages_queue[0].encode())
                 self.messages_queue.pop(0)
