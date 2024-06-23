@@ -10,8 +10,8 @@
 
 const raylib::Vector3 Player::OFFSET = {0.5f, 0.5f, 0.5f};
 const std::vector<std::string> Player::MODELS = {
-    "bonus/assets/models/player/knight.obj",
-    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/checker.obj",
+    "bonus/assets/models/player/checker.obj",
     "bonus/assets/models/player/pawn.obj",
     "bonus/assets/models/player/knight.obj",
     "bonus/assets/models/player/bishop.obj",
