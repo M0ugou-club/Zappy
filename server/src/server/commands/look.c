@@ -174,8 +174,8 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     if (player == NULL)
         return;
-    resp = malloc(2 * sizeof(char));
-    resp = strcpy(resp, "[");
+    resp = malloc(3 * sizeof(char));
+    resp = strcpy(resp, "[ ");
     resp = look(srv, cl, player, resp);
     queue_formatted_message(cl, resp);
     free(resp);
