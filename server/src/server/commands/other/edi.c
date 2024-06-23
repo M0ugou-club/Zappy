@@ -9,5 +9,5 @@
 
 void edi(server_t *srv, connection_t *cl, egg_t *egg)
 {
-    queue_formatted_message(cl, "edi #%d\n", egg->id);
+    queue_formatted_message(cl, "edi %d\n", egg->id);
 }

@@ -124,6 +124,11 @@ game_t *init_game(int x, int y, char **teams, args_t *args);
 void refill_map(server_t *srv);
 void game_tick(server_t *srv);
 
+char *add_to_string(char *resp, char *li_cont);
+void add_vals(int *cone_width, int *cone_gap, int *cone_distance);
+int count_players_on_square(cell_t *square, server_t *srv);
+cell_t *move_square_width(cell_t *square, direction_t orientation);
+
 player_t *get_player_by_fd(player_t *players, int fd);
 void clean_str(char *str);
 
