@@ -4,230 +4,135 @@
 ** File description:
 ** look
 */
-#include "server.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
-const char *objects[] = {
+#include "server.h"
+
+static const char *objects[] = {
     "food",
     "linemate",
     "deraumere",
     "sibur",
     "mendiane",
     "phiras",
-    "thystame"};
+    "thystame"
+};
 
-static cell_t *mv_distance(cell_t *square, direction_t ori, int distance)
+static cell_t *go_forward(direction_t dir, cell_t *cell)
 {
-    for (int i = 0; i < distance; i++) {
-        if (ori == NORTH) {
-            square = square->north;
-        }
-        if (ori == EAST) {
-            square = square->east;
-        }
-        if (ori == SOUTH) {
-            square = square->south;
-        }
-        if (ori == WEST) {
-            square = square->west;
-        }
+    switch (dir) {
+        case NORTH:
+            return cell->north;
+        case EAST:
+            return cell->east;
+        case SOUTH:
+            return cell->south;
+        case WEST:
+            return cell->west;
     }
-    return square;
+    return cell;
 }
 
-static cell_t *mv_gap(cell_t *square, direction_t orientation, int gap)
+static cell_t *go_left(direction_t dir, cell_t *cell)
 {
-    for (int i = 0; i < gap; i++) {
-        if (orientation == NORTH) {
-            square = square->west;
-        }
-        if (orientation == EAST) {
-            square = square->north;
-        }
-        if (orientation == SOUTH) {
-            square = square->west;
-        }
-        if (orientation == WEST) {
-            square = square->south;
-        }
+    switch (dir) {
+        case NORTH:
+            return cell->west;
+        case EAST:
+            return cell->north;
+        case SOUTH:
+            return cell->east;
+        case WEST:
+            return cell->south;
     }
-    return square;
+    return cell;
 }
 
-static cell_t *get_start(player_t *player, int cone_gap, int cone_distance)
+static cell_t *go_right(direction_t dir, cell_t *cell)
 {
-    direction_t orientation = player->direction;
-    cell_t *square = player->square;
-
-    square = mv_distance(square, orientation, cone_distance);
-    square = mv_gap(square, orientation, cone_gap);
-    return square;
-}
-
-static void append_items(char **resp, int item_count, const char *item_name)
-{
-    for (int j = 0; j < item_count; j++) {
-        if (strlen(*resp) > 0) {
-            *resp = realloc(*resp, strlen(*resp) + strlen(" ") + 1);
-            strcat(*resp, " ");
-        }
-        *resp = realloc(*resp, strlen(*resp) + strlen(item_name) + 1);
-        strcat(*resp, item_name);
+    switch (dir) {
+        case NORTH:
+            return cell->east;
+        case EAST:
+            return cell->south;
+        case SOUTH:
+            return cell->west;
+        case WEST:
+            return cell->north;
     }
+    return cell;
 }
 
-static char *get_square_content(cell_t *square, server_t *srv)
+static char *append_string(char *dst, const char *src)
 {
-    char *resp = malloc(1);
-    int players_count = count_players_on_square(square, srv);
+    char *res = NULL;
+    size_t dst_len = dst ? strlen(dst) : 0;
 
-    *resp = '\0';
-    while (players_count > 0) {
-        resp = realloc(resp, strlen(resp) + strlen("player") + 1);
-        strcat(resp, "player");
-        if (players_count > 1) {
-            resp = realloc(resp, strlen(resp) + strlen(" ") + 1);
-            strcat(resp, " ");
-        }
-        players_count--;
+    res = malloc(dst_len + strlen(src) + 1);
+    memset(res, 0, dst_len + strlen(src) + 1);
+    if (dst)
+        strcpy(res, dst);
+    strcat(res, src);
+    return res;
+}
+
+static char *append_object(char *dst, const char *object, size_t count)
+{
+    char *res = NULL;
+    size_t dst_len = dst ? strlen(dst) : 0;
+
+    res = malloc(dst_len + (strlen(object) * count) + count + 1);
+    memset(res, 0, dst_len + (strlen(object) * count) + count + 1);
+    if (dst)
+        strcpy(res, dst);
+    for (size_t i = 0; i < count; i++) {
+        strcat(res, object);
+        strcat(res, " ");
     }
-    for (int i = 0; i < 7; i++) {
-        append_items(&resp, square->items[i], objects[i]);
-    }
-    return resp;
+    return res;
 }
 
-char *append_square_content(char *resp, cell_t *square, server_t *srv)
+static char *get_contents(server_t *srv, cell_t *cell)
 {
-    char *sq_tent = get_square_content(square, srv);
+    char *res = NULL;
+    size_t player_count = 0;
 
-    resp = realloc(resp, strlen(resp) + strlen(sq_tent) + 1);
-    strcat(resp, sq_tent);
-    free(sq_tent);
-    return resp;
+    for (player_t *ply = srv->game->players; ply; ply = ply->next)
+        if (ply->square->pos_x == cell->pos_x &&
+            ply->square->pos_y == cell->pos_y)
+            player_count++;
+    res = append_object(res, "player", player_count);
+    for (size_t i = 0; i < NONE - 1; i++)
+        res = append_object(res, objects[i], cell->items[i]);
+    return res;
 }
 
-char *get_ln_squa(player_t *p, int cn_width, cell_t *sq_start, server_t *srv)
+static char *do_cells(size_t j, size_t i, server_t *srv, player_t *ply)
 {
-    char *resp = malloc(1);
-    direction_t orientation = p->direction;
-    cell_t *square = sq_start;
+    cell_t *cell = ply->square;
+    char *res = NULL;
 
-    *resp = '\0';
-    for (int i = 0; i < cn_width; i++) {
-        if (square != NULL) {
-            resp = append_square_content(resp, square, srv);
-        }
-        if (i != cn_width - 1) {
-            resp = add_to_string(resp, ", ");
-        }
-        if (square != NULL) {
-            square = move_square_width(square, orientation);
-        }
-    }
-    return resp;
-}
-
-char *begin_response(char *resp, cell_t *square, server_t *srv)
-{
-    char *sq_cont = get_square_content(square, srv);
-
-    resp = realloc(resp, strlen(resp) + strlen(sq_cont) + 1);
-    strcat(resp, sq_cont);
-    free(sq_cont);
-    return resp;
-}
-
-char *look(server_t *srv, connection_t *cl, player_t *player, char *resp)
-{
-    int cone_width = 3;
-    int cone_gap = 1;
-    int cone_distance = 1;
-    cell_t *start_line = NULL;
-    char *li_cont = NULL;
-
-    resp = begin_response(resp, player->square, srv);
-    for (int i = 1; i <= player->level; i++) {
-        start_line = get_start(player, cone_gap, cone_distance);
-        resp = add_to_string(resp, ", ");
-        if (start_line != NULL) {
-            li_cont = get_ln_squa(player, cone_width, start_line, srv);
-            resp = add_to_string(resp, li_cont);
-            free(li_cont);
-        }
-        add_vals(&cone_width, &cone_gap, &cone_distance);
-    }
-    resp = add_to_string(resp, "]\n");
-    return resp;
+    for (size_t k = 0; k < j; k++)
+        cell = go_forward(ply->direction, cell);
+    for (size_t k = 0; k < i; k++)
+        cell = go_left(ply->direction, cell);
+    res = append_string(res, get_contents(srv, cell));
+    if (i != ply->level || j != (i * 2))
+        res = append_string(res, ",");
+    return res;
 }
 
 void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
-    player_t *player = get_player_by_fd(srv->game->players, cl->fd);
-    char *resp = NULL;
+    player_t *ply = get_player_by_fd(srv->game->players, cl->fd);
+    size_t rows = ply->level;
+    char *res = strdup("[");
 
-    if (player == NULL)
+    if (ply == NULL)
         return;
-    resp = malloc(3 * sizeof(char));
-    resp = strcpy(resp, "[");
-    resp = look(srv, cl, player, resp);
-    printf("\033[0;37m");
-    printf("[LOOK]:", resp);
-    printf("\033[0m");
-    printf("\033[0;34m");
-    printf("%s", resp);
-    printf("\033[0m");
-    queue_formatted_message(cl, resp);
-    free(resp);
+    for (size_t i = 0; i <= rows; i++)
+        for (size_t j = 0; j < (i * 2) + 1; j++)
+            res = append_string(res, do_cells(j, i, srv, ply));
+    res = append_string(res, "]\n");
+    queue_formatted_message(cl, res);
+    free(res);
 }
-
-/* void print_all_cells(cell_t *square)
-// {
-//     printf("Square: %d %d\n", square->pos_x, square->pos_y);
-//     printf("Items: ");
-//     for (int i = 0; i < 7; i++) {
-//         printf("%d ", square->items[i]);
-//     }
-//     printf("\n");
-// }
-
-// void print_cell(cell_t *square)
-// {
-//     printf("Square: %d %d\n", square->pos_x, square->pos_y);
-//     printf("Items: ");
-//     for (int i = 0; i < 7; i++) {
-//         printf("%d ", square->items[i]);
-//     }
-//     printf("\n");
-// }
-
-
-//     print_all_cells(player->square);
-
-//     if (player->direction == NORTH) {
-//         printf("NORTH\n");
-//         print_all_cells(player->square->north->west);
-//         print_cell(player->square->north);
-//         print_all_cells(player->square->north->east);
-//     }
-//     if (player->direction == EAST) {
-//         printf("EAST\n");
-//         print_all_cells(player->square->north->east);
-//         print_cell(player->square->east);
-//         print_all_cells(player->square->south->east);
-//     }
-//     if (player->direction == SOUTH) {
-//         printf("SOUTH\n");
-//         print_all_cells(player->square->south->east);
-//         print_cell(player->square->south);
-//         print_all_cells(player->square->south->west);
-//     }
-//     if (player->direction == WEST) {
-//         printf("WEST\n");
-//         print_all_cells(player->square->south->west);
-//         print_cell(player->square->west);
-//         print_all_cells(player->square->north->west);
-//     }
-*/

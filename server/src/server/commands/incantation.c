@@ -92,11 +92,17 @@ void cmd_incantation(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     if (!check_incantation(srv, cl, player))
         return;
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < NONE - 1; i++) {
         player->square->items[i_inventory] -=
-            incantation[player->level - 1][i];
+            incantation[player->level - 1][i_inventory];
         i_inventory++;
     }
+    broadcast_gui(srv, "bct %d %d %d %d %d %d %d %d %d\n",
+        player->square->pos_x, player->square->pos_y,
+        player->square->items[0], player->square->items[1],
+        player->square->items[2], player->square->items[3],
+        player->square->items[4], player->square->items[5],
+        player->square->items[6]);
     players_incantation(srv, player);
     queue_formatted_message(cl, "Elevation underway\n");
 }

@@ -35,7 +35,12 @@ int main(int ac, char **av)
     }
     server.sendToServer("GRAPHIC");
 
-    core.start();
+    try {
+        core.start();
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return 84;
+    }
     server.disconnectFromServer();
     delete std::get<IN>(queues);
     delete std::get<OUT>(queues);
