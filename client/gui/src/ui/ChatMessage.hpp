@@ -21,6 +21,8 @@ class ChatMessage {
         ChatMessage(raylib::Font *font, std::string message, raylib::Color color);
         ~ChatMessage();
 
+        ChatMessage(const ChatMessage &other);
+
         void update(int pos);
         bool isAlive();
 
