@@ -27,8 +27,8 @@ void cmd_forward(server_t *srv, connection_t *cl, regex_parse_t *parse)
             break;
     }
     queue_formatted_message(cl, "ok\n");
-    broadcast_gui(srv, "ppo #%d %d %d %d\n", player->id,
-        player->square->pos_x, player->square->pos_y, player->direction);
+    broadcast_gui(srv, "ppo %d %d %d %d\n", player->id,
+        player->square->pos_x, player->square->pos_y, player->direction + 1);
 }
 
 // Turn the player to the right
@@ -38,8 +38,8 @@ void cmd_right(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     player->direction = (player->direction + 1) % 4;
     queue_formatted_message(cl, "ok\n");
-    broadcast_gui(srv, "ppo #%d %d %d %d\n", player->id,
-        player->square->pos_x, player->square->pos_y, player->direction);
+    broadcast_gui(srv, "ppo %d %d %d %d\n", player->id,
+        player->square->pos_x, player->square->pos_y, player->direction + 1);
 }
 
 // Turn the player to the left
@@ -49,6 +49,6 @@ void cmd_left(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     player->direction = (player->direction + 3) % 4;
     queue_formatted_message(cl, "ok\n");
-    broadcast_gui(srv, "ppo #%d %d %d %d\n", player->id,
-        player->square->pos_x, player->square->pos_y, player->direction);
+    broadcast_gui(srv, "ppo %d %d %d %d\n", player->id,
+        player->square->pos_x, player->square->pos_y, player->direction + 1);
 }

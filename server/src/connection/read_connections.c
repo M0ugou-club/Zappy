@@ -8,24 +8,6 @@
 #include "connection.h"
 #include "server.h"
 
-static bool action_setup(connection_t *conn)
-{
-    if (conn == NULL)
-        return true;
-    if (conn->buffer == NULL) {
-        conn->buffer = malloc(BUFFER_SIZE);
-        if (conn->buffer == NULL)
-            return true;
-        memset(conn->buffer, 0, BUFFER_SIZE);
-    } else {
-        conn->buffer = realloc(conn->buffer,
-            sizeof(conn->buffer) + BUFFER_SIZE);
-        if (conn->buffer == NULL)
-            return true;
-    }
-    return false;
-}
-
 static int strcount(const char *str, char c)
 {
     int count = 0;
@@ -39,22 +21,24 @@ static bool action(server_t *srv, connection_t *cli)
 {
     char tmp[BUFFER_SIZE];
     ssize_t ret;
+    player_t *ply = get_player_by_fd(srv->game->players, cli->fd);
 
-    if (action_setup(cli))
-        return false;
-    ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
+    ret = read(cli->fd, tmp, BUFFER_SIZE);
     if (ret <= 0) {
+        if (ply) {
+            broadcast_gui(srv, "pdi %d\n", ply->id);
+            remove_player(&srv->game->players, cli->fd);
+        }
         remove_connection(&srv->cons, cli->fd);
         return true;
     }
-    tmp[ret] = '\0';
-    memcpy(cli->buffer + strlen(cli->buffer), tmp, ret);
+    cli->buffer = append_buffer(cli->buffer, tmp, &cli->buffer_size, ret);
     return false;
 }
 
 static bool handshake(server_t *srv, char *team, connection_t *cl)
 {
-    if (strcmp(team, "GRAPHIC") == 0) {
+    if (strcmp(team, GRAPHIC_TEAM) == 0) {
         queue_formatted_message(cl,
             "msz %zu %zu\n", srv->args->x, srv->args->y);
         queue_formatted_message(cl, "sgt %zu\n", srv->args->frequency);
@@ -71,44 +55,62 @@ static bool handshake(server_t *srv, char *team, connection_t *cl)
         queue_formatted_message(cl, " %d %d\n", srv->args->x, srv->args->y);
         return true;
     }
-    SEND_FD(cl->fd, "ko\n");
     return false;
 }
 
-static bool read_team_internal(server_t *srv, char *tmp,
-    connection_t *cli, player_t *ply)
+static char *get_team_ptr(server_t *srv, char *team)
 {
+    char *tmp = NULL;
+
+    if (strcmp(team, GRAPHIC_TEAM) == 0)
+        return GRAPHIC_TEAM;
+    for (int i = 0; srv->game->teams[i]; i++) {
+        if (strcmp(srv->game->teams[i], team) == 0) {
+            tmp = srv->game->teams[i];
+            break;
+        }
+    }
+    return tmp;
+}
+
+static void read_team_internal(server_t *srv, char *tmp,
+    connection_t *cli)
+{
+    player_t *ply = NULL;
+
     if (handshake(srv, tmp, cli)) {
         cli->handshake_step = ESTABLISHED;
-        cli->team = strdup(tmp);
-        if (strcmp(cli->team, "GRAPHIC") != 0) {
+        cli->team = get_team_ptr(srv, tmp);
+        if (strcmp(cli->team, GRAPHIC_TEAM) == 0)
+            return;
+        if (check_eggs(srv->game, cli->team)) {
             ply = spawn_player(srv->game, cli->team, cli->fd);
             broadcast_gui(srv, "pnw #%zu %d %d %d %d %s\n",
-                srv->game->players->id, ply->square->pos_x,
+                ply->id, ply->square->pos_x,
                 ply->square->pos_y, ply->direction, ply->level,
                 ply->team);
+            return;
         }
-        return true;
     }
+    send_formatted_message(cli, "ko\n");
     remove_connection(&srv->cons, cli->fd);
-    return false;
+    return;
 }
 
-static bool read_team(server_t *srv, connection_t *cli)
+static void read_team(server_t *srv, connection_t *cli)
 {
     ssize_t ret;
     char tmp[BUFFER_SIZE];
-    player_t *ply = NULL;
 
     memset(tmp, '\0', BUFFER_SIZE);
     ret = read(cli->fd, tmp, BUFFER_SIZE - 1);
     if (ret <= 0) {
         remove_connection(&srv->cons, cli->fd);
-        return true;
+        return;
     }
     tmp[ret] = '\0';
     clean_str(tmp);
-    return read_team_internal(srv, tmp, cli, ply);
+    read_team_internal(srv, tmp, cli);
 }
 
 void read_connections(server_t *srv)
@@ -117,9 +119,11 @@ void read_connections(server_t *srv)
     bool ret = false;
 
     while (tmp != NULL) {
-        if (tmp->handshake_step == TEAM && FD_ISSET(tmp->fd, srv->readfds))
-            ret = read_team(srv, tmp);
-        if (!ret && tmp->handshake_step == ESTABLISHED
+        if (tmp->handshake_step == TEAM && FD_ISSET(tmp->fd, srv->readfds)) {
+            read_team(srv, tmp);
+            return;
+        }
+        if (tmp->handshake_step == ESTABLISHED
             && FD_ISSET(tmp->fd, srv->readfds))
             ret = action(srv, tmp);
         if (ret)

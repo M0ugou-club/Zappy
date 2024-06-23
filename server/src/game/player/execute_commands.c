@@ -24,18 +24,17 @@ static const command_regex_t AI_COMMANDS[] = {
     {NULL, 0.0f, NULL}
 };
 
-static char *player_dequeue(connection_t *cl)
+char *player_dequeue(connection_t *cl)
 {
     char *cmd = NULL;
 
-    if (!cl->command_queue[0])
+    if (cl->queue_size == 0)
         return NULL;
-    cmd = strdup(cl->command_queue[0]);
-    free(cl->command_queue[0]);
-    for (int i = 0; i < MAX_COMMAND_QUEUE - 1; i++) {
+    cmd = cl->command_queue[0];
+    for (int i = 0; i < cl->queue_size - 1; i++) {
         cl->command_queue[i] = cl->command_queue[i + 1];
     }
-    cl->command_queue[MAX_COMMAND_QUEUE - 1] = NULL;
+    cl->queue_size--;
     return cmd;
 }
 
@@ -43,22 +42,22 @@ static void execute_ai_command(server_t *srv, connection_t *cl,
     player_t *ply, char *cmd)
 {
     int regex_ret = 0;
-    regex_t *regex = malloc(sizeof(regex_t));
+    regex_t regex;
     regex_parse_t parse = {0};
 
     parse.str = cmd;
     memset(parse.pmatch, 0, sizeof(parse.pmatch));
     for (int i = 0; AI_COMMANDS[i].command != NULL; i++) {
-        regex_ret = regcomp(regex, AI_COMMANDS[i].command, REG_EXTENDED);
-        regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
+        regex_ret = regcomp(&regex, AI_COMMANDS[i].command, REG_EXTENDED);
+        regex_ret = regexec(&regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
         if (regex_ret == 0) {
             AI_COMMANDS[i].func(srv, cl, &parse);
-            ply->action_cooldown = get_time()
-                + CALC_TIME(AI_COMMANDS[i].time / srv->args->frequency);
-            regfree(regex);
+            set_cooldown(&ply->action_cooldown,
+                AI_COMMANDS[i].time / srv->args->frequency);
+            regfree(&regex);
             return;
         }
-        regfree(regex);
+        regfree(&regex);
     }
     SEND_FD(ply->fd, CMD_ERROR);
 }
@@ -69,9 +68,11 @@ void execute_ai_commands(server_t *srv)
     char *cmd = NULL;
 
     for (player_t *tmp = srv->game->players; tmp; tmp = tmp->next) {
-        if (get_time() < tmp->action_cooldown)
+        if (tmp->incantation || !time_passed(&tmp->action_cooldown))
             continue;
         cl = get_client_by_fd(srv->cons, tmp->fd);
+        if (!cl)
+            continue;
         cmd = player_dequeue(cl);
         if (!cmd)
             continue;
@@ -80,24 +81,10 @@ void execute_ai_commands(server_t *srv)
     }
 }
 
-static int queue_item_count(connection_t *cl)
-{
-    int count = 0;
-
-    while (cl->command_queue[count] && count < MAX_COMMAND_QUEUE) {
-        count++;
-    }
-    return count;
-}
-
 void player_enqueue(connection_t *cl, char *cmd)
 {
-    if (queue_item_count(cl) >= MAX_COMMAND_QUEUE)
+    if (cl->queue_size >= MAX_COMMAND_QUEUE)
         return;
-    for (int i = 0; i < MAX_COMMAND_QUEUE; i++) {
-        if (!cl->command_queue[i]) {
-            cl->command_queue[i] = strdup(cmd);
-            break;
-        }
-    }
+    cl->command_queue[cl->queue_size] = strdup(cmd);
+    cl->queue_size++;
 }

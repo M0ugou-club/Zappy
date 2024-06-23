@@ -14,7 +14,8 @@ player_t *new_player(char *team_name)
 
     if (player == NULL)
         return NULL;
-    player->id++;
+    id++;
+    player->id = id;
     player->team = team_name;
     player->level = 1;
     player->fd = 0;
@@ -23,9 +24,9 @@ player_t *new_player(char *team_name)
     player->next = NULL;
     player->disconnect = false;
     player->incantation = false;
-    memset(player->inventory, 0, 7);
+    memset(player->inventory, 0, NONE * sizeof(int));
     player->inventory[FOOD] = 10;
-    player->action_cooldown = 0;
-    player->last_eat = 0;
+    memset(&player->action_cooldown, 0, sizeof(struct timeval));
+    memset(&player->eat_cooldown, 0, sizeof(struct timeval));
     return player;
 }

@@ -25,7 +25,7 @@ void broadcast_gui(server_t *srv, char *fmt, ...)
     va_end(args);
     for (connection_t *tmp = srv->cons; tmp; tmp = tmp->next)
         if (tmp->handshake_step == ESTABLISHED
-            && strcmp(tmp->team, "GRAPHIC") == 0)
+            && strcmp(tmp->team, GRAPHIC_TEAM) == 0)
             queue_message(tmp, msg);
     free(msg);
 }

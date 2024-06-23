@@ -2,7 +2,7 @@
 import socket
 import sys
 import player
-
+import traceback
 
 P_HELP = "is the port number"
 N_HELP = "is the name of the team"
@@ -51,11 +51,16 @@ def main():
     '''Main function to handle client connection and communication.'''
     print("Client started")
     info = [get_port(), get_name(), get_machine()]
-    IA1 = player.Player(info[1], info[2], info[0])
+    ia = player.Player(info[1], info[2], info[0])
 
-    IA1.connect()
-    IA1.run()
-    IA1.disconnect(0)
+    try:
+        ia.connect()
+        ia.run()
+    except Exception as e:
+        print(f"Error: {e}")
+        print(traceback.format_exc())
+    finally:
+        ia.disconnect(0)
 
 
 if __name__ == "__main__":

@@ -10,8 +10,8 @@
 
 const raylib::Vector3 Player::OFFSET = {0.5f, 0.5f, 0.5f};
 const std::vector<std::string> Player::MODELS = {
-    "bonus/assets/models/player/pawn.obj",
-    "bonus/assets/models/player/knight.obj",
+    "bonus/assets/models/player/checker.obj",
+    "bonus/assets/models/player/checker.obj",
     "bonus/assets/models/player/pawn.obj",
     "bonus/assets/models/player/knight.obj",
     "bonus/assets/models/player/bishop.obj",
@@ -51,7 +51,7 @@ Player::Player(int teamIndex, const raylib::Vector2 &mapSize)
 
 raylib::Color Player::getColor() const
 {
-    if (_teamIdx < 0 || _teamIdx >= COLORS.size())
+    if (_teamIdx < 0 || static_cast<std::size_t>(_teamIdx) >= COLORS.size())
         return raylib::Color::DarkPurple();
     return COLORS[_teamIdx];
 }

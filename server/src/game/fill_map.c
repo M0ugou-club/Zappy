@@ -48,23 +48,45 @@ static int count_items(game_t *game, int i)
     return count;
 }
 
-void refill_map(game_t *game)
+static void broadcast_updated_cell(server_t *srv, cell_t *cell)
+{
+    if (cell->updated == true) {
+        broadcast_gui(srv, "bct %d %d %d %d %d %d %d %d %d\n",
+        cell->pos_x, cell->pos_y,
+        cell->items[0], cell->items[1],
+        cell->items[2], cell->items[3],
+        cell->items[4], cell->items[5],
+        cell->items[6]);
+        cell->updated = false;
+    }
+}
+
+static void broadcast_updated_cells(server_t *srv)
+{
+    for (int x = 0; x < srv->game->map_x; x++)
+        for (int y = 0; y < srv->game->map_y; y++)
+            broadcast_updated_cell(srv, &srv->game->map[x][y]);
+}
+
+void refill_map(server_t *srv)
 {
     int x;
     int y;
     int count = 0;
     int nb_items = 0;
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < NONE; i++) {
         count = 0;
-        nb_items = count_items(game, i);
-        while (count < game->max_items->items[i] - nb_items) {
-            x = rand() % game->map_x;
-            y = rand() % game->map_y;
-            game->map[x][y].items[i] += 1;
+        nb_items = count_items(srv->game, i);
+        while (count < srv->game->max_items->items[i] - nb_items) {
+            x = rand() % srv->game->map_x;
+            y = rand() % srv->game->map_y;
+            srv->game->map[x][y].items[i] += 1;
+            srv->game->map[x][y].updated = true;
             count++;
         }
     }
+    broadcast_updated_cells(srv);
 }
 
 void place_items_randomly(game_t *game, args_t *args)

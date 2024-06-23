@@ -11,7 +11,7 @@ void pin(server_t *srv, connection_t *cl)
 {
     player_t *player = get_player_by_fd(srv->game->players, cl->fd);
 
-    queue_formatted_message(cl, "pin #%d %d %d %d %d %d %d %d %d %d\n",
+    queue_formatted_message(cl, "pin %d %d %d %d %d %d %d %d %d %d\n",
         player->id, player->square->pos_x,
         player->square->pos_y, player->inventory[0],
         player->inventory[1], player->inventory[2], player->inventory[3],

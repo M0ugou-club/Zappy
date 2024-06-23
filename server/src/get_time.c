@@ -7,10 +7,18 @@
 
 #include "server.h"
 
-long get_time(void)
+bool time_passed(struct timeval *tv)
 {
-    struct timeval tv;
+    struct timeval now;
 
-    gettimeofday(&tv, NULL);
-    return ((long)(tv.tv_sec * 1000 + tv.tv_usec / 1000));
+    gettimeofday(&now, NULL);
+    return (now.tv_sec > tv->tv_sec
+        || (now.tv_sec == tv->tv_sec && now.tv_usec >= tv->tv_usec));
+}
+
+void set_cooldown(struct timeval *tv, float time)
+{
+    gettimeofday(tv, NULL);
+    tv->tv_sec += (int)time;
+    tv->tv_usec += (time - (int)time) * 1000000;
 }

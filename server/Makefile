@@ -9,6 +9,7 @@ NAME = zappy_server
 
 SRC =	src/main.c \
 		src/get_time.c \
+		src/buffer.c \
 		src/server/init_server.c \
 		src/server/free_server.c \
 		src/server/run_server.c \
@@ -37,6 +38,7 @@ SRC =	src/main.c \
 		src/server/commands/inventory.c \
 		src/server/commands/item.c \
 		src/server/commands/look.c \
+		src/server/commands/look_helper.c \
 		src/server/commands/move.c \
 		src/server/commands/gui/bct.c \
 		src/server/commands/gui/mct.c \

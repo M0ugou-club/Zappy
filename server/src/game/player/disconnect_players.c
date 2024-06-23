@@ -16,6 +16,9 @@ void disconnect_players(server_t *srv)
         ply = get_player_by_fd(srv->game->players, tmp->fd);
         if (ply != NULL && ply->disconnect == true) {
             remove_connection(&srv->cons, tmp->fd);
+            broadcast_gui(srv, "pdi %d\n", ply->id);
+            remove_player(&srv->game->players, ply->fd);
+            return;
         }
         tmp = tmp->next;
     }

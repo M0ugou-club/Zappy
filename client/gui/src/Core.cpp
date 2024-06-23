@@ -6,6 +6,7 @@
 */
 
 #include "Core.hpp"
+#include "raylib.h"
 
 Core::Core(const Args &args, std::tuple<SafeQueue<std::string> *, SafeQueue<std::string> *> queues)
     : _args(args), _defaultScene("menu"), _queues(queues)
@@ -34,7 +35,6 @@ void Core::loadScene(const std::string &scene)
 void Core::start()
 {
     raylib::Window window(_width, _height, "Zappy");
-
     window.SetConfigFlags(FLAG_MSAA_4X_HINT);
     window.SetTargetFPS(60);
 
