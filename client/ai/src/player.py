@@ -429,9 +429,10 @@ class Player:
             if reponse.startswith("dead"):
                 print(bcolors.FAIL + "Player is dead" + bcolors.ENDC)
                 self.disconnect(int(42))
-            elif reponse.startswith("[ food"):
+            elif reponse.startswith("[ food") or reponse.startswith("[food"):
                 self.interpret_inventory(reponse)
-            elif reponse.startswith("[ player"):
+            elif reponse.startswith("[ player") or reponse.startswith("[player"):
+                print(bcolors.OKGREEN + reponse + bcolors.ENDC)
                 self.interpret_look(reponse)
             elif reponse.startswith("message "):
                 self.receive_broadcast(reponse)
