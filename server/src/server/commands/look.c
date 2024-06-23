@@ -135,6 +135,7 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 
     if (ply == NULL)
         return;
+    printf("%d\n", ply->direction);
     for (size_t i = 0; i <= rows; i++)
         for (size_t j = 0; j < (i * 2) + 1; j++) {
             cells = do_cells(j, i, srv, ply);
@@ -143,5 +144,6 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
         }
     res = append_string(res, "]\n");
     queue_formatted_message(cl, res);
+    puts(res);
     free(res);
 }
