@@ -1,3 +1,5 @@
+''' AI for the Zappy project '''
+
 import random
 import socket
 import subprocess
@@ -5,6 +7,7 @@ import select
 import asyncio
 import sys
 import logging
+from time import sleep
 
 class bcolors:
     HEADER = '\033[95m'
@@ -21,6 +24,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 class Player:
+    '''Player class'''
     def __init__(self, team, machine, port):
         self.team = team
         self.level = 1
@@ -28,13 +32,13 @@ class Player:
         self.machine = machine
         self.port = port
         self.socket = socket.socket()
-        self.survival = True
+        self.survival = False
         self.is_incanting = False
         self.player_ready = 1
         self.step = 0
         self.action = 0
         self.team_mates = 0
-        self.MTopt = False
+        self.mtopt = False
         self.nbr_connect = 0
         self.inventory = {
             'food': 10,
@@ -109,7 +113,6 @@ class Player:
         lambda self: (self.right(), self.forward(), self.left(), self.forward())
     ]
 
-
     messages_queue = []
 
 
@@ -124,109 +127,88 @@ class Player:
         '''turn right'''
         self.messages_queue.append("Right\n")
 
+
     def left(self) -> None:
         '''turn left'''
         self.messages_queue.append("Left\n")
+
 
     def take(self, object : str) -> None:
         '''take object'''
         self.messages_queue.append(f"Take {object}\n")
         self.step = 0
 
-    def interpret_look(self, response : str) -> list:
+
+    def interpret_look(self, response : str) -> None:
         '''interpret the look response'''
         response = response[1:-1]
         response = response.split(',')
-        for i in range(len(response)):
-            if (response[i][0] == ' '):
-                response[i] = response[i][1:]
-            response[i] = response[i].split(' ')
-        for i in range(len(response)):
-            if response[i] == ['']:
-                response[i] = []
-        self.looked = response
-        return response
+        response = [cell.strip() for cell in response]
+        self.looked = [cell.split(' ') for cell in response]
 
 
-    def look(self) -> list:
+    def look(self) -> None:
         '''look around the player'''
         response = self.messages_queue.append("Look\n")
-        return response
 
 
     def interpret_incantation(self, response : str) -> None:
         '''interpret the incantation response'''
+        print(bcolors.WARNING + "GG MON GRAS !!!" + bcolors.ENDC)
         response = response.split(": ")
         self.is_incanting = False
         self.level = int(response[1])
         self.player_ready = 1
+        if self.nbr_connect == 0:
+            self.fork()
 
 
     def incantation(self) -> None:
         '''incantation'''
         self.messages_queue.append("Incantation\n")
         self.connect_nbr()
-        if (self.nbr_connect == 0):
-            self.fork()
 
 
     def broadcast(self, message : str) -> None:
         '''broadcast a message'''
         self.messages_queue.append(f"Broadcast {message}\n")
 
+
     def connect_nbr(self) -> None:
         '''connect the player'''
         self.messages_queue.append("Connect_nbr\n")
+
 
     def fork(self) -> None:
         '''fork the player'''
         self.messages_queue.append("Fork\n")
 
+
     def eject(self) -> None:
         '''eject the player'''
         self.messages_queue.append("Eject\n")
+
 
     def set_object(self, object : str) -> None:
         '''set object'''
         self.messages_queue.append(f"Set {object}\n")
 
-    def check_dict_inventory(self, key : str) -> bool:
-        '''check the inventory'''
-        return key in [
-            "food",
-            "linemate",
-            "deraumere",
-            "sibur",
-            "mendiane",
-            "phiras",
-            "thystame"
-        ]
 
-    def interpret_inventory(self, response : str) -> dict:
+    def interpret_inventory(self, response : str) -> None:
         '''interpret the inventory response'''
-        response = response[1:-2]
-        response = response.split(',')
-        for i in range(len(response) - 1):
-            if (response[i][0] == ' '):
-                response[i] = response[i][1:]
-        inventory = {}
-        for i in range(len(response) - 1):
-            response[i] = response[i].split(' ')
-            if self.check_dict_inventory(response[i][0]):
-                inventory[response[i][0]] = int(response[i][1])
-            else:
-                key = response[i][0]
-                inventory[key[3:]] = int(response[i][1])
-        self.inventory.update(inventory)
-        return inventory
+        response = response[1:-1]
+        response = ' '.join(response.split())
+        response = response.replace(" ,", ",").replace(", ", ",")
+        response = response.replace(" ", "=")
+        self.inventory.update(eval(f"dict({response})"))
 
 
     def get_inventory(self) -> None:
         '''get the inventory'''
         self.messages_queue.append("Inventory\n")
 
-    ##AI functions
 
+    ##AI functions
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
@@ -266,20 +248,10 @@ class Player:
         '''take the item in the tile'''
         for item in searching_item:
             nbr = self.count_item(tile, item)
-            nbr = self.count_item(tile, item)
             if item in tile:
                 for _ in range(nbr):
                     print(bcolors.OKCYAN + f"Player {self.team} is taking {item}" + bcolors.ENDC)
                     self.take(item)
-
-
-    def how_many_food(self, tile : list) -> int:
-        '''count the food in the tile'''
-        count = 0
-        for i in range(len(tile)):
-            if tile[i] == 'food':
-                count += 1
-        return count
 
 
     def get_correct_tile(self, searching_item : list) -> tuple[int, list]:
@@ -288,8 +260,8 @@ class Player:
             food_count = 0
             index = 0
             for i in range(len(self.looked)):
-                if self.how_many_food(self.looked[i]) > food_count:
-                    food_count = self.how_many_food(self.looked[i])
+                if self.count_item(self.looked[i], "food") > food_count:
+                    food_count = self.count_item(self.looked[i], "food")
                     index = i
             if food_count > 0:
                 return index, self.looked[index]
@@ -312,7 +284,7 @@ class Player:
         return 0, 0
 
 
-    def  search_object(self, searching_item : list) -> None:
+    def search_object(self, searching_item : list) -> None:
         '''search the object in the tile'''
         correct_tile = self.get_correct_tile(searching_item)
         if correct_tile:
@@ -322,20 +294,8 @@ class Player:
             self.step = 0
 
 
-    def count_player(self, looked: list) -> int:
-        '''count the player in the tile'''
-        count = 0
-        for i in range(len(looked)):
-            if looked[i] == 'player':
-                count += 1
-        return count
-
-
-    def check_requirements(self, requirements: dict) -> bool:
+    def check_requirements(self, requirements: dict) -> int:
         '''check the requirements'''
-        self.get_inventory()
-        self.look()
-        look = self.looked
         for key in requirements:
             if key != 'player' and self.inventory[key] < requirements[key]:
                 return 1
@@ -360,6 +320,9 @@ class Player:
 
     def receive_broadcast(self, message_received) -> None:
         '''receive the broadcast'''
+        if self.survival:
+            print(bcolors.FAIL + "NAN MAIS OHHHHHHHHHHHHHHHH" + bcolors.UNDERLINE + bcolors.ENDC)
+            return
         direction = message_received.split(", ")[0].split(" ")[1]
         message = message_received.split(", ")[1]
         if not message.startswith(self.team):
@@ -367,9 +330,8 @@ class Player:
         ordre = message.split(":")[1]
         lvl = int(message.split("??")[1])
         if ordre.startswith("ON;EVOLUE;OUUU;??") and lvl == self.level:
+            print(bcolors.OKBLUE + "MAMAMIAAAAAAAAAAAAAAAAAAAAA" + bcolors.ENDC)
             self.messages_queue = []
-            if self.inventory['food'] < 6:
-                return
             self.go_to_direction(int(direction))
             self.step = 0
         if ordre.startswith("chui;pret;mon;gars??") and lvl == self.level:
@@ -410,6 +372,10 @@ class Player:
     def get_action(self) -> None:
         '''get the action'''
         if self.inventory['food'] < 6:
+            self.survival = True
+        if self.survival:
+            if self.inventory['food'] >= 15:
+                self.survival = False
             print(bcolors.FAIL + "Player is starving" + bcolors.ENDC)
             self.is_incanting = False
             self.search_object(['food'])
@@ -431,23 +397,25 @@ class Player:
             if reponse.startswith("dead"):
                 print(bcolors.FAIL + "Player is dead" + bcolors.ENDC)
                 self.disconnect(int(42))
-            elif reponse.startswith("[ food"):
+            elif reponse.startswith("[ food") or reponse.startswith("[food"):
                 self.interpret_inventory(reponse)
-            elif reponse.startswith("[ player"):
+            elif reponse.startswith("[ player") or reponse.startswith("[player"):
                 self.interpret_look(reponse)
             elif reponse.startswith("message "):
-                print(bcolors.OKPINK + f"MAMAMAMAMIAAAAAAAAAAAAAAAAA" + bcolors.ENDC)
                 self.receive_broadcast(reponse)
             elif reponse.isnumeric():
                 self.nbr_connect = int(reponse)
             elif reponse.startswith("Current level: "):
                 self.interpret_incantation(reponse)
+            elif reponse.startswith("ko"):
+                self.is_incanting = False
 
 
     def handle_server_sending(self) -> None:
         '''Handle sending messages to the server'''
         if self.step == 0:
             if self.messages_queue:
+                sleep(1)
                 print(bcolors.OKYELLOW + f"Player is sending {self.messages_queue[0]}" + bcolors.ENDC)
                 self.socket.sendall(self.messages_queue[0].encode())
                 self.messages_queue.pop(0)
@@ -462,10 +430,9 @@ class Player:
             self.get_action()
             return
 
-
     def run(self) -> None:
         '''run the player'''
-        while (True):
+        while True:
             print(bcolors.OKBLUE + f"Player {self.team} is lvl {self.level}" + bcolors.ENDC)
             if self.socket.fileno() == -1:
                 self.disconnect(2)
