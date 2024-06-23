@@ -4,8 +4,10 @@
 ** File description:
 ** look
 */
-
 #include "server.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 const char *objects[] = {
     "food",
@@ -45,7 +47,7 @@ static cell_t *mv_gap(cell_t *square, direction_t orientation, int gap)
             square = square->north;
         }
         if (orientation == SOUTH) {
-            square = square->east;
+            square = square->west;
         }
         if (orientation == WEST) {
             square = square->south;
@@ -64,101 +66,113 @@ static cell_t *get_start(player_t *player, int cone_gap, int cone_distance)
     return square;
 }
 
-int count_players_on_square(cell_t *square, server_t *srv)
-{
-    player_t *players = srv->game->players;
-    int players_count = 0;
-
-    while (players) {
-        if (players->square == square) {
-            players_count++;
-        }
-        players = players->next;
-    }
-    return players_count;
-}
-
-static void append_items(char *response, int item_count, const char *item_name)
+static void append_items(char **resp, int item_count, const char *item_name)
 {
     for (int j = 0; j < item_count; j++) {
-        if (strlen(response) > 0) {
-            strcat(response, " ");
+        if (strlen(*resp) > 0) {
+            *resp = realloc(*resp, strlen(*resp) + strlen(" ") + 1);
+            strcat(*resp, " ");
         }
-        strcat(response, item_name);
+        *resp = realloc(*resp, strlen(*resp) + strlen(item_name) + 1);
+        strcat(*resp, item_name);
     }
 }
 
-char *get_square_content(cell_t *square, server_t *srv)
+static char *get_square_content(cell_t *square, server_t *srv)
 {
-    static char response[1024];
+    char *resp = malloc(1);
     int players_count = count_players_on_square(square, srv);
 
-    strcpy(response, "");
+    *resp = '\0';
     while (players_count > 0) {
-        strcat(response, "player");
+        resp = realloc(resp, strlen(resp) + strlen("player") + 1);
+        strcat(resp, "player");
         if (players_count > 1) {
-            strcat(response, " ");
+            resp = realloc(resp, strlen(resp) + strlen(" ") + 1);
+            strcat(resp, " ");
         }
         players_count--;
     }
     for (int i = 0; i < 7; i++) {
-        append_items(response, square->items[i], objects[i]);
+        append_items(&resp, square->items[i], objects[i]);
     }
-    return response;
+    return resp;
 }
 
-static cell_t *move_square_widht(cell_t *square, direction_t orientation)
+char *append_square_content(char *resp, cell_t *square, server_t *srv)
 {
-    if (orientation == NORTH)
-        square = square->west;
-    if (orientation == EAST)
-        square = square->north;
-    if (orientation == SOUTH)
-        square = square->east;
-    if (orientation == WEST)
-        square = square->south;
-    return square;
+    char *sq_tent = get_square_content(square, srv);
+
+    resp = realloc(resp, strlen(resp) + strlen(sq_tent) + 1);
+    strcat(resp, sq_tent);
+    free(sq_tent);
+    return resp;
 }
 
 char *get_ln_squa(player_t *p, int cn_width, cell_t *sq_start, server_t *srv)
 {
-    static char response[1024];
+    char *resp = malloc(1);
     direction_t orientation = p->direction;
     cell_t *square = sq_start;
 
-    strcpy(response, "");
+    *resp = '\0';
     for (int i = 0; i < cn_width; i++) {
-        if (square != NULL)
-            strcat(response, get_square_content(square, srv));
-        if (i != cn_width - 1)
-            strcat(response, ",");
         if (square != NULL) {
-            square = move_square_widht(square, orientation);
+            resp = append_square_content(resp, square, srv);
+        }
+        if (i != cn_width - 1) {
+            resp = add_to_string(resp, ",");
+        }
+        if (square != NULL) {
+            square = move_square_width(square, orientation);
         }
     }
-    return response;
+    return resp;
+}
+
+char *begin_response(char *resp, cell_t *square, server_t *srv)
+{
+    char *sq_cont = get_square_content(square, srv);
+
+    resp = malloc(2);
+    strcpy(resp, "[");
+    resp = realloc(resp, strlen(resp) + strlen(sq_cont) + 1);
+    strcat(resp, sq_cont);
+    free(sq_cont);
+    return resp;
+}
+
+char *look(server_t *srv, connection_t *cl, player_t *player, char *resp)
+{
+    int cone_width = 3;
+    int cone_gap = 1;
+    int cone_distance = 1;
+    cell_t *start_line = NULL;
+    char *li_cont = NULL;
+
+    resp = begin_response(resp, player->square, srv);
+    for (int i = 1; i <= player->level; i++) {
+        start_line = get_start(player, cone_gap, cone_distance);
+        add_to_string(resp, ",");
+        if (start_line != NULL) {
+            li_cont = get_ln_squa(player, cone_width, start_line, srv);
+            resp = add_to_string(resp, li_cont);
+            free(li_cont);
+        }
+        add_vals(&cone_width, &cone_gap, &cone_distance);
+    }
+    resp = add_to_string(resp, "]\n");
+    return resp;
 }
 
 void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
 {
     player_t *player = get_player_by_fd(srv->game->players, cl->fd);
-    static char response[1024];
-    int cone_width = 3;
-    int cone_gap = 1;
-    int cone_distance = 1;
-    cell_t *start_line = NULL;
+    char *resp = NULL;
 
-    strcpy(response, "[");
-    strcat(response, get_square_content(player->square, srv));
-    for (int i = 1; i <= player->level; i++) {
-        start_line = get_start(player, cone_gap, cone_distance);
-        strcat(response, ",");
-        if (start_line != NULL)
-            strcat(response, get_ln_squa(player, cone_width, start_line, srv));
-        cone_width += 2;
-        cone_gap += 1;
-        cone_distance += 1;
-    }
-    strcat(response, "]\n");
-    queue_formatted_message(cl, response);
+    if (player == NULL)
+        return;
+    resp = look(srv, cl, player, resp);
+    queue_formatted_message(cl, resp);
+    free(resp);
 }
