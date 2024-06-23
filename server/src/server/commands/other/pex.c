@@ -9,5 +9,5 @@
 
 void pex(server_t *srv, connection_t *cl, player_t *player)
 {
-    queue_formatted_message(cl, "pex #%d\n", player->id);
+    queue_formatted_message(cl, "pex %d\n", player->id);
 }

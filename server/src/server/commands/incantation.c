@@ -44,7 +44,7 @@ static void players_incantation(server_t *srv, player_t *ply)
     while (tmp != NULL) {
         if (same_square(tmp->square, ply->square)
             && tmp->incantation == false) {
-            broadcast_gui(srv, "pic %d %d %d #%d\n",
+            broadcast_gui(srv, "pic %d %d %d %d\n",
                 tmp->square->pos_x,
                 tmp->square->pos_y, ply->level + 1, ply->id);
             tmp->incantation = true;

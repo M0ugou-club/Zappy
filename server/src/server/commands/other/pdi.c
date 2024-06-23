@@ -9,5 +9,5 @@
 
 void pdi(server_t *srv, connection_t *cl, player_t *player)
 {
-    queue_formatted_message(cl, "pdi #%d\n", player->id);
+    queue_formatted_message(cl, "pdi %d\n", player->id);
 }
