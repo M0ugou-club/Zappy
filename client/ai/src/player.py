@@ -122,15 +122,20 @@ class Player:
     ##IPC functions
 
     def receive(self, checks: bool = True) -> str:
+        print("I RECEIVE SOMETHING")
         msg = self.socket.recv(1024).decode()
         if not msg.endswith("\n"):
             msg += self.receive()
         if checks:
-            if "message" in msg:
-                self.broadcasts.append(msg)
-                return self.receive()
-            if "dead" in msg:
-                self.disconnect(0)
+            messages = msg.split("\n")
+            for message in messages:
+                if "message" in message:
+                    self.broadcasts.append(message)
+                    self.receive()
+                elif "dead" in message:
+                    self.disconnect(0)
+                else:
+                    return message
         return msg
 
 
@@ -226,7 +231,7 @@ class Player:
         res = self.receive().strip()
         res = res[1:-1]
         res = ' '.join(res.split())
-        res = res.replace(" ,", ",").replace(", ", ",")
+        res = res.replace(" ,", ",").replace(", ", ",").replace(",,", ",").strip(",")
         res = res.replace(" ", "=")
         self.inventory.update(eval(f"dict({res})"))
 
@@ -400,8 +405,9 @@ class Player:
             print(bcolors.FAIL + "Player is starving" + bcolors.ENDC)
             self.search_object(['food'])
             return
-        for message in self.broadcasts:
-            self.receive_broadcast(message)
+        if (self.broadcasts):
+            self.receive_broadcast(self.broadcasts[-1])
+            self.broadcasts.clear()
         if self.mode == self.Mode.EXPEDITION:
             self.action = self.check_requirements(self.LEVEL_REQUIREMENTS[self.level])
             self.incantation_gestion()
