@@ -12,11 +12,8 @@
 
 char *add_to_string(char *resp, char *li_cont)
 {
-    printf("resp ass: %s\n", resp);
-    printf("li_cont ass: %s\n", li_cont);
     resp = realloc(resp, strlen(resp) + strlen(li_cont) + 1);
     strcat(resp, li_cont);
-    printf("resultat du caca: %S\n", resp);
     return resp;
 }
 

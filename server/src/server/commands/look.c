@@ -121,7 +121,7 @@ char *get_ln_squa(player_t *p, int cn_width, cell_t *sq_start, server_t *srv)
             resp = append_square_content(resp, square, srv);
         }
         if (i != cn_width - 1) {
-            resp = add_to_string(resp, ",");
+            resp = add_to_string(resp, ", ");
         }
         if (square != NULL) {
             square = move_square_width(square, orientation);
@@ -134,7 +134,6 @@ char *begin_response(char *resp, cell_t *square, server_t *srv)
 {
     char *sq_cont = get_square_content(square, srv);
 
-    printf("sq_cont: %s\n", sq_cont);
     resp = realloc(resp, strlen(resp) + strlen(sq_cont) + 1);
     strcat(resp, sq_cont);
     free(sq_cont);
@@ -150,15 +149,12 @@ char *look(server_t *srv, connection_t *cl, player_t *player, char *resp)
     char *li_cont = NULL;
 
     resp = begin_response(resp, player->square, srv);
-    printf("resp: %s\n", resp);
     for (int i = 1; i <= player->level; i++) {
         start_line = get_start(player, cone_gap, cone_distance);
-        add_to_string(resp, ",");
-        printf("resp2: %s\n", resp);
+        resp = add_to_string(resp, ", ");
         if (start_line != NULL) {
             li_cont = get_ln_squa(player, cone_width, start_line, srv);
             resp = add_to_string(resp, li_cont);
-            printf("resp3: %s\n", resp);
             free(li_cont);
         }
         add_vals(&cone_width, &cone_gap, &cone_distance);
@@ -175,8 +171,63 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
     if (player == NULL)
         return;
     resp = malloc(3 * sizeof(char));
-    resp = strcpy(resp, "[ ");
+    resp = strcpy(resp, "[");
     resp = look(srv, cl, player, resp);
+    printf("\033[0;37m");
+    printf("[LOOK]:", resp);
+    printf("\033[0m");
+    printf("\033[0;34m");
+    printf("%s", resp);
+    printf("\033[0m");
     queue_formatted_message(cl, resp);
     free(resp);
 }
+
+/* void print_all_cells(cell_t *square)
+// {
+//     printf("Square: %d %d\n", square->pos_x, square->pos_y);
+//     printf("Items: ");
+//     for (int i = 0; i < 7; i++) {
+//         printf("%d ", square->items[i]);
+//     }
+//     printf("\n");
+// }
+
+// void print_cell(cell_t *square)
+// {
+//     printf("Square: %d %d\n", square->pos_x, square->pos_y);
+//     printf("Items: ");
+//     for (int i = 0; i < 7; i++) {
+//         printf("%d ", square->items[i]);
+//     }
+//     printf("\n");
+// }
+
+
+//     print_all_cells(player->square);
+
+//     if (player->direction == NORTH) {
+//         printf("NORTH\n");
+//         print_all_cells(player->square->north->west);
+//         print_cell(player->square->north);
+//         print_all_cells(player->square->north->east);
+//     }
+//     if (player->direction == EAST) {
+//         printf("EAST\n");
+//         print_all_cells(player->square->north->east);
+//         print_cell(player->square->east);
+//         print_all_cells(player->square->south->east);
+//     }
+//     if (player->direction == SOUTH) {
+//         printf("SOUTH\n");
+//         print_all_cells(player->square->south->east);
+//         print_cell(player->square->south);
+//         print_all_cells(player->square->south->west);
+//     }
+//     if (player->direction == WEST) {
+//         printf("WEST\n");
+//         print_all_cells(player->square->south->west);
+//         print_cell(player->square->west);
+//         print_all_cells(player->square->north->west);
+//     }
+*/
