@@ -181,8 +181,9 @@ class Player:
             if "Current level" in res:
                 self.level += 1
                 self.mode = self.Mode.EXPEDITION
-        else:
-            return
+                if self.connect_nbr() <= 0:
+                    self.fork()
+        self.player_ready = 1
 
 
     def broadcast(self, message : str) -> None:
@@ -310,7 +311,9 @@ class Player:
         '''search the object in the tile'''
         print(bcolors.OKGREEN + f"Player is looking for f{self.looked}" + bcolors.ENDC)
         self.look()
+        print(self.looked)
         correct_tile = self.get_correct_tile(searching_item)
+        print(correct_tile)
         if correct_tile:
             self.go_to(correct_tile[1], self.get_pos(correct_tile[0]), searching_item)
         else:
@@ -343,10 +346,6 @@ class Player:
 
     def receive_broadcast(self, message_received) -> None:
         '''receive the broadcast'''
-        if self.survival:
-            return
-        if self.inventory['food'] < 6:
-            return
         direction = message_received.split(", ")[0].split(" ")[1]
         message = message_received.split(", ")[1]
         if not message.startswith(self.team):
@@ -354,7 +353,6 @@ class Player:
         ordre = message.split(":")[1]
         lvl = int(message.split("??")[1])
         if ordre.startswith("ON;EVOLUE;OUUU;??") and lvl == self.level:
-            self.messages_queue = []
             self.go_to_direction(int(direction))
         if ordre.startswith("chui;pret;mon;gars??") and lvl == self.level:
             self.player_ready += 1
@@ -395,12 +393,15 @@ class Player:
         self.get_inventory()
         if self.inventory['food'] < 6:
             self.mode = self.Mode.SURVIVAL
+            self.player_ready = 1
         if self.mode == self.Mode.SURVIVAL:
             if self.inventory['food'] >= 15:
                 self.mode = self.Mode.EXPEDITION
             print(bcolors.FAIL + "Player is starving" + bcolors.ENDC)
             self.search_object(['food'])
             return
+        for message in self.broadcasts:
+            self.receive_broadcast(message)
         if self.mode == self.Mode.EXPEDITION:
             self.action = self.check_requirements(self.LEVEL_REQUIREMENTS[self.level])
             self.incantation_gestion()
