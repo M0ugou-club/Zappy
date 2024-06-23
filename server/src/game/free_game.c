@@ -13,12 +13,24 @@ static void free_eggs(cell_t *square)
 
     if (!square->eggs)
         return;
-    while (square->eggs[idx]->id != -1) {
+    while (square->eggs[idx]) {
         free(square->eggs[idx]);
         idx++;
     }
     free(square->eggs[idx]);
     free(square->eggs);
+}
+
+void free_players(game_t *game)
+{
+    player_t *ply = game->players;
+    player_t *next = NULL;
+
+    while (ply) {
+        next = ply->next;
+        free(ply);
+        ply = next;
+    }
 }
 
 void free_game(game_t *game)
@@ -30,6 +42,6 @@ void free_game(game_t *game)
     }
     free(game->map);
     free(game->max_items);
-    free(game->players);
+    free_players(game);
     free(game);
 }

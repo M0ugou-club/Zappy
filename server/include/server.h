@@ -19,6 +19,7 @@
 
     #define CMD_SUCCESS "ok\n"
     #define CMD_ERROR "ko\n"
+    #define GRAPHIC_TEAM "GRAPHIC"
 
     #include <unistd.h>
     #include <stdlib.h>
@@ -105,6 +106,7 @@ void execute_connections(server_t *srv);
 void disconnect_players(server_t *srv);
 void execute_ai_commands(server_t *srv);
 void player_enqueue(connection_t *cl, char *cmd);
+char *player_dequeue(connection_t *cl);
 
 void queue_message(connection_t *conn, char *msg);
 void queue_formatted_message(connection_t *conn, const char *fmt, ...);

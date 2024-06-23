@@ -60,10 +60,11 @@ static void execute_client(connection_t *cli, server_t *srv)
 
     if (cmd == NULL || cli->team == NULL)
         return;
-    if (strcmp(cli->team, "GRAPHIC") == 0)
+    if (strcmp(cli->team, GRAPHIC_TEAM) == 0)
         execute_graphical(cmd, cli->fd, srv);
     else
         player_enqueue(cli, cmd);
+    free(cmd);
 }
 
 void execute_connections(server_t *srv)

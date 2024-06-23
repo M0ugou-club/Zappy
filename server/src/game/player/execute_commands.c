@@ -24,7 +24,7 @@ static const command_regex_t AI_COMMANDS[] = {
     {NULL, 0.0f, NULL}
 };
 
-static char *player_dequeue(connection_t *cl)
+char *player_dequeue(connection_t *cl)
 {
     char *cmd = NULL;
 
@@ -42,22 +42,22 @@ static void execute_ai_command(server_t *srv, connection_t *cl,
     player_t *ply, char *cmd)
 {
     int regex_ret = 0;
-    regex_t *regex = malloc(sizeof(regex_t));
+    regex_t regex;
     regex_parse_t parse = {0};
 
     parse.str = cmd;
     memset(parse.pmatch, 0, sizeof(parse.pmatch));
     for (int i = 0; AI_COMMANDS[i].command != NULL; i++) {
-        regex_ret = regcomp(regex, AI_COMMANDS[i].command, REG_EXTENDED);
-        regex_ret = regexec(regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
+        regex_ret = regcomp(&regex, AI_COMMANDS[i].command, REG_EXTENDED);
+        regex_ret = regexec(&regex, cmd, MAX_REGEX_MATCHES, parse.pmatch, 0);
         if (regex_ret == 0) {
             AI_COMMANDS[i].func(srv, cl, &parse);
             set_cooldown(&ply->action_cooldown,
                 AI_COMMANDS[i].time / srv->args->frequency);
-            regfree(regex);
+            regfree(&regex);
             return;
         }
-        regfree(regex);
+        regfree(&regex);
     }
     SEND_FD(ply->fd, CMD_ERROR);
 }

@@ -38,7 +38,6 @@ void remove_connection(connection_t **cl, int sockfd)
     prev->next = tmp->next;
     close(tmp->fd);
     free(tmp->buffer);
-    free(tmp->team);
     free(tmp->send_queue);
     free(tmp);
 }

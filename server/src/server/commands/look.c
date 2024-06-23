@@ -72,6 +72,7 @@ static char *append_string(char *dst, const char *src)
     if (dst)
         strcpy(res, dst);
     strcat(res, src);
+    free(dst);
     return res;
 }
 
@@ -88,6 +89,7 @@ static char *append_object(char *dst, const char *object, size_t count)
         strcat(res, object);
         strcat(res, " ");
     }
+    free(dst);
     return res;
 }
 
@@ -110,12 +112,15 @@ static char *do_cells(size_t j, size_t i, server_t *srv, player_t *ply)
 {
     cell_t *cell = ply->square;
     char *res = NULL;
+    char *contents = NULL;
 
     for (size_t k = 0; k < j; k++)
         cell = go_forward(ply->direction, cell);
     for (size_t k = 0; k < i; k++)
         cell = go_left(ply->direction, cell);
-    res = append_string(res, get_contents(srv, cell));
+    contents = get_contents(srv, cell);
+    res = append_string(res, contents);
+    free(contents);
     if (i != ply->level || j != (i * 2))
         res = append_string(res, ",");
     return res;
@@ -126,12 +131,16 @@ void cmd_look(server_t *srv, connection_t *cl, regex_parse_t *parse)
     player_t *ply = get_player_by_fd(srv->game->players, cl->fd);
     size_t rows = ply->level;
     char *res = strdup("[");
+    char *cells = NULL;
 
     if (ply == NULL)
         return;
     for (size_t i = 0; i <= rows; i++)
-        for (size_t j = 0; j < (i * 2) + 1; j++)
-            res = append_string(res, do_cells(j, i, srv, ply));
+        for (size_t j = 0; j < (i * 2) + 1; j++) {
+            cells = do_cells(j, i, srv, ply);
+            res = append_string(res, cells);
+            free(cells);
+        }
     res = append_string(res, "]\n");
     queue_formatted_message(cl, res);
     free(res);

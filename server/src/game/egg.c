@@ -47,23 +47,19 @@ void add_egg(cell_t *square, char *team_name)
 
 void del_egg(cell_t *square, char *team_name)
 {
-    int i = 0;
-    int nb_eggs = 0;
-
-    if (square->eggs == NULL)
+    if (!check_egg(square, team_name)) {
+        printf("ERROR: Egg of team %s not found!\n", team_name);
         return;
-    for (i = 0; square->eggs[i]; i++) {
+    }
+    for (int i = 0; square->eggs[i]; i++) {
         if (strcmp(square->eggs[i]->team, team_name) == 0) {
-            square->eggs[i] = NULL;
+            free(square->eggs[i]);
+            for (int j = i; square->eggs[j]; j++) {
+                square->eggs[j] = square->eggs[j + 1];
+            }
             break;
         }
     }
-    for (nb_eggs = 0; square->eggs[nb_eggs]; nb_eggs++);
-    for (int j = i; square->eggs[j]; j++) {
-        square->eggs[j] = square->eggs[j + 1];
-    }
-    if (nb_eggs)
-        square->eggs = realloc(square->eggs, sizeof(egg_t *) * (nb_eggs));
 }
 
 bool check_egg(cell_t *square, char *team_name)
