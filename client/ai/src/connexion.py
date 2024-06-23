@@ -51,15 +51,15 @@ def main():
     '''Main function to handle client connection and communication.'''
     print("Client started")
     info = [get_port(), get_name(), get_machine()]
-    IA1 = player.Player(info[1], info[2], info[0])
+    ia = player.Player(info[1], info[2], info[0])
 
     try:
-        IA1.connect()
-        IA1.run()
+        ia.connect()
+        ia.run()
     except socket.error as e:
         print(f"Error: {e}")
     finally:
-        IA1.disconnect(0)
+        ia.disconnect(0)
 
 
 if __name__ == "__main__":

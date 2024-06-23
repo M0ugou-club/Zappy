@@ -1,3 +1,5 @@
+''' AI for the Zappy project '''
+
 import random
 import socket
 import subprocess
@@ -22,6 +24,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 class Player:
+    '''Player class'''
     def __init__(self, team, machine, port):
         self.team = team
         self.level = 1
@@ -35,7 +38,7 @@ class Player:
         self.step = 0
         self.action = 0
         self.team_mates = 0
-        self.MTopt = False
+        self.mtopt = False
         self.nbr_connect = 0
         self.inventory = {
             'food': 10,
@@ -110,7 +113,6 @@ class Player:
         lambda self: (self.right(), self.forward(), self.left(), self.forward())
     ]
 
-
     messages_queue = []
 
 
@@ -125,14 +127,17 @@ class Player:
         '''turn right'''
         self.messages_queue.append("Right\n")
 
+
     def left(self) -> None:
         '''turn left'''
         self.messages_queue.append("Left\n")
+
 
     def take(self, object : str) -> None:
         '''take object'''
         self.messages_queue.append(f"Take {object}\n")
         self.step = 0
+
 
     def interpret_look(self, response : str) -> None:
         '''interpret the look response'''
@@ -142,10 +147,9 @@ class Player:
         self.looked = [cell.split(' ') for cell in response]
 
 
-    def look(self) -> list:
+    def look(self) -> None:
         '''look around the player'''
         response = self.messages_queue.append("Look\n")
-        return response
 
 
     def interpret_incantation(self, response : str) -> None:
@@ -155,7 +159,7 @@ class Player:
         self.is_incanting = False
         self.level = int(response[1])
         self.player_ready = 1
-        if (self.nbr_connect == 0):
+        if self.nbr_connect == 0:
             self.fork()
 
 
@@ -169,33 +173,26 @@ class Player:
         '''broadcast a message'''
         self.messages_queue.append(f"Broadcast {message}\n")
 
+
     def connect_nbr(self) -> None:
         '''connect the player'''
         self.messages_queue.append("Connect_nbr\n")
+
 
     def fork(self) -> None:
         '''fork the player'''
         self.messages_queue.append("Fork\n")
 
+
     def eject(self) -> None:
         '''eject the player'''
         self.messages_queue.append("Eject\n")
+
 
     def set_object(self, object : str) -> None:
         '''set object'''
         self.messages_queue.append(f"Set {object}\n")
 
-    def check_dict_inventory(self, key : str) -> bool:
-        '''check the inventory'''
-        return key in [
-            "food",
-            "linemate",
-            "deraumere",
-            "sibur",
-            "mendiane",
-            "phiras",
-            "thystame"
-        ]
 
     def interpret_inventory(self, response : str) -> None:
         '''interpret the inventory response'''
@@ -210,8 +207,8 @@ class Player:
         '''get the inventory'''
         self.messages_queue.append("Inventory\n")
 
-    ##AI functions
 
+    ##AI functions
 
     def go_to_direction(self, direction : int) -> None:
         '''go to the direction given in parameter'''
@@ -287,7 +284,7 @@ class Player:
         return 0, 0
 
 
-    def  search_object(self, searching_item : list) -> None:
+    def search_object(self, searching_item : list) -> None:
         '''search the object in the tile'''
         correct_tile = self.get_correct_tile(searching_item)
         if correct_tile:
@@ -297,20 +294,8 @@ class Player:
             self.step = 0
 
 
-    def count_player(self, looked: list) -> int:
-        '''count the player in the tile'''
-        count = 0
-        for i in range(len(looked)):
-            if looked[i] == 'player':
-                count += 1
-        return count
-
-
-    def check_requirements(self, requirements: dict) -> bool:
+    def check_requirements(self, requirements: dict) -> int:
         '''check the requirements'''
-        self.get_inventory()
-        self.look()
-        look = self.looked
         for key in requirements:
             if key != 'player' and self.inventory[key] < requirements[key]:
                 return 1
@@ -447,7 +432,7 @@ class Player:
 
     def run(self) -> None:
         '''run the player'''
-        while (True):
+        while True:
             print(bcolors.OKBLUE + f"Player {self.team} is lvl {self.level}" + bcolors.ENDC)
             if self.socket.fileno() == -1:
                 self.disconnect(2)
