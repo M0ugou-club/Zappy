@@ -134,19 +134,12 @@ class Player:
         self.messages_queue.append(f"Take {object}\n")
         self.step = 0
 
-    def interpret_look(self, response : str) -> list:
+    def interpret_look(self, response : str) -> None:
         '''interpret the look response'''
         response = response[1:-1]
         response = response.split(',')
-        for i in range(len(response)):
-            if (response[i][0] == ' '):
-                response[i] = response[i][1:]
-            response[i] = response[i].split(' ')
-        for i in range(len(response)):
-            if response[i] == ['']:
-                response[i] = []
-        self.looked = response
-        return response
+        response = [cell.strip() for cell in response]
+        self.looked = [cell.split(' ') for cell in response]
 
 
     def look(self) -> list:
@@ -204,23 +197,13 @@ class Player:
             "thystame"
         ]
 
-    def interpret_inventory(self, response : str) -> dict:
+    def interpret_inventory(self, response : str) -> None:
         '''interpret the inventory response'''
-        response = response[1:-2]
-        response = response.split(',')
-        for i in range(len(response) - 1):
-            if (response[i][0] == ' '):
-                response[i] = response[i][1:]
-        inventory = {}
-        for i in range(len(response) - 1):
-            response[i] = response[i].split(' ')
-            if self.check_dict_inventory(response[i][0]):
-                inventory[response[i][0]] = int(response[i][1])
-            else:
-                key = response[i][0]
-                inventory[key[3:]] = int(response[i][1])
-        self.inventory.update(inventory)
-        return inventory
+        response = response[1:-1]
+        response = ' '.join(response.split())
+        response = response.replace(" ,", ",").replace(", ", ",")
+        response = response.replace(" ", "=")
+        self.inventory.update(eval(f"dict({response})"))
 
 
     def get_inventory(self) -> None:
@@ -432,7 +415,6 @@ class Player:
             elif reponse.startswith("[ food") or reponse.startswith("[food"):
                 self.interpret_inventory(reponse)
             elif reponse.startswith("[ player") or reponse.startswith("[player"):
-                print(bcolors.OKGREEN + reponse + bcolors.ENDC)
                 self.interpret_look(reponse)
             elif reponse.startswith("message "):
                 self.receive_broadcast(reponse)
