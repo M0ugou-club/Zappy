@@ -19,8 +19,8 @@
 
 typedef enum direction_e {
     NORTH = 1,
-    SOUTH = 2,
-    EAST = 3,
+    EAST = 2,
+    SOUTH = 3,
     WEST = 4
 } direction_t;
 
